@@ -1,0 +1,19 @@
+#reference: cse477
+version: "3.8"
+services:
+  flask-app:
+    container_name: urban-science-container_flask-app
+    # indicates that `Dockerfile-dev` should be used for local instantiations
+    build:
+        context: .
+        dockerfile: Dockerfile-dev
+    stdin_open: true
+    tty: true
+    ports:
+      - "8080:8080"
+    # mounts the local directory to docker container as a volume
+    volumes:
+      - .:/app
+
+
+  

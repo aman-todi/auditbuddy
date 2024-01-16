@@ -1,4 +1,3 @@
-#reference: cse477
 FROM ubuntu:20.04
 
 # update ubuntu

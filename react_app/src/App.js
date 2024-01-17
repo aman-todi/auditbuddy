@@ -1,5 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
+import $ from 'jquery';
+
 
 // example component
 function MyButton() {
@@ -13,6 +15,24 @@ function MyButton() {
 // example function
 function Test() {
   document.getElementById("test").innerText = "this button does something";
+}
+
+// example ajax request
+function RequestButton() {
+  return (
+    <button onClick={Request}> 
+    send a request
+    </button>
+  );
+}
+function Request() {
+  $.ajax({
+    url: "/test",
+    type: "GET",
+    success: function(returned_data) {
+      document.getElementById("request").innerText = returned_data.test
+    }
+  });
 }
 
 function App() {
@@ -34,6 +54,8 @@ function App() {
 
         <MyButton />
         <p id="test"></p>
+        <RequestButton/>
+        <p id="request"></p>
 
 
       </header>

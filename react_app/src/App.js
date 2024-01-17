@@ -1,14 +1,34 @@
+import React, { useRef } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import $ from 'jquery';
 
 
-// example component
-function MyButton() {
+// Define a function for Importing Videos called VideoImportButton
+function VideoImportButton() {
+
+  // Create a reference to the file input element
+  // Will be updated later with current property
+  // https://react.dev/reference/react/useRef
+  const fileInputRef = useRef(null);
+
+  // Define a function to be called when the button is clicked
+  const handleClick = () => {
+    // Trigger the click event of the file input programmatically
+    fileInputRef.current.click();
+  };
+
+  // Render the VideoImportButton component
   return (
-    <button onClick={Test}>
-      I'm a button part two
-    </button>
+    <div>
+      <input
+        type="file"
+        accept="video/*"
+        ref={fileInputRef} // Attach the file input reference to the useRef hook
+        style={{ display: 'none' }} // Hide the file input on a visual level
+      />
+      <button onClick={handleClick}>Import Video</button>
+    </div>
   );
 }
 
@@ -20,8 +40,8 @@ function Test() {
 // example ajax request
 function RequestButton() {
   return (
-    <button onClick={Request}> 
-    send a request
+    <button onClick={Request}>
+      send a request
     </button>
   );
 }
@@ -29,7 +49,7 @@ function Request() {
   $.ajax({
     url: "/test",
     type: "GET",
-    success: function(returned_data) {
+    success: function (returned_data) {
       document.getElementById("request").innerText = returned_data.test
     }
   });
@@ -52,9 +72,9 @@ function App() {
           Learn React
         </a>
 
-        <MyButton />
+        <VideoImportButton />
         <p id="test"></p>
-        <RequestButton/>
+        <RequestButton />
         <p id="request"></p>
 
 

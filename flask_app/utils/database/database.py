@@ -1,3 +1,4 @@
+# setup the database
 import mysql.connector
 import glob
 import json

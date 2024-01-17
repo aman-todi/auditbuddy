@@ -4,10 +4,15 @@ import './App.css';
 // example component
 function MyButton() {
   return (
-    <button action="/test" method="post">
+    <button onClick={Test}>
       I'm a button part two
     </button>
   );
+}
+
+// example function
+function Test() {
+  document.getElementById("test").innerText = "this button does something";
 }
 
 function App() {
@@ -28,6 +33,7 @@ function App() {
         </a>
 
         <MyButton />
+        <p id="test"></p>
 
 
       </header>

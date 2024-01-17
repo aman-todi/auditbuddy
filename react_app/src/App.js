@@ -5,7 +5,7 @@ import './App.css';
 function MyButton() {
   return (
     <button action="/test" method="post">
-      I'm a button
+      I'm a button part two
     </button>
   );
 }
@@ -26,8 +26,8 @@ function App() {
         >
           Learn React
         </a>
-        
-        <MyButton/>
+
+        <MyButton />
 
 
       </header>

@@ -4,14 +4,15 @@ import './App.css';
 import $ from 'jquery';
 import axios from 'axios';
 
-
 // Define a function for Importing Videos called VideoImportButton
 function VideoImportButton() {
   const fileInputRef = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [fileName, setFileName] = useState(''); // State to store the file name
 
   const handleFileChange = (event) => {
-      setSelectedFile(event.target.files[0]);
+    setSelectedFile(event.target.files[0]);
+    setFileName(event.target.files[0] ? event.target.files[0].name : ''); // Update the file name
   };
 
   const handleUpload = async () => {
@@ -30,6 +31,8 @@ function VideoImportButton() {
               }
           });
           alert(`File uploaded successfully: ${response.data.filename}`);
+          setFileName(''); // Reset the file name after successful upload
+          setSelectedFile(null); // Reset the selected file as well
       } 
       catch (error) {
           if (error.response) {
@@ -42,7 +45,7 @@ function VideoImportButton() {
               console.error('Error request:', error.request);
               alert('Error uploading file: No response from server');
           } else {
-              // Something happened in setting up the request that triggered an error
+              // Something happened in setting up the request that triggered an Error
               console.error('Error message:', error.message);
               alert('Error uploading file');
           }
@@ -50,11 +53,12 @@ function VideoImportButton() {
   };
 
   return (
-      <div>
-          <input type="file" onChange={handleFileChange} ref={fileInputRef} style={{ display: 'none' }} />
-          <button onClick={() => fileInputRef.current.click()}>Select Video</button>
-          <button onClick={handleUpload}>Upload Video</button>
-      </div>
+    <div>
+        <input type="file" onChange={handleFileChange} ref={fileInputRef} style={{ display: 'none' }} />
+        <button onClick={() => fileInputRef.current.click()}>Select Video</button>
+        <button onClick={handleUpload}>Upload Video</button>
+        {fileName && <div className="file-name-box">Selected file: {fileName}</div>}
+    </div>
   );
 }
 

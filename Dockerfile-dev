@@ -14,7 +14,7 @@ RUN service mysql start && mysql -e "CREATE USER 'master'@'localhost' IDENTIFIED
 RUN apt -y install python3-pip
 RUN apt -y install vim
 RUN mkdir /app
-COPY . /app
+COPY . /app 
 WORKDIR /app
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt

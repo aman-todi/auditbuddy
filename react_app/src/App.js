@@ -1,34 +1,60 @@
-import React, { useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import $ from 'jquery';
+import axios from 'axios';
 
 
 // Define a function for Importing Videos called VideoImportButton
 function VideoImportButton() {
-
-  // Create a reference to the file input element
-  // Will be updated later with current property
-  // https://react.dev/reference/react/useRef
   const fileInputRef = useRef(null);
+  const [selectedFile, setSelectedFile] = useState(null);
 
-  // Define a function to be called when the button is clicked
-  const handleClick = () => {
-    // Trigger the click event of the file input programmatically
-    fileInputRef.current.click();
+  const handleFileChange = (event) => {
+      setSelectedFile(event.target.files[0]);
   };
 
-  // Render the VideoImportButton component
+  const handleUpload = async () => {
+      if (!selectedFile) {
+          alert('Please select a file to upload.');
+          return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+
+      try {
+          const response = await axios.post('http://localhost:8080/upload-video', formData, {
+              headers: {
+                  'Content-Type': 'multipart/form-data'
+              }
+          });
+          alert(`File uploaded successfully: ${response.data.filename}`);
+      } 
+      catch (error) {
+          if (error.response) {
+              // The request was made and the server responded with a status code
+              // that falls out of the range of 2xx
+              console.error('Error response:', error.response.data);
+              alert(`Error uploading file: ${error.response.data.error}`);
+          } else if (error.request) {
+              // The request was made but no response was received
+              console.error('Error request:', error.request);
+              alert('Error uploading file: No response from server');
+          } else {
+              // Something happened in setting up the request that triggered an error
+              console.error('Error message:', error.message);
+              alert('Error uploading file');
+          }
+      }
+  };
+
   return (
-    <div>
-      <input
-        type="file"
-        accept="video/*"
-        ref={fileInputRef} // Attach the file input reference to the useRef hook
-        style={{ display: 'none' }} // Hide the file input on a visual level
-      />
-      <button onClick={handleClick}>Import Video</button>
-    </div>
+      <div>
+          <input type="file" onChange={handleFileChange} ref={fileInputRef} style={{ display: 'none' }} />
+          <button onClick={() => fileInputRef.current.click()}>Select Video</button>
+          <button onClick={handleUpload}>Upload Video</button>
+      </div>
   );
 }
 

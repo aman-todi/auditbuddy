@@ -3,6 +3,8 @@ import logo from './logo.svg';
 import './App.css';
 import $ from 'jquery';
 import axios from 'axios';
+import * as MaterialUI from './MaterialUI';
+import NavBar from './MaterialUI';
 
 // Define a function for Importing Videos called VideoImportButton
 function VideoImportButton() {
@@ -55,26 +57,22 @@ function VideoImportButton() {
   return (
     <div>
         <input type="file" onChange={handleFileChange} ref={fileInputRef} style={{ display: 'none' }} />
-        <button onClick={() => fileInputRef.current.click()}>Select Video</button>
-        <button onClick={handleUpload}>Upload Video</button>
+        <MaterialUI.CustomButton onClick={() => fileInputRef.current.click()}>Select Video</MaterialUI.CustomButton>
+        <MaterialUI.CustomButton variant="contained" onClick={handleUpload}>Upload Video</MaterialUI.CustomButton>
         {fileName && <div className="file-name-box">Selected file: {fileName}</div>}
     </div>
   );
 }
 
-// example function
-function Test() {
-  document.getElementById("test").innerText = "this button does something";
-}
-
 // example ajax request
 function RequestButton() {
   return (
-    <button onClick={Request}>
+    <MaterialUI.CustomButton variant="contained" onClick={Request}>
       send a request
-    </button>
+    </MaterialUI.CustomButton>
   );
 }
+
 function Request() {
   $.ajax({
     url: "/test",
@@ -88,19 +86,11 @@ function Request() {
 function App() {
   return (
     <div className="App">
+      <NavBar/>
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
         <p>
-          Team Urban Science
+          Video Upload
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
 
         <VideoImportButton />
         <p id="test"></p>

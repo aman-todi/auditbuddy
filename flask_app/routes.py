@@ -10,10 +10,6 @@ from werkzeug.utils import secure_filename
 
 @app.route('/')
 def root():
-	return redirect('/home')
-
-@app.route('/home')
-def home():
 	return render_template('index.html')
 
 @app.route('/test')

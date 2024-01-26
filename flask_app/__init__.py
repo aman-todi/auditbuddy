@@ -16,6 +16,9 @@ def create_app():
                   static_folder='../react_app/build',
                   template_folder='../react_app/build')
 	CORS(app)
+
+	api_key_path = os.path.join(app.root_path, 'static', 'main', 'config', "valued-range-411422-d36068bfa11f.json")
+	os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = api_key_path
 	
 	from .utils.database.database import database
 	db = database()

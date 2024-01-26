@@ -24,7 +24,7 @@ def deploy_cvision_tools(path_to_video):
     cap = cv2.VideoCapture(path_to_video)
 
     frame_counter = 0
-    display_frequency = 20  # Set the frequency of frames to save
+    display_frequency = 40  # Set the frequency of frames to save
 
     while True:
         ret, frame = cap.read()

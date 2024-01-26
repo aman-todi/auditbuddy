@@ -30,8 +30,8 @@ class CarDetector:
                 scores = detection[5:]
                 class_id = np.argmax(scores)
                 confidence = scores[class_id]
-                # Check if detection is of a car and meets the confidence threshold
-                if confidence > self.confidence_threshold and class_id == 2:
+                # Check if detection is of a car (id 2) or truck (id 7) and meets the confidence threshold
+                if confidence > self.confidence_threshold and (class_id == 2 or class_id == 7):
                     # Calculate bounding box coordinates
                     center_x = int(detection[0] * width)
                     center_y = int(detection[1] * height)
@@ -45,10 +45,6 @@ class CarDetector:
 
         # Apply Non-Maximum Suppression to filter overlapping boxes
         indices = cv2.dnn.NMSBoxes(boxes, confidences, self.confidence_threshold, self.nms_threshold)
-
-        # If indices is a NumPy array, convert it to a list
-        if isinstance(indices, np.ndarray):
-            indices = indices.tolist()
 
         # Use list comprehension to filter car boxes based on class ID
         car_boxes = [boxes[i] for i in indices if class_ids[i] == 2]  # Filter out non-car objects

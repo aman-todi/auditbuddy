@@ -3,7 +3,7 @@
 import numpy as np
 
 class Tracker:
-    def __init__(self, distance_threshold=150):
+    def __init__(self, distance_threshold=145):
         self.next_id = 0
         self.objects = {}  # Stores object ID and its centroid
         self.distance_threshold = distance_threshold  # Threshold for considering object as matched

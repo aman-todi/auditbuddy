@@ -34,9 +34,6 @@ def upload_video():
         filename = secure_filename(file.filename)
         save_path = os.path.join(app.root_path, 'static', 'main', 'videos', filename)
         file.save(save_path)
-        
-        # extending beyond just returning file uploaded successfully OR put this at the end
-        # return jsonify({'message': 'File uploaded successfully', 'filename': filename}), 200
 
 
         # Analyse the uploaded video and delete it after
@@ -46,4 +43,5 @@ def upload_video():
             # Delete the video after analysing it
             os.remove(save_path)
 
+		# Will be changed later to say results processing or something
         return jsonify({'message': 'File uploaded successfully', 'filename': filename}), 200

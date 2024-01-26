@@ -24,9 +24,7 @@ def deploy_cvision_tools(path_to_video):
     cap = cv2.VideoCapture(path_to_video)
 
     frame_counter = 0
-    display_frequency = 40  # Set the frequency of frames to save
-
-    total_car_count = 0
+    display_frequency = 20  # Set the frequency of frames to save
 
     while True:
         ret, frame = cap.read()
@@ -41,7 +39,7 @@ def deploy_cvision_tools(path_to_video):
         tracker.update(car_boxes)
 
         # Draw bounding boxes and save the frame only if the counter matches the display frequency
-        if frame_counter % display_frequency == 0:
+        if frame_counter % display_frequency == 0 or frame_counter == 1:
             for box in car_boxes:
                 x, y, w, h = box
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)

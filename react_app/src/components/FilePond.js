@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { FilePond } from 'react-filepond';
+// filepond
+import { FilePond} from 'react-filepond';
 import 'filepond/dist/filepond.min.css';
+// material ui
 import * as MaterialUI from './MaterialUI';
+// axios
 import axios from 'axios';
 
 const FilePondImageImport = () => {
@@ -53,8 +56,9 @@ const FilePondImageImport = () => {
     return (
       <div>
         <FilePond
-          allowMultiple={false}
-          onupdatefiles={handleFileAdded}
+            allowMultiple={false}
+
+            onupdatefiles={handleFileAdded}
         />
         <MaterialUI.CustomButton onClick={handleUpload} >Upload Image</MaterialUI.CustomButton>
       </div>

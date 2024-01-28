@@ -3,9 +3,13 @@ import Button from '@mui/material/Button';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Drawer from '@mui/material/Drawer';
-import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
-import {Link as RouterLink} from 'react-router-dom';
+import {Link as RouterLink, useLocation, useNavigate, Link} from 'react-router-dom';
+import Divider from '@mui/material/Divider';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemText from '@mui/material/ListItemText';
 
 // custom button
 export const CustomButton = (props) => {
@@ -57,7 +61,7 @@ export const NavBar = (props) => {
     };
 
     return (
-    <AppBar position='sticky' style={style}>
+    <AppBar position='sticky' style={style} sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
         <Toolbar>
             <Typography>
                 Team Urban Science
@@ -73,13 +77,40 @@ export const NavBar = (props) => {
 };
 
 export const SideBar = (props) => {
+    // find location of the current user
+    const location = useLocation();
+    const path = location.pathname;
+
     return (
-        <Drawer variant='permanent' sx={{flexGrow: 1}}>
-            <Toolbar>
-                <Typography>
-                Team Urban Science
-                </Typography>
+        <Drawer variant='permanent'>
+            <Toolbar sx={{marginTop: 7.5, width: 125}}>
                 <List>
+                    <ListItem>
+                        <ListItemButton selected={path === '/audit'} component={Link} to="/audit">
+                            <ListItemText primary="Dashboard" />
+                        </ListItemButton>
+                    </ListItem>
+                    <ListItem>
+                        <ListItemButton selected={path === '/audit/upload'} component={Link} to="/audit/upload">
+                            <ListItemText primary="Upload"/>
+                        </ListItemButton>
+                    </ListItem>
+                    <ListItem>
+                        <ListItemButton selected={path === '/audit/results'} component={Link} to="/audit/results">
+                            <ListItemText primary="Results" />
+                        </ListItemButton>
+                    </ListItem>
+                    <Divider></Divider>
+                    <ListItem>
+                        <ListItemButton>
+                            <ListItemText primary="Contact" />
+                        </ListItemButton>
+                    </ListItem>
+                    <ListItem>
+                        <ListItemButton>
+                            <ListItemText primary="Settings" />
+                        </ListItemButton>
+                    </ListItem>
                 </List>
             </Toolbar>
         </Drawer >

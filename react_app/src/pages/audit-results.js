@@ -9,7 +9,7 @@ function AuditPage () {
         <MaterialUI.SideBar></MaterialUI.SideBar>
         <header className="App-header" style={{marginLeft: 125}}>
         <div className="App">
-          <p>Dashboard</p>
+          <p>Results</p>
         </div>
         </header>
         </React.Fragment>

@@ -3,7 +3,10 @@ import * as MaterialUI from './components/MaterialUI';
 import {BrowserRouter, Routes, Route} from "react-router-dom"
 import HomePage from './pages/home';
 import LoginPage from './pages/login';
+// audit and subpages
 import AuditPage from './pages/audit';
+import UploadPage from './pages/audit-upload';
+import ResultsPage from './pages/audit-results';
 
 function App() {
   return (
@@ -14,6 +17,8 @@ function App() {
           <Route exact path="/" element={<HomePage/>}></Route>
           <Route exact path="/login" element={<LoginPage/>}></Route>
           <Route exact path="/audit" element={<AuditPage/>}></Route>
+            <Route path="/audit/upload" element={<UploadPage/>}></Route>
+            <Route path="/audit/results" element={<ResultsPage/>}></Route>
 
         </Routes>
     </BrowserRouter>

@@ -13,4 +13,16 @@
   color: rgb(50,50,50);
 }
 
+.File {
+  display: flex;  
+  flex-direction: column;
+  justify-content: center;
+  width: 50vw;
+  margin-top: 1vw;
+}
+
+.UploadButton {
+  align-items: center;
+}
+
 

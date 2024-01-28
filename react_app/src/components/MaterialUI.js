@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState} from 'react';
+// navbar/sidebar
 import Button from '@mui/material/Button';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Drawer from '@mui/material/Drawer';
 import Typography from '@mui/material/Typography';
-import {Link as RouterLink, useLocation, useNavigate, Link} from 'react-router-dom';
+import {Link as RouterLink, useLocation, Link} from 'react-router-dom';
 import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -76,6 +77,7 @@ export const NavBar = (props) => {
     );
 };
 
+// custom side bar
 export const SideBar = (props) => {
     // find location of the current user
     const location = useLocation();

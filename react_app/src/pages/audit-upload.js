@@ -1,7 +1,7 @@
 import React from 'react';
 import '../App.css';
 import * as MaterialUI from '../components/MaterialUI';
-import FileUpload from '../components/FilePond';
+import FileUpload from '../components/FileUpload';
 
 function AuditPage () {
 
@@ -10,7 +10,8 @@ function AuditPage () {
         <MaterialUI.SideBar></MaterialUI.SideBar>
         <header className="App-header" style={{marginLeft: 125}}>
         <div className="App">
-          <p>Upload Media</p>
+          <h1>Upload Media</h1>
+          <p>Submit the audit data and press 'Analyze' to send your files to processing.</p>
         </div>
         <div className="File">
         <FileUpload/>

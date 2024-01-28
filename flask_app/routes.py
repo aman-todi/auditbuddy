@@ -20,6 +20,11 @@ def test():
 
 @app.route('/upload-video', methods=['POST'])
 def upload_video():
+    #FOR OTHER FORM INPUT
+    department = request.form['department']
+    print("department", department)
+
+    #FOR VIDEO ANALYSIS
     # Check if the post request has the file part
     if 'file' not in request.files:
         return jsonify({'error': 'No file part in the request'}), 400

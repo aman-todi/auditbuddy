@@ -80,34 +80,49 @@ export const SideBar = (props) => {
     // find location of the current user
     const location = useLocation();
     const path = location.pathname;
+    const colorSelected = {
+        "&.Mui-selected": {
+            // 50% lighter than urban science green
+            backgroundColor: "#bae38c",
+            "&:hover": {
+                backgroundColor: "#bae38c"
+            }
+        },
+
+        "&:hover": {
+            backgroundColor: "#ddf1c6"
+        },
+        // fix margin 
+        marginLeft:-3,
+    };
 
     return (
-        <Drawer variant='permanent'>
-            <Toolbar sx={{marginTop: 7.5, width: 125}}>
+        <Drawer variant='permanent' anchor='left'>
+            <Toolbar sx={{marginTop: 7.5, width: 100}}>
                 <List>
-                    <ListItem>
-                        <ListItemButton selected={path === '/audit'} component={Link} to="/audit">
-                            <ListItemText primary="Dashboard" />
+                    <ListItem disablePadding>
+                        <ListItemButton sx={{...colorSelected}} selected={path === '/audit'} component={Link} to="/audit">
+                            <ListItemText primary="Dashboard" sx={{width: 120}}/>
                         </ListItemButton>
                     </ListItem>
-                    <ListItem>
-                        <ListItemButton selected={path === '/audit/upload'} component={Link} to="/audit/upload">
+                    <ListItem disablePadding>
+                        <ListItemButton sx={{...colorSelected}} selected={path === '/audit/upload'} component={Link} to="/audit/upload">
                             <ListItemText primary="Upload"/>
                         </ListItemButton>
                     </ListItem>
-                    <ListItem>
-                        <ListItemButton selected={path === '/audit/results'} component={Link} to="/audit/results">
+                    <ListItem disablePadding>
+                        <ListItemButton sx={{...colorSelected}} selected={path === '/audit/results'} component={Link} to="/audit/results">
                             <ListItemText primary="Results" />
                         </ListItemButton>
                     </ListItem>
-                    <Divider></Divider>
-                    <ListItem>
-                        <ListItemButton>
+                    <Divider sx={{...colorSelected}}></Divider>
+                    <ListItem disablePadding>
+                        <ListItemButton sx={{...colorSelected}}>
                             <ListItemText primary="Contact" />
                         </ListItemButton>
                     </ListItem>
-                    <ListItem>
-                        <ListItemButton>
+                    <ListItem disablePadding>
+                        <ListItemButton sx={{...colorSelected}}>
                             <ListItemText primary="Settings" />
                         </ListItemButton>
                     </ListItem>

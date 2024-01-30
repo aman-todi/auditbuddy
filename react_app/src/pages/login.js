@@ -12,7 +12,7 @@ function LoginPage() {
         <Container component= "main" maxWidth="xs">
             <Box sx={{display: "flex", flexDirection: "column"}}>
                 <TextField fullWidth required label='Email' variant="outlined" margin="normal"/>
-                <TextField fullWidth required label='Password' variant="outlined" margin="normal"/>
+                <TextField fullWidth required label='Password' variant="outlined" margin="normal" type="password"/>
                 <MaterialUI.CustomButton type ="submit">Login</MaterialUI.CustomButton>
             </Box>
         </Container>

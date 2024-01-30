@@ -21,8 +21,14 @@ def test():
 @app.route('/upload-video', methods=['POST'])
 def upload_video():
     #FOR OTHER FORM INPUT
+    name = request.form['name']
+    print("name: ", name)
+    dealership = request.form['dealership']
+    print("dealership", dealership)
     department = request.form['department']
     print("department", department)
+    country = request.form['country']
+    print("country", country)
 
     #FOR VIDEO ANALYSIS
     # Check if the post request has the file part

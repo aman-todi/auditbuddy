@@ -5,7 +5,7 @@ import { FilePond} from 'react-filepond';
 import 'filepond/dist/filepond.min.css';
 // material ui
 import * as MaterialUI from './MaterialUI';
-import { InputLabel, FormControl, FormHelperText, MenuItem, Select } from '@mui/material/';
+import { InputLabel, FormControl, MenuItem, Select, TextField, Container} from '@mui/material/';
 // axios
 import axios from 'axios';
 
@@ -13,6 +13,9 @@ const FormImport = (props) => {
     // states to keep track of file and form
     const [file, setFile] = useState(null);
     const [department, setDepartment] = useState('');
+    const [country, setCountry] = useState('');
+    const [dealership, setDealership] = useState('');
+    const [name, setName] = useState('');
     
     const handleFileAdded = (fileItems) => {
         if (fileItems.length > 0)
@@ -26,10 +29,31 @@ const FormImport = (props) => {
         setDepartment(event.target.value);
     };
 
+    const handleCountryAdded = (event) => {
+        setCountry(event.target.value)
+    }
+
+    const handleDealershipAdded = (event) => {
+        setDealership(event.target.value)
+    }
+
+    const handleNameAdded = (event) => {
+        setName(event.target.value)
+    }
+
     const handleUpload = async () => {
         // form validation
-        if (department == '') {
+        if (name === '') {
+            alert('Please enter the dealership name')
+        }
+        else if (dealership === '') {
+            alert('Please select a dealership')
+        }
+        else if (department === '') {
             alert('Please select a department')
+        }
+        else if (country === '') {
+            alert('Please select a country')
         }
         else if (!file) {
             alert('Please select a file')
@@ -40,8 +64,14 @@ const FormImport = (props) => {
             // single image
             const formData = new FormData();
             formData.append('file', file);
+            // name
+            formData.append('name', name);
             // department
             formData.append('department', department);
+            // country
+            formData.append('country', country)
+            // dealership
+            formData.append('dealership', dealership)
             
             try {
                 const response = await axios.post('http://localhost:8080/upload-video', formData, {
@@ -71,7 +101,31 @@ const FormImport = (props) => {
       };
 
     return (
+    <Container>
       <div>
+        <TextField required id="outlined-basic" label="Dealership Name" variant="outlined" onChange={handleNameAdded}
+        sx ={{minWidth: 250}}
+        />
+        <FormControl required sx={{minWidth: 140}}>
+        <InputLabel>Dealership</InputLabel>
+        <Select
+        value = {dealership}
+        label = "Dealership"
+        onChange={handleDealershipAdded}
+        >
+            <MenuItem value={"audi"}>Audi</MenuItem>
+            <MenuItem value={"bmw"}>BMW</MenuItem>
+            <MenuItem value={"cadillac"}>Cadillac</MenuItem>
+            <MenuItem value={"chevrolet"}>Chevrolet</MenuItem>
+            <MenuItem value={"ford"}>Ford</MenuItem>
+            <MenuItem value={"honda"}>Honda</MenuItem>
+            <MenuItem value={"kia"}>Kia</MenuItem>
+            <MenuItem value={"nissan"}>Nissan</MenuItem>
+            <MenuItem value={"subaru"}>Subaru</MenuItem>
+            <MenuItem value={"toyota"}>Toyota</MenuItem>
+            <MenuItem value={"volkswagen"}>Volkswagen</MenuItem>
+        </Select>
+        </FormControl>
         <FormControl required sx={{minWidth: 150}}>
         <InputLabel>Department</InputLabel>
         <Select
@@ -84,7 +138,17 @@ const FormImport = (props) => {
             <MenuItem value={"parts"}>Parts</MenuItem>
             <MenuItem value = {"bodyandpaint"}>Body & Paint</MenuItem>
         </Select>
-        <FormHelperText>Required</FormHelperText>
+        </FormControl>
+        <FormControl required sx={{minWidth: 125}}>
+        <InputLabel>Country</InputLabel>
+        <Select
+        value = {country}
+        label = "Country"
+        onChange={handleCountryAdded}
+        >
+            <MenuItem value={"usa"}>USA</MenuItem>
+            <MenuItem value={"canada"}>Canada</MenuItem>
+        </Select>
         </FormControl>
         <FilePond
             allowMultiple={false}
@@ -92,6 +156,7 @@ const FormImport = (props) => {
         />
         <MaterialUI.CustomButton type ="submit" onClick={handleUpload}>Analyze</MaterialUI.CustomButton>
       </div>
+      </Container>
     );
   };
   

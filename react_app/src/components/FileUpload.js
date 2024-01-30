@@ -5,7 +5,7 @@ import { FilePond} from 'react-filepond';
 import 'filepond/dist/filepond.min.css';
 // material ui
 import * as MaterialUI from './MaterialUI';
-import { InputLabel, FormControl, MenuItem, Select, TextField, Container} from '@mui/material/';
+import { InputLabel, FormControl, MenuItem, Select, TextField, Container, Box} from '@mui/material/';
 // axios
 import axios from 'axios';
 
@@ -101,12 +101,11 @@ const FormImport = (props) => {
       };
 
     return (
-    <Container>
-      <div>
-        <TextField required id="outlined-basic" label="Dealership Name" variant="outlined" onChange={handleNameAdded}
-        sx ={{minWidth: 250}}
+    <Container component="main" maxWidth="s">
+      <Box sx={{display: "flex",  flexDirection: { xs: 'column', sm: 'row' }, alignItems: "center"}}>
+        <TextField fullWidth required label="Dealership Name" variant="outlined" onChange={handleNameAdded}
         />
-        <FormControl required sx={{minWidth: 140}}>
+        <FormControl required fullWidth>
         <InputLabel>Dealership</InputLabel>
         <Select
         value = {dealership}
@@ -126,7 +125,7 @@ const FormImport = (props) => {
             <MenuItem value={"volkswagen"}>Volkswagen</MenuItem>
         </Select>
         </FormControl>
-        <FormControl required sx={{minWidth: 150}}>
+        <FormControl required fullWidth>
         <InputLabel>Department</InputLabel>
         <Select
         value = {department}
@@ -139,7 +138,7 @@ const FormImport = (props) => {
             <MenuItem value = {"bodyandpaint"}>Body & Paint</MenuItem>
         </Select>
         </FormControl>
-        <FormControl required sx={{minWidth: 125}}>
+        <FormControl required fullWidth>
         <InputLabel>Country</InputLabel>
         <Select
         value = {country}
@@ -150,12 +149,16 @@ const FormImport = (props) => {
             <MenuItem value={"canada"}>Canada</MenuItem>
         </Select>
         </FormControl>
+        </Box>
+        <Box sx={{marginTop: 2}}>
         <FilePond
             allowMultiple={false}
             onupdatefiles={handleFileAdded}
         />
+        </Box>
+        <Box sx={{display: "flex", flexDirection: "column", alignItems: "center"}}>
         <MaterialUI.CustomButton type ="submit" onClick={handleUpload}>Analyze</MaterialUI.CustomButton>
-      </div>
+        </Box>
       </Container>
     );
   };

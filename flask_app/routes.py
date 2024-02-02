@@ -1,5 +1,5 @@
 from flask import current_app as app
-from flask import render_template, redirect, request, jsonify
+from flask import render_template, redirect, request, jsonify, send_from_directory,abort
 from .utils.database.database  import database
 from pprint import pprint
 import json
@@ -10,6 +10,8 @@ from werkzeug.utils import secure_filename
 from flask_app.video_analysis import deploy_cvision_tools
 from flask_app.brand_detection.logo import LogoDetector
 
+ANNOTATED_IMAGES_FOLDER = os.path.join(app.root_path, 'static', 'main', 'annotated_images')
+
 @app.route('/')
 def root():
 	return render_template('index.html')
@@ -17,6 +19,29 @@ def root():
 @app.route('/test')
 def test():
 	return jsonify(test = "test ajax call")
+
+
+@app.route('/annotated_images/<path:filename>')
+def annotated_images(filename):
+    if filename.endswith('.DS_Store'):
+        # If the requested file is a .DS_Store file, return a 404 Not Found error
+        abort(404)
+    else:
+        # Otherwise, serve the requested file from the annotated images folder
+        return send_from_directory(ANNOTATED_IMAGES_FOLDER, filename)
+
+
+
+@app.route('/get-first-annotated-image')
+def get_annotated_images():
+    annotated_images_folder = os.path.join(app.root_path, 'static', 'main', 'annotated_images')
+    annotated_images = os.listdir(annotated_images_folder)
+
+    # Filter out .DS_Store file if present
+    annotated_images = [filename for filename in annotated_images if filename != '.DS_Store']
+
+    return jsonify({'images': annotated_images})
+
 
 @app.route('/upload-video', methods=['POST'])
 def upload_video():
@@ -51,7 +76,7 @@ def upload_video():
 
             # Analyse the uploaded video and delete it after
             logo_detector.detect_logos_image(save_path)
-            deploy_cvision_tools(save_path) 
+            deploy_cvision_tools(save_path)
             if os.path.exists(save_path):
                 # Delete the video after analysing it
                 os.remove(save_path)

@@ -10,11 +10,11 @@
   align-items: center;
   justify-content: center;
   font-size: calc(3px + 2vmin);
-  color: rgb(50,50,50);
+  color: rgb(50, 50, 50);
 }
 
 .File {
-  display: flex;  
+  display: flex;
   flex-direction: column;
   justify-content: center;
   width: 50vw;
@@ -24,5 +24,3 @@
 .UploadButton {
   align-items: center;
 }
-
-

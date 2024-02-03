@@ -23,7 +23,7 @@ function AuditPage() {
       </header>
       </React.Fragment>
       ) : (<p>Not Authorized</p>)
-      };
+      }
     </React.Fragment>
   );
 }

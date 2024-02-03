@@ -16,6 +16,10 @@ ANNOTATED_IMAGES_FOLDER = os.path.join(app.root_path, 'static', 'main', 'annotat
 def root():
 	return render_template('index.html')
 
+@app.route('/<path:path>')
+def index(path):
+    return render_template('index.html')
+
 @app.route('/test')
 def test():
 	return jsonify(test = "test ajax call")

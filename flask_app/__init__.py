@@ -12,8 +12,8 @@ from flask_failsafe import failsafe
 @failsafe
 def create_app():
 	# change the static and template folders of flask to the react build files
-	app = Flask(__name__, static_url_path='',
-                  static_folder='../react_app/build',
+	app = Flask(__name__, static_url_path='/static',
+                  static_folder='../react_app/build/static',
                   template_folder='../react_app/build')
 	CORS(app)
 

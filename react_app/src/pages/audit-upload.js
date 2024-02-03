@@ -1,11 +1,18 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import '../App.css';
 import * as MaterialUI from '../components/MaterialUI';
 import FormImport from '../components/FormImport';
 import { auth } from '../components/Authentication';
 
 function AuditPage() {
-  const user = auth.currentUser;
+  
+   // page authentication
+   const [user, setUser] = useState(auth.currentUser);
+
+   useEffect(() => {
+     auth.onAuthStateChanged((currentUser) => setUser(currentUser));
+   }, []);
+
   return (
     <React.Fragment>
       {user ? 

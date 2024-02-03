@@ -7,9 +7,14 @@ import random
 import os
 db = database()
 from werkzeug.utils import secure_filename
+# computer vision
 from flask_app.video_analysis import deploy_cvision_tools
 from flask_app.brand_detection.logo import LogoDetector
-
+# firebase auth
+import firebase_admin
+import firebase_admin.auth as auth
+import firebase_admin.credentials as credentials
+    
 ANNOTATED_IMAGES_FOLDER = os.path.join(app.root_path, 'static', 'main', 'annotated_images')
 
 @app.route('/')
@@ -91,6 +96,31 @@ def upload_video():
                 return jsonify({'error': error_message}), 500
     else:
         return jsonify({'error': 'Unsupported file format'}), 400
+    
+# checks if a user is an admin
+@app.route('/check-admin', methods=['POST'])
+def check_admin():
+    # initialize
+    path = os.path.join(app.root_path, 'static', 'main', 'config', 'test-99d52-firebase-adminsdk-1nugx-736f004ccf.json')
+    cred = credentials.Certificate(path)
+    if not firebase_admin._apps:
+        firebase_admin.initialize_app(cred)
+
+    # list of admins
+    admin = ["admin@email.com"]
+    # get the user token
+    token = request.json.get('userToken')
+    #decode the token
+    decoded_token = auth.verify_id_token(token)
+    user_email = decoded_token['email']
+
+    # check if the current user is an admin
+    if user_email in admin:
+        return jsonify({'isAdmin': True}), 200
+
+    return jsonify({'isAdmin': False}), 200
+
+
 
             
     

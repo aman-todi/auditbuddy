@@ -19,6 +19,9 @@ WORKDIR /app
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
+# install firebase-admin
+RUN pip install firebase-admin
+
 # open ports, set environment variables, start the application
 EXPOSE 8080 
 ENV PORT 8080

@@ -27,7 +27,12 @@ function ResultsPage() {
     window.open(`/annotated_images/${imageName}`, '_blank');
   };
 
-  const user = auth.currentUser;
+   // page authentication
+   const [user, setUser] = useState(auth.currentUser);
+
+   useEffect(() => {
+     auth.onAuthStateChanged((currentUser) => setUser(currentUser));
+   }, []);
 
   return (
     <React.Fragment>

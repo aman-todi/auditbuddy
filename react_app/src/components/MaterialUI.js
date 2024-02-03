@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 // navbar/sidebar
 import Button from '@mui/material/Button';
 import AppBar from '@mui/material/AppBar';
@@ -71,6 +71,13 @@ export const NavBar = (props) => {
         navigate('/');
     }
 
+    // page authentication
+    const [user, setUser] = useState(auth.currentUser);
+
+    useEffect(() => {
+        auth.onAuthStateChanged((currentUser) => setUser(currentUser));
+     }, []);
+
     return (
         <AppBar position='sticky' style={style} sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
             <Toolbar>
@@ -80,7 +87,7 @@ export const NavBar = (props) => {
                 <Typography sx={{ flexGrow: 1 }}>
                 </Typography>
                 <NavButton><NavLink to="/">Home</NavLink></NavButton>
-                {auth.currentUser ? (
+                {user ? (
                 <React.Fragment>
                     <NavButton><NavLink to="/audit">Audit</NavLink></NavButton>
                     <CustomButton onClick={handleLogout}>Logout</CustomButton>
@@ -90,6 +97,7 @@ export const NavBar = (props) => {
         </AppBar>
     );
 };
+
 export const SideBar = () => {
     const location = useLocation();
     const path = location.pathname;

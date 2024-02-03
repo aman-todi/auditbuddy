@@ -1,7 +1,7 @@
 // firebase sdk
 import { initializeApp } from "firebase/app";
 // authentication
-import { getAuth, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -20,11 +20,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 // initialize authentication
-const auth = getAuth(app);
-
-// login function
-
-// logout function
-
+export const auth = getAuth(app);
 
 

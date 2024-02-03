@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
+import React from 'react';
 // navbar/sidebar
 import Button from '@mui/material/Button';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Drawer from '@mui/material/Drawer';
 import Typography from '@mui/material/Typography';
-import { Link as RouterLink, useLocation, Link } from 'react-router-dom';
+import { Link as RouterLink, useLocation, Link, useNavigate } from 'react-router-dom';
 import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
+// authentication
+import { auth } from '../components/Authentication';
 
 // custom button
 export const CustomButton = (props) => {
@@ -55,11 +57,19 @@ export const NavButton = (props) => {
 // custom nav bar
 export const NavBar = (props) => {
 
+    const navigate = useNavigate();
+
     // styling
     const style = {
         // grey
         backgroundColor: 'rgb(50,50,50)'
     };
+
+    // log out
+    const handleLogout = async () => {
+        await auth.signOut();
+        navigate('/');
+    }
 
     return (
         <AppBar position='sticky' style={style} sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
@@ -70,14 +80,16 @@ export const NavBar = (props) => {
                 <Typography sx={{ flexGrow: 1 }}>
                 </Typography>
                 <NavButton><NavLink to="/">Home</NavLink></NavButton>
-                <NavButton><NavLink to="/audit">Audit</NavLink></NavButton>
-                <CustomButton><NavLink to="/login">Login</NavLink></CustomButton>
+                {auth.currentUser ? (
+                <React.Fragment>
+                    <NavButton><NavLink to="/audit">Audit</NavLink></NavButton>
+                    <CustomButton onClick={handleLogout}>Logout</CustomButton>
+                    </React.Fragment>
+                    ) : (<CustomButton><NavLink to="login">Login</NavLink></CustomButton>)}
             </Toolbar>
         </AppBar>
     );
 };
-
-
 export const SideBar = () => {
     const location = useLocation();
     const path = location.pathname;

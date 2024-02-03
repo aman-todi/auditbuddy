@@ -4,7 +4,7 @@ import '../App.css';
 import * as MaterialUI from '../components/MaterialUI';
 import { Container, Paper, Typography, Button } from '@mui/material';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-
+import { auth } from '../components/Authentication';
 
 function ResultsPage() {
 
@@ -27,11 +27,13 @@ function ResultsPage() {
     window.open(`/annotated_images/${imageName}`, '_blank');
   };
 
-
+  const user = auth.currentUser;
 
   return (
     <React.Fragment>
-      <MaterialUI.SideBar />
+      { user ? (
+        <React.Fragment>
+          <MaterialUI.SideBar />
       <Container maxWidth="md" style={{ marginTop: '2rem' }}>
         <Paper elevation={3} style={{ padding: '2rem', maxHeight: '70vh', overflowY: 'auto' }}>
           <Typography variant="h5" gutterBottom>Results</Typography>
@@ -57,6 +59,10 @@ function ResultsPage() {
         </Paper>
       </Container>
     </React.Fragment>
+      ) : (<p>Not Authorized</p>)
+    
+    }
+      </React.Fragment>
   );
 }
 

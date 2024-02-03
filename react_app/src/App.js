@@ -13,14 +13,14 @@ function App() {
     <React.Fragment>
       <BrowserRouter>
       <MaterialUI.NavBar></MaterialUI.NavBar>
-        <Routes>
+          <Routes>
           <Route exact path="/" element={<HomePage/>}></Route>
           <Route exact path="/login" element={<LoginPage/>}></Route>
           <Route exact path="/audit" element={<AuditPage/>}></Route>
             <Route path="/audit/upload" element={<UploadPage/>}></Route>
             <Route path="/audit/results" element={<ResultsPage/>}></Route>
 
-        </Routes>
+          </Routes>
     </BrowserRouter>
     </React.Fragment>
   );

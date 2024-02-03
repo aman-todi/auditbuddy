@@ -11,6 +11,13 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
+import ListItemIcon from '@mui/material/ListItemIcon';
+// icons
+import AlignHorizontalLeftIcon from '@mui/icons-material/AlignHorizontalLeft';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import BallotIcon from '@mui/icons-material/Ballot';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import SettingsIcon from '@mui/icons-material/Settings';
 // authentication
 import { auth } from '../components/Authentication';
 
@@ -81,11 +88,10 @@ export const NavBar = (props) => {
     return (
         <AppBar position='sticky' style={style} sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
             <Toolbar>
-                <Typography>
-                    Team Urban Science
+                <Typography sx={{fontSize: "0.85rem"}}>
+                    URBAN SCIENCE
                 </Typography>
-                <Typography sx={{ flexGrow: 1 }}>
-                </Typography>
+                <Typography sx={{flexGrow: 1}}></Typography>
                 <NavButton><NavLink to="/">Home</NavLink></NavButton>
                 {user ? (
                 <React.Fragment>
@@ -115,32 +121,37 @@ export const SideBar = () => {
     };
 
     return (
-        <Drawer variant='permanent' anchor='left'>
+        <Drawer variant='permanent' anchor='left' sx={{width: 100}}>
             <Toolbar sx={{ marginTop: 7.5, width: 100 }}>
                 <List>
                     <ListItem disablePadding>
                         <ListItemButton sx={{ ...colorSelected }} selected={path === '/audit'} component={Link} to="/audit">
-                            <ListItemText primary="Dashboard" sx={{ width: 120 }} />
+                            <ListItemIcon sx={{minWidth: 40}}><AlignHorizontalLeftIcon></AlignHorizontalLeftIcon></ListItemIcon>
+                            <ListItemText primary="Dashboard" sx={{ width: 76 }} />
                         </ListItemButton>
                     </ListItem>
                     <ListItem disablePadding>
                         <ListItemButton sx={{ ...colorSelected }} selected={path === '/audit/upload'} component={Link} to="/audit/upload">
+                            <ListItemIcon sx={{minWidth: 40}}><CloudUploadIcon></CloudUploadIcon></ListItemIcon>
                             <ListItemText primary="Upload" />
                         </ListItemButton>
                     </ListItem>
                     <ListItem disablePadding>
                         <ListItemButton sx={{ ...colorSelected }} selected={path === '/audit/results'} component={Link} to="/audit/results">
+                            <ListItemIcon sx={{minWidth: 40}}><BallotIcon></BallotIcon></ListItemIcon>
                             <ListItemText primary="Results" />
                         </ListItemButton>
                     </ListItem>
                     <Divider sx={{ ...colorSelected }}></Divider>
                     <ListItem disablePadding>
                         <ListItemButton sx={{ ...colorSelected }}>
+                            <ListItemIcon sx={{minWidth: 40}}><HelpOutlineIcon></HelpOutlineIcon></ListItemIcon>
                             <ListItemText primary="Contact" />
                         </ListItemButton>
                     </ListItem>
                     <ListItem disablePadding>
                         <ListItemButton sx={{ ...colorSelected }}>
+                            <ListItemIcon sx={{minWidth: 40}}><SettingsIcon></SettingsIcon></ListItemIcon>
                             <ListItemText primary="Settings" />
                         </ListItemButton>
                     </ListItem>

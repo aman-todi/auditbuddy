@@ -101,7 +101,7 @@ def upload_video():
 @app.route('/check-admin', methods=['POST'])
 def check_admin():
     # initialize
-    path = os.path.join(app.root_path, 'static', 'main', 'config', 'test-99d52-firebase-adminsdk-1nugx-736f004ccf.json')
+    path = os.path.join(app.root_path, 'static', 'main', 'config', 'valued-range-411422-d36068bfa11f.json')
     cred = credentials.Certificate(path)
     if not firebase_admin._apps:
         firebase_admin.initialize_app(cred)

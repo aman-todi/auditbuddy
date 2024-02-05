@@ -8,12 +8,13 @@ import { getAuth } from "firebase/auth";
 
 // web app firebase config (currently connected to a test account)
 const firebaseConfig = {
-  apiKey: "AIzaSyAz_u7HjJhkORVS1ObcglowgX3e4l6HJQs",
-  authDomain: "test-99d52.firebaseapp.com",
-  projectId: "test-99d52",
-  storageBucket: "test-99d52.appspot.com",
-  messagingSenderId: "1097112274536",
-  appId: "1:1097112274536:web:2840ba7f9e2be0c89a1ddd"
+  apiKey: "AIzaSyCFLyEemhNfxcMtrY1dvzA4mfy7Xqb-9Lg",
+  authDomain: "valued-range-411422.firebaseapp.com",
+  projectId: "valued-range-411422",
+  storageBucket: "valued-range-411422.appspot.com",
+  messagingSenderId: "910714431854",
+  appId: "1:910714431854:web:c69740781298268552397f",
+  measurementId: "G-9X6VSBJY3C"
 };
 
 // initialize firebase
@@ -21,5 +22,3 @@ const app = initializeApp(firebaseConfig);
 
 // initialize authentication
 export const auth = getAuth(app);
-
-

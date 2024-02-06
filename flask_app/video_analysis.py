@@ -45,6 +45,6 @@ def deploy_cvision_tools(path_to_video):
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
             save_frame(frame, frame_counter)
         
-    print("Count of cars found: ", tracker.get_total_car_count())
+    print("Count of cars found: ", tracker.get_total_count())
 
     cap.release()

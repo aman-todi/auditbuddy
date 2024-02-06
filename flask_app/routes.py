@@ -111,7 +111,7 @@ def upload_video():
         return jsonify({'message': f'{", ".join(processed_categories)} uploaded and processed successfully'}), 200
     else:
         return jsonify({'error': 'Unsupported file format'}), 400
-    
+
 # checks if a user is an admin
 @app.route('/check-admin', methods=['POST'])
 def check_admin():

@@ -46,6 +46,10 @@ class CarDetector:
         # Apply Non-Maximum Suppression to filter overlapping boxes
         indices = cv2.dnn.NMSBoxes(boxes, confidences, self.confidence_threshold, self.nms_threshold)
 
+        # If indices is a NumPy array, convert it to a list
+        if isinstance(indices, np.ndarray):
+            indices = indices.tolist()
+
         # Use list comprehension to filter car boxes based on class ID
         car_boxes = [boxes[i] for i in indices if class_ids[i] == 2]  # Filter out non-car objects
 

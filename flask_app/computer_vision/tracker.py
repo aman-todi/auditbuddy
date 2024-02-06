@@ -29,6 +29,6 @@ class Tracker:
                 self.objects[self.next_id] = centroid
                 self.next_id += 1
 
-    def get_total_car_count(self):
+    def get_total_count(self):
         # Return the total number of distinct cars detected throughout the video
         return self.next_id

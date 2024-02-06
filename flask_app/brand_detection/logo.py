@@ -1,6 +1,5 @@
 from flask import current_app as app, jsonify, render_template, redirect, request
 from google.cloud import vision
-from google.cloud import videointelligence
 import os
 import cv2
 import time

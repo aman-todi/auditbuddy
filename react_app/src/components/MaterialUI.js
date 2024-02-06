@@ -12,6 +12,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
+
 // icons
 import AlignHorizontalLeftIcon from '@mui/icons-material/AlignHorizontalLeft';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -86,7 +87,7 @@ export const NavBar = (props) => {
      }, []);
 
     return (
-        <AppBar position='sticky' style={style} sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+        <AppBar position='fixed' style={style} sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
             <Toolbar>
                 <Typography sx={{fontSize: "0.85rem"}}>
                     URBAN SCIENCE

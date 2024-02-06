@@ -39,8 +39,6 @@ def annotated_images(filename):
         # Otherwise, serve the requested file from the annotated images folder
         return send_from_directory(ANNOTATED_IMAGES_FOLDER, filename)
 
-
-
 @app.route('/get-first-annotated-image')
 def get_annotated_images():
     annotated_images_folder = os.path.join(app.root_path, 'static', 'main', 'annotated_images')
@@ -65,35 +63,52 @@ def upload_video():
     print("country", country)
 
     #FOR VIDEO ANALYSIS
-    # Check if the post request has the file part
-    if 'file' not in request.files:
+    # Check if the post request has the file part for all of the categories
+    required_categories = ['logo', 'hospitality', 'spatial', 'parking', 'cars']
+
+    if all(key not in request.files for key in required_categories):
         return jsonify({'error': 'No file part in the request'}), 400
 
-    file = request.files['file']
+    # logic for extracting files from different detection categories
+    if 'logo' in request.files:
+        logo = request.files['logo']
+    if 'hospitality' in request.files:
+        hospitality = request.files['hospitality']
+    if 'parking' in request.files:
+        parking = request.files['parking']
+    if 'cars' in request.files:
+        cars = request.files['cars']
+    if 'spatial' in request.files:
+         spatial = request.files['spatial']
 
-    # If the user does not select a file, the browser submits an
-    # empty file without a filename.
-    if file.filename == '':
-        return jsonify({'error': 'No selected file'}), 400
+    processed_categories = []
 
-    if file:
-        filename = secure_filename(file.filename)
-        save_path = os.path.join(app.root_path, 'static', 'main', 'media', filename)
-        file.save(save_path)
-        try:
-            logo_detector = LogoDetector()
+    for category in required_categories:
+        if category in request.files:
+            file = request.files[category]
+            filename = secure_filename(file.filename)
+            save_path = os.path.join(app.root_path, 'static', 'main', 'media', filename)
+            file.save(save_path)
 
-            # Analyse the uploaded video and delete it after
-            logo_detector.detect_logos_image(save_path)
-            deploy_cvision_tools(save_path)
-            if os.path.exists(save_path):
-                # Delete the video after analysing it
-                os.remove(save_path)
-            return jsonify({'message': 'File uploaded successfully', 'filename': filename}), 200
-        except Exception as e:
-                error_message = f"Error during detection: {str(e)}"
+            try:
+                if category == 'logo':
+                    logo_detector = LogoDetector()
+                    logo_detector.detect_logos_image(save_path)
+                if category == 'cars':
+                    deploy_cvision_tools(save_path)
+
+                if os.path.exists(save_path):
+                    # Delete the file after processing
+                    os.remove(save_path)
+
+                processed_categories.append(category)
+            except Exception as e:
+                error_message = f"Error during {category} processing: {str(e)}"
                 print(error_message)
                 return jsonify({'error': error_message}), 500
+
+    if processed_categories:
+        return jsonify({'message': f'{", ".join(processed_categories)} uploaded and processed successfully'}), 200
     else:
         return jsonify({'error': 'Unsupported file format'}), 400
     

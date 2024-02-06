@@ -7,41 +7,64 @@ import 'filepond/dist/filepond.min.css';
 import * as MaterialUI from './MaterialUI';
 
 // import ShowResults from './pages/audit-results';
-import { InputLabel, FormControl, MenuItem, Select, TextField, Container, Box } from '@mui/material/';
+import { InputLabel, FormControl, MenuItem, Select, TextField, Container, Box, Tab, Tabs} from '@mui/material/';
 // axios
 import axios from 'axios';
 
+const FormImport = () => {
 
-const FormImport = (props) => {
-  // states to keep track of file and form
-  const [file, setFile] = useState(null);
+  // states to keep track of each file drop box
+  const [logo, setLogo] = useState(null);
+  const [parking, setParking] = useState(null);
+  const [cars, setCars] = useState(null);
+  const [hospitality, setHospitality] = useState(null);
+  const [spatial, setSpatial] = useState(null);
+  
+  // states to keep track of form
   const [department, setDepartment] = useState('');
   const [country, setCountry] = useState('');
   const [dealership, setDealership] = useState('');
   const [name, setName] = useState('');
 
-  const handleFileAdded = (fileItems) => {
+  const handleLogoAdded = (fileItems) => {
     if (fileItems.length > 0) {
-      // set the state of file
-      setFile(fileItems[0].file)
+      // set the state of file (this for one file)
+      setLogo(fileItems[0].file)
     }
   };
 
-  const handleDepartmentAdded = (event) => {
-    setDepartment(event.target.value);
+  const handleCarsAdded = (fileItems) => {
+    if (fileItems.length > 0) {
+      // set the state of file (this for one file)
+      setCars(fileItems[0].file)
+    }
   };
 
-  const handleCountryAdded = (event) => {
-    setCountry(event.target.value)
-  }
+  const handleParkingAdded = (fileItems) => {
+    if (fileItems.length > 0) {
+      // set the state of file (this for one file)
+      setParking(fileItems[0].file)
+    }
+  };
 
-  const handleDealershipAdded = (event) => {
-    setDealership(event.target.value)
-  }
+  const handleHospitalityAdded = (fileItems) => {
+    if (fileItems.length > 0) {
+      // set the state of file (this for one file)
+      setHospitality(fileItems[0].file)
+    }
+  };
 
-  const handleNameAdded = (event) => {
-    setName(event.target.value)
-  }
+  const handleSpatialAdded = (fileItems) => {
+    if (fileItems.length > 0) {
+      // set the state of file (this for one file)
+      setSpatial(fileItems[0].file)
+    }
+  };
+
+  // handles each form input states
+  const handleFormInput = (event, setFormInputState) => {
+    setFormInputState(event.target.value);
+  };
 
   const handleUpload = async () => {
     // form validation
@@ -57,14 +80,21 @@ const FormImport = (props) => {
     else if (country === '') {
       alert('Please select a country')
     }
-    else if (!file) {
-      alert('Please select a file')
+    else if (!logo && !cars && !parking && !spatial && !hospitality) {
+      alert('Please select a file in atleast one category')
     }
     else {
       // create a form and append this file
       // single image
       const formData = new FormData();
-      formData.append('file', file);
+
+      // default rn until rest of backend is implemented
+      formData.append('logo', logo);
+      formData.append('hospitality', hospitality);
+      formData.append('parking', parking);
+      formData.append('spatial', spatial);
+      formData.append('cars', cars);
+
       // name
       formData.append('name', name);
       // department
@@ -101,17 +131,24 @@ const FormImport = (props) => {
     }
   };
 
+  // handle tab index to change tabs
+  const [tabIndex, setTabIndex] = useState(0);
+  const handleTabChange = (event, newTabIndex) => {
+    setTabIndex(newTabIndex);
+  };
+
   return (
     <Container component="main" maxWidth="s">
-      <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, alignItems: "center" }}>
-        <TextField fullWidth required label="Dealership Name" variant="outlined" onChange={handleNameAdded}
+      <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, alignItems: "center"}}>
+        <TextField fullWidth required label="Name" variant="outlined" onChange={(event) => handleFormInput(event, setName)}
+          sx={{margin: "0.1rem"}}
         />
-        <FormControl required fullWidth>
-          <InputLabel>Dealership</InputLabel>
+        <FormControl required fullWidth  sx={{margin: "0.1rem"}}>
+          <InputLabel>Brand</InputLabel>
           <Select
             value={dealership}
-            label="Dealership"
-            onChange={handleDealershipAdded}
+            label="Brand"
+            onChange={(event) => handleFormInput(event, setDealership)}
           >
             <MenuItem value={"audi"}>Audi</MenuItem>
             <MenuItem value={"bmw"}>BMW</MenuItem>
@@ -126,12 +163,12 @@ const FormImport = (props) => {
             <MenuItem value={"volkswagen"}>Volkswagen</MenuItem>
           </Select>
         </FormControl>
-        <FormControl required fullWidth>
+        <FormControl required fullWidth  sx={{margin: "0.1rem"}}>
           <InputLabel>Department</InputLabel>
           <Select
             value={department}
             label="Department"
-            onChange={handleDepartmentAdded}
+            onChange={(event) => handleFormInput(event, setDepartment)}
           >
             <MenuItem value={"service"}>Service</MenuItem>
             <MenuItem value={"sales"}>Sales</MenuItem>
@@ -139,25 +176,89 @@ const FormImport = (props) => {
             <MenuItem value={"bodyandpaint"}>Body & Paint</MenuItem>
           </Select>
         </FormControl>
-        <FormControl required fullWidth>
+        <FormControl required fullWidth sx={{margin: "0.1rem"}}>
           <InputLabel>Country</InputLabel>
           <Select
             value={country}
             label="Country"
-            onChange={handleCountryAdded}
+            onChange={(event) => handleFormInput(event, setCountry)}
           >
             <MenuItem value={"usa"}>USA</MenuItem>
             <MenuItem value={"canada"}>Canada</MenuItem>
           </Select>
         </FormControl>
       </Box>
-      <Box sx={{ marginTop: 2 }}>
-        <FilePond
-          allowMultiple={false}
-          onupdatefiles={handleFileAdded}
-        />
+
+      <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '2.5rem'}} indicatorColor="primary">
+      <Tabs value={tabIndex} onChange={handleTabChange} sx={{fontSize: '0.75rem'}}
+      TabIndicatorProps={{
+        style: {
+          backgroundColor: "#74b42c",
+        }
+      }}
+      >
+        <Tab label={<span style={{ color: 'rgb(50,50,50)' }}>LOGOS</span>}/>
+        <Tab label={<span style={{ color: 'rgb(50,50,50)' }}>DISPLAY CARS</span>}/>
+        <Tab label={<span style={{ color: 'rgb(50,50,50)' }}>PARKING SPACES</span>}/>
+        <Tab label={<span style={{ color: 'rgb(50,50,50)' }}>HOSPITALITY</span>}/>
+        <Tab label={<span style={{ color: 'rgb(50,50,50)' }}>SPATIAL</span>}/>
+      </Tabs>
       </Box>
-      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+
+      <Box>
+ 
+      <div style={{ display: tabIndex === 0 ? 'block' : 'none' }}>
+        <Box sx={{ marginTop: '1rem' }}>
+          <FilePond
+            allowMultiple={false}
+            onupdatefiles= {handleLogoAdded}
+            stylePanelLayout={'compact'}
+          />
+        </Box>
+      </div> 
+
+      <div style={{ display: tabIndex === 1 ? 'block' : 'none' }}>
+          <Box sx={{marginTop: '1rem'}}>
+            <FilePond
+          allowMultiple={false}
+          onupdatefiles={handleCarsAdded}
+          stylePanelLayout={'compact'}
+        />
+          </Box>
+      </div>
+
+      <div style={{ display: tabIndex === 2 ? 'block' : 'none' }}>
+          <Box sx={{marginTop: '1rem'}}>
+            <FilePond
+          allowMultiple={false}
+          onupdatefiles={handleParkingAdded}
+          stylePanelLayout={'compact'}
+        />
+          </Box>
+      </div>
+
+      <div style={{ display: tabIndex === 3 ? 'block' : 'none' }}>
+          <Box sx={{marginTop: '1rem'}}>
+            <FilePond
+          allowMultiple={false}
+          onupdatefiles={handleHospitalityAdded}
+          stylePanelLayout={'compact'}
+        />
+          </Box>
+      </div>
+
+      <div style={{ display: tabIndex === 4 ? 'block' : 'none' }}>
+          <Box sx={{marginTop: '1rem'}}>
+            <FilePond
+          allowMultiple={false}
+          onupdatefiles={handleSpatialAdded}
+          stylePanelLayout={'compact'}
+        />
+          </Box>
+      </div>
+      </Box>
+     
+      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "0.1rem"}}>
         <MaterialUI.CustomButton type="submit" onClick={handleUpload}>Analyze</MaterialUI.CustomButton>
       </Box>
     </Container>

@@ -19,9 +19,9 @@ function AuditPage() {
       (
       <React.Fragment>
       <MaterialUI.SideBar></MaterialUI.SideBar>
-      <header className="App-header" style={{ marginLeft: 125 }}>
+      <header className="App-header" style={{ marginLeft: 125, marginTop: 50 }}>
         <div className="App">
-          <h1>Upload Media</h1>
+          <h1 sx={{}} >Upload Media</h1>
           <p>Submit the audit data and press 'Analyze' to send your files to processing.</p>
         </div>
         <div className="File">

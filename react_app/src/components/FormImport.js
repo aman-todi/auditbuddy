@@ -5,9 +5,10 @@ import { FilePond } from 'react-filepond';
 import 'filepond/dist/filepond.min.css';
 // material ui
 import * as MaterialUI from './MaterialUI';
+import HelpIcon from '@mui/icons-material/Help';
 
 // import ShowResults from './pages/audit-results';
-import { InputLabel, FormControl, MenuItem, Select, TextField, Container, Box, Tab, Tabs} from '@mui/material/';
+import { InputLabel, FormControl, MenuItem, Select, TextField, Container, Box, Tab, Tabs, Tooltip, Typography} from '@mui/material/';
 // axios
 import axios from 'axios';
 
@@ -139,8 +140,14 @@ const FormImport = () => {
 
   return (
     <Container component="main" maxWidth="s">
+            <Typography variant="p" sx={{ display: "flex", alignItems: "center", marginBottom: "1rem" }}>
+              <span style={{ fontWeight: "bold", marginRight: "0.5rem"}}>Dealership</span>
+              <Tooltip disableFocusListener title="The information of the dealership being submitted">
+                <HelpIcon sx={{fontSize: "small"}}/>
+              </Tooltip>
+            </Typography>
       <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, alignItems: "center"}}>
-        <TextField fullWidth required label="Name" variant="outlined" onChange={(event) => handleFormInput(event, setName)}
+        <TextField fullWidth required label="Dealership Name" variant="outlined" onChange={(event) => handleFormInput(event, setName)}
           sx={{margin: "0.1rem"}}
         />
         <FormControl required fullWidth  sx={{margin: "0.1rem"}}>
@@ -189,7 +196,13 @@ const FormImport = () => {
         </FormControl>
       </Box>
 
-      <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '2.5rem'}} indicatorColor="primary">
+      <Typography variant="p" sx={{ display: "flex", alignItems: "center", marginBottom: "1rem", marginTop: "1rem" }}>
+              <span style={{ fontWeight: "bold", marginRight: "0.5rem"}}>Detection</span>
+              <Tooltip disableFocusListener title="Upload files in the categories that you'd like to detect">
+                <HelpIcon sx={{fontSize: "small"}}/>
+              </Tooltip>
+            </Typography>
+      <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'center'}} indicatorColor="primary">
       <Tabs value={tabIndex} onChange={handleTabChange} sx={{fontSize: '0.75rem'}}
       TabIndicatorProps={{
         style: {

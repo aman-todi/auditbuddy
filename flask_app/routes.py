@@ -13,9 +13,11 @@ from flask_app.brand_detection.logo import LogoDetector
 # firebase auth
 import firebase_admin
 import firebase_admin.auth as auth
-import firebase_admin.credentials as credentials
+from firebase_admin import credentials, storage
     
 ANNOTATED_IMAGES_FOLDER = os.path.join(app.root_path, 'static', 'main', 'annotated_images')
+
+bucket = storage.bucket()
 
 @app.route('/')
 def root():
@@ -29,25 +31,21 @@ def index(path):
 def test():
 	return jsonify(test = "test ajax call")
 
-
-@app.route('/annotated_images/<path:filename>')
-def annotated_images(filename):
-    if filename.endswith('.DS_Store'):
-        # If the requested file is a .DS_Store file, return a 404 Not Found error
-        abort(404)
-    else:
-        # Otherwise, serve the requested file from the annotated images folder
-        return send_from_directory(ANNOTATED_IMAGES_FOLDER, filename)
-
-@app.route('/get-first-annotated-image')
+@app.route('/get-annotated-images')
 def get_annotated_images():
-    annotated_images_folder = os.path.join(app.root_path, 'static', 'main', 'annotated_images')
-    annotated_images = os.listdir(annotated_images_folder)
+    try:
+        # Fetch annotated images from Firebase Storage and return their URLs
+        blobs = bucket.list_blobs(prefix='annotated_images/')
+        
+        # Extract public URLs of the annotated images only if it is a png (It will grab the folder as well if not)
+        image_urls = [blob.public_url for blob in blobs if os.path.splitext(blob.name)[1] == '.png']
 
-    # Filter out .DS_Store file if present
-    annotated_images = [filename for filename in annotated_images if filename != '.DS_Store']
-
-    return jsonify({'images': annotated_images})
+        return jsonify({'images': image_urls}), 200
+    except Exception as e:
+        # Handle any errors that occur during image retrieval
+        error_message = f"Error fetching annotated images: {str(e)}"
+        print(error_message)
+        return jsonify({'error': error_message}), 500
 
 
 @app.route('/upload-video', methods=['POST'])
@@ -85,27 +83,28 @@ def upload_video():
 
     for category in required_categories:
         if category in request.files:
-            file = request.files[category]
-            filename = secure_filename(file.filename)
-            save_path = os.path.join(app.root_path, 'static', 'main', 'media', filename)
-            file.save(save_path)
+            files = request.files.getlist(category)  # Get list of files for the category
+            for file in files:
+                filename = secure_filename(file.filename)
+                save_path = os.path.join(app.root_path, 'static', 'main', 'media', filename)
+                file.save(save_path)
 
-            try:
-                if category == 'logo':
-                    logo_detector = LogoDetector()
-                    logo_detector.detect_logos_image(save_path)
-                if category == 'cars':
-                    deploy_cvision_tools(save_path)
+                try:
+                    if category == 'logo':
+                        logo_detector = LogoDetector()
+                        logo_detector.detect_logos_image(save_path)
+                    elif category == 'cars':
+                        deploy_cvision_tools(save_path)
 
-                if os.path.exists(save_path):
-                    # Delete the file after processing
-                    os.remove(save_path)
+                    if os.path.exists(save_path):
+                        # Delete the file after processing
+                        os.remove(save_path)
 
-                processed_categories.append(category)
-            except Exception as e:
-                error_message = f"Error during {category} processing: {str(e)}"
-                print(error_message)
-                return jsonify({'error': error_message}), 500
+                    processed_categories.append(category)
+                except Exception as e:
+                    error_message = f"Error during {category} processing: {str(e)}"
+                    print(error_message)
+                    return jsonify({'error': error_message}), 500
 
     if processed_categories:
         return jsonify({'message': f'{", ".join(processed_categories)} uploaded and processed successfully'}), 200

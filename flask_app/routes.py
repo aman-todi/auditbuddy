@@ -13,7 +13,7 @@ from flask_app.brand_detection.logo import LogoDetector
 # firebase auth
 import firebase_admin
 import firebase_admin.auth as auth
-from firebase_admin import credentials, storage
+from firebase_admin import credentials, storage, firestore
     
 ANNOTATED_IMAGES_FOLDER = os.path.join(app.root_path, 'static', 'main', 'annotated_images')
 
@@ -134,7 +134,26 @@ def check_admin():
 
     return jsonify({'isAdmin': False}), 200
 
+# pull results from the database
+@app.route('/generate-results', methods=['POST'])
+def generate_results():
+    try:
+        # firestore database
+        db = firestore.client()
+        
+        # results collection
+        collection = db.collection('results')
 
+        # all of our results
+        results = []
+        for doc in collection.stream():
+            # put in a dictionary
+            result_dict = doc.to_dict()
+            results.append(result_dict)
 
-            
+        # return results
+        return jsonify(results), 200
+    # handle errors
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
     

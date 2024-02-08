@@ -16,9 +16,10 @@ def save_frame(frame, frame_number, output_folder='car_frames'):
 
 def deploy_cvision_tools(path_to_video):
     print("Deploy cvision is called")
-    # Initialize detector and tracker
-    detector = CarDetector()
-    tracker = Tracker()
+
+    # Initialize car detector and tracker
+    car_detector = CarDetector()
+    car_tracker = Tracker(distance_threshold=145)
 
     # Load and segment video
     cap = cv2.VideoCapture(path_to_video)
@@ -35,8 +36,8 @@ def deploy_cvision_tools(path_to_video):
         frame_counter += 1
 
         # Detect and track cars
-        car_boxes = detector.detect_cars(frame)
-        tracker.update(car_boxes)
+        car_boxes = car_detector.detect_cars(frame)
+        car_tracker.update(car_boxes)
 
         # Draw bounding boxes and save the frame only if the counter matches the display frequency
         if frame_counter % display_frequency == 0 or frame_counter == 1:
@@ -45,6 +46,6 @@ def deploy_cvision_tools(path_to_video):
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
             save_frame(frame, frame_counter)
         
-    print("Count of cars found: ", tracker.get_total_count())
+    print("Count of cars found: ", car_tracker.get_total_count())
 
     cap.release()

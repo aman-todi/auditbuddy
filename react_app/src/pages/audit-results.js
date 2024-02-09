@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import '../App.css';
 import * as MaterialUI from '../components/MaterialUI';
-import { Container, Grid, Paper, Typography, Button, Box, Dialog, DialogActions, DialogContent, DialogTitle} from '@mui/material';
+import { Container, Grid, Paper, Typography, Button, Dialog, DialogActions, DialogContent, DialogTitle, Card, CardContent, FormControl, Box} from '@mui/material';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import { auth } from '../components/Authentication';
+import { SearchBar } from '../components/SearchBar';
 // axios
 import axios from 'axios';
 
@@ -94,17 +95,23 @@ const keys_order = ['Dealership Name', 'Brand', 'Department', 'Country']
           <Container maxWidth="lg" style={{ marginTop: '6rem' }}>
           <h1>Results</h1>
         <div>
-            <div style={{display: 'flex', backgroundColor: 'rgb(255,255,255)', justifyContent: 'flex-start'}}>
+          {/* search bar*/}
+          <SearchBar></SearchBar>
+
+            <div style={{display: 'flex', flexWrap: 'wrap', justifyContent: 'center', }}>
             {/* box for each item */}
             {items.map((item, index) => (
-                <Box onClick={() => handleBoxClick(item)} key={index} border={1} margin={1} padding={1} sx={{cursor: 'pointer'}}>
+                <Card variant="outlined" onClick={() => handleBoxClick(item)} key={index} sx={{cursor: 'pointer', padding: 1, margin: 1, fontSize: '0.75rem', width: '20%', justifyContent: 'flex-start'}}>
+                  <CardContent>
                     {/* display key-value pair */}
                     {keys_order.map(key => (
                     <div key={key} style={{ textAlign: 'left' }}>
-                      <strong>{key}:</strong> {item[key]}
+                      <Typography sx={{fontWeight: 'bold'}}>{key}: <Typography>{item[key]}</Typography></Typography>
+                     
                     </div>
                     ))}
-                </Box>
+                  </CardContent>
+                </Card>
             ))}
             </div>
 
@@ -124,13 +131,13 @@ const keys_order = ['Dealership Name', 'Brand', 'Department', 'Country']
                 <CheckCircleOutlineIcon style={{ position: 'absolute', top: 0, left: 0, color: 'green' }} />
                 <Typography variant="h6" align="center">Result {index + 1}</Typography>
                 <div style={{ display: 'flex', justifyContent: 'center', marginTop: '0.5rem' }}>
-                  <Button
+                  <MaterialUI.CustomButton
                     variant="contained"
                     color="primary"
                     onClick={() => openAnnotatedImageInNewTab(imageUrl)}
                   >
                     Open Image
-                  </Button>
+                  </MaterialUI.CustomButton>
                 </div>
               </Paper>
             </Grid>

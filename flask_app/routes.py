@@ -157,3 +157,16 @@ def generate_results():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
+
+@app.route('/audit/results/<dealership>/<year>')
+def audit_results(dealership, year):
+    # Here you can fetch data based on the dealership and year
+    # For example, you can query your database for results related to the specified dealership and year
+    # Assuming you have fetched data as a dictionary named 'results'
+    results = {
+        "dealership": dealership,
+        "year": year,
+        # Add other data fields as needed
+    }
+    # Return the data as JSON
+    return jsonify(results)

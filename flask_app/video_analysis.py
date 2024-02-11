@@ -5,7 +5,7 @@ import cv2
 from flask_app.computer_vision.tracker import Tracker
 from flask_app.computer_vision.car_detection import CarDetector
 
-def save_frame(frame, frame_number, output_folder='car_frames'):
+def save_frame(frame, frame_number, output_folder):
     print("save frame is called")
     # Saves a frame to the specified folder with a given frame number
     if not os.path.exists(output_folder):
@@ -44,7 +44,7 @@ def deploy_cvision_tools(path_to_video):
             for box in car_boxes:
                 x, y, w, h = box
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-            save_frame(frame, frame_counter)
+            save_frame(frame, frame_counter, 'car_frames')
         
     print("Count of cars found: ", car_tracker.get_total_count())
 

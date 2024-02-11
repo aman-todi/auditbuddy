@@ -9,9 +9,6 @@ import time
 import numpy as np
 
 
-
-
-
 class LogoDetector:
     def __init__(self, confidence_threshold=0.6, nms_threshold=0.4):
         self.confidence_threshold = confidence_threshold  # Set confidence threshold for detection

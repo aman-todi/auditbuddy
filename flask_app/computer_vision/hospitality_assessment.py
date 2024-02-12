@@ -4,7 +4,7 @@ import numpy as np
 import cv2
 
 class HospitalityFinder:
-    def __init__(self, confidence_threshold=0.6, nms_threshold=0.4):
+    def __init__(self, confidence_threshold=0.8, nms_threshold=0.2):
         # Load YOLO model with given weights and cfg files
         self.net = cv2.dnn.readNet("flask_app/computer_vision/yolo/yolov3.weights", "flask_app/computer_vision/yolo/yolov3.cfg")
         layer_names = self.net.getLayerNames()
@@ -22,9 +22,9 @@ class HospitalityFinder:
         outs = self.net.forward(self.output_layers)  # Perform a forward pass and get output
 
         # Segregate hospitality indicators by class
-        # Beverage (class 1): Bottle, Wine Glass, Cup - 40,41,42
-        # Snacks (class 2) : Bowl, Banana, Apple, Sandwich, Orange, Broccoli, Carrot, Hot dog, Pizza, Donut, Cake - [46,56]
-        # Seating (class 3): Bench, Chair, Couch - 14,57,58
+        # Beverage (class 1): Bottle, Wine Glass, Cup - 39,40,41
+        # Snacks (class 2) : Banana, Apple, Sandwich, Orange, Broccoli, Carrot, Hot dog, Pizza, Donut, Cake - [45,55]
+        # Seating (class 3): Bench, Chair, Couch - 13,56,57
 
         class_ids_1 = []
         confidences_1 = []
@@ -54,19 +54,19 @@ class HospitalityFinder:
                 y = int(center_y - h / 2)
 
                 # Check for beverages (class 1)
-                if confidence > self.confidence_threshold and class_id in [40,41,42]:
+                if confidence > self.confidence_threshold and class_id in [39,41]:
                     boxes_1.append([x, y, w, h])
                     confidences_1.append(float(confidence))
                     class_ids_1.append(class_id)
 
                 # Check for snacks (class 2)
-                elif confidence > self.confidence_threshold and 46 <= class_id <= 56:
+                elif confidence > self.confidence_threshold and (45 <= class_id <= 55):
                     boxes_2.append([x, y, w, h])
                     confidences_2.append(float(confidence))
                     class_ids_2.append(class_id)
 
                 # Check for seating (class 3)
-                elif confidence > self.confidence_threshold and [14,57,58]:
+                elif confidence > self.confidence_threshold and class_id in [13,56,57]:
                     boxes_3.append([x, y, w, h])
                     confidences_3.append(float(confidence))
                     class_ids_3.append(class_id)
@@ -77,8 +77,8 @@ class HospitalityFinder:
         indices_3 = cv2.dnn.NMSBoxes(boxes_3, confidences_3, self.confidence_threshold, self.nms_threshold)
 
         # Use list comprehension to filter boxes based on class ID
-        boxes_1 = [boxes_1[i] for i in indices_1 if class_ids_1[i] in [40,41,42]]
-        boxes_2 = [boxes_2[i] for i in indices_2 if 46 <= class_ids_2[i] <= 56]
-        boxes_3 = [boxes_3[i] for i in indices_3 if class_ids_3[i] in [14,57,58]]
+        boxes_1 = [boxes_1[i] for i in indices_1 if class_ids_1[i] in [39,41]]
+        boxes_2 = [boxes_2[i] for i in indices_2 if (45 <= class_ids_2[i] <= 55)]
+        boxes_3 = [boxes_3[i] for i in indices_3 if class_ids_3[i] in [13,56,57]]
 
         return boxes_1, boxes_2, boxes_3  # Return 3 sets of boxes for each of the classes: beverages, snacks, and seating

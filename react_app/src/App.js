@@ -20,7 +20,7 @@ function App() {
           <Route exact path="/audit" element={<AuditPage />}></Route>
           <Route path="/audit/upload" element={<UploadPage />}></Route>
           <Route path="/audit/results" element={<ResultsPage />}></Route>
-          <Route path="/audit/results/:dealershipName" element={<AdvancedResultsPage />} />
+          <Route path="/audit/results/:brandName/:dealershipName" element={<AdvancedResultsPage />} />
         </Routes>
       </BrowserRouter>
     </React.Fragment>

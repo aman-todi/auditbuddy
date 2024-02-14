@@ -8,7 +8,7 @@ import os
 db = database()
 from werkzeug.utils import secure_filename
 # computer vision
-from flask_app.video_analysis import deploy_cvision_tools
+from flask_app.video_analysis import count_cars_in_footage, assess_hospitality, count_parking_spaces
 from flask_app.brand_detection.logo import LogoDetector
 # firebase auth
 import firebase_admin
@@ -97,14 +97,22 @@ def upload_video():
                     if category == 'logo':
                         logo_detector = LogoDetector()
                         logo_detector.detect_logos_image(save_path)
+
                     elif category == 'cars':
-                        deploy_cvision_tools(save_path)
+                        count_cars_in_footage(save_path)
+
+                    elif category == 'hospitality':
+                        assess_hospitality(save_path)
+
+                    elif category == 'parking':
+                        count_parking_spaces(save_path)
 
                     if os.path.exists(save_path):
                         # Delete the file after processing
                         os.remove(save_path)
 
                     processed_categories.append(category)
+                    
                 except Exception as e:
                     error_message = f"Error during {category} processing: {str(e)}"
                     print(error_message)

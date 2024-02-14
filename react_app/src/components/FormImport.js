@@ -157,17 +157,17 @@ const FormImport = () => {
             label="Brand"
             onChange={(event) => handleFormInput(event, setDealership)}
           >
-            <MenuItem value={"audi"}>Audi</MenuItem>
-            <MenuItem value={"bmw"}>BMW</MenuItem>
-            <MenuItem value={"cadillac"}>Cadillac</MenuItem>
-            <MenuItem value={"chevrolet"}>Chevrolet</MenuItem>
-            <MenuItem value={"ford"}>Ford</MenuItem>
-            <MenuItem value={"honda"}>Honda</MenuItem>
-            <MenuItem value={"kia"}>Kia</MenuItem>
-            <MenuItem value={"nissan"}>Nissan</MenuItem>
-            <MenuItem value={"subaru"}>Subaru</MenuItem>
-            <MenuItem value={"toyota"}>Toyota</MenuItem>
-            <MenuItem value={"volkswagen"}>Volkswagen</MenuItem>
+            <MenuItem value={"Audi"}>Audi</MenuItem>
+            <MenuItem value={"BMW"}>BMW</MenuItem>
+            <MenuItem value={"Cadillac"}>Cadillac</MenuItem>
+            <MenuItem value={"Chevrolet"}>Chevrolet</MenuItem>
+            <MenuItem value={"Ford"}>Ford</MenuItem>
+            <MenuItem value={"Honda"}>Honda</MenuItem>
+            <MenuItem value={"Kia"}>Kia</MenuItem>
+            <MenuItem value={"Nissan"}>Nissan</MenuItem>
+            <MenuItem value={"Subaru"}>Subaru</MenuItem>
+            <MenuItem value={"Toyota"}>Toyota</MenuItem>
+            <MenuItem value={"Volkswagen"}>Volkswagen</MenuItem>
           </Select>
         </FormControl>
         <FormControl required fullWidth  sx={{margin: "0.1rem"}}>
@@ -177,10 +177,10 @@ const FormImport = () => {
             label="Department"
             onChange={(event) => handleFormInput(event, setDepartment)}
           >
-            <MenuItem value={"service"}>Service</MenuItem>
-            <MenuItem value={"sales"}>Sales</MenuItem>
-            <MenuItem value={"parts"}>Parts</MenuItem>
-            <MenuItem value={"bodyandpaint"}>Body & Paint</MenuItem>
+            <MenuItem value={"Service"}>Service</MenuItem>
+            <MenuItem value={"Sales"}>Sales</MenuItem>
+            <MenuItem value={"Parts"}>Parts</MenuItem>
+            <MenuItem value={"Body and Paint"}>Body & Paint</MenuItem>
           </Select>
         </FormControl>
         <FormControl required fullWidth sx={{margin: "0.1rem"}}>
@@ -190,8 +190,8 @@ const FormImport = () => {
             label="Country"
             onChange={(event) => handleFormInput(event, setCountry)}
           >
-            <MenuItem value={"usa"}>USA</MenuItem>
-            <MenuItem value={"canada"}>Canada</MenuItem>
+            <MenuItem value={"USA"}>USA</MenuItem>
+            <MenuItem value={"Canada"}>Canada</MenuItem>
           </Select>
         </FormControl>
       </Box>

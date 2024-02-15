@@ -10,6 +10,7 @@ from werkzeug.utils import secure_filename
 # computer vision
 from flask_app.video_analysis import count_cars_in_footage, assess_hospitality, count_parking_spaces
 from flask_app.brand_detection.logo import LogoDetector
+from flask_app.computer_vision.square_footage_detector import compute_square_footage
 # firebase auth
 import firebase_admin
 import firebase_admin.auth as auth
@@ -106,7 +107,11 @@ def upload_video():
 
                     elif category == 'parking':
                         count_parking_spaces(save_path)
-
+                    elif category == 'spatial':
+                        pass
+                        # need option to upload more than one image before processing because calibration
+                        # image needs to be processed first
+                        #compute_square_footage()
                     if os.path.exists(save_path):
                         # Delete the file after processing
                         os.remove(save_path)

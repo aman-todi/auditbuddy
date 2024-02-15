@@ -12,6 +12,30 @@ import axios from 'axios';
 function ResultsPage() {
   const navigate = useNavigate();
 
+  const [logoResults, setLogoResults] = useState([]);
+  // Define state variables for other categories here
+
+  useEffect(() => {
+    // Fetch results for each category separately
+    fetchLogoResults();
+    // Fetch results for other categories here
+  }, []);
+
+  const fetchLogoResults = () => {
+    fetch('/get-annotated-images') // Fetch images for the logo category
+      .then(response => response.json())
+      .then(data => {
+        setLogoResults(data.images); // Set the logo detection results received from the backend
+      })
+      .catch(error => console.error('Error fetching logo results:', error));
+  };
+
+  // Define functions to fetch results for other categories here
+
+  const openAnnotatedImageInNewTab = (imageUrl) => {
+    window.open(imageUrl, '_blank');
+  };
+
   // page authentication
   const [user, setUser] = useState(auth.currentUser);
 
@@ -61,9 +85,9 @@ function ResultsPage() {
   }, []);
 
   const handleFileListingClick = (item) => {
-    navigate(`/audit/results/${encodeURIComponent(item["Brand"])}/${encodeURIComponent(item["Dealership Name"])}`);
+    // Navigate to separate page with the listing data
+    navigate(`/audit/results/${item['Dealership Name']}`);
   };
-
 
   // order to display the keys of database results
   const brand_names = ['Audi', 'Honda', 'BMW', 'Ford', 'Chevrolet', 'Lincoln', 'Mercedes', 'GM']
@@ -93,25 +117,23 @@ function ResultsPage() {
 
                   {/* pop-up box*/}
                   <Dialog fullWidth open={popupItem} onClose={closePopup} sx={{ marginLeft: 15, display: 'flex', flexDirection: 'column' }}>
-                    <DialogTitle>{popupItem} Results</DialogTitle>
+                    <DialogTitle> {popupItem} Results</DialogTitle>
                     <DialogContent>
                       <Typography variant="h6" align="center">File Listing</Typography>
                       <Box sx={{ maxHeight: 400, overflowY: 'auto' }}>
-                        {items.reduce((uniqueNames, item) => {
-                          if (item['Brand'] === popupItem && !uniqueNames.includes(item['Dealership Name'])) {
-                            uniqueNames.push(item);
-                          }
-                          return uniqueNames;
-                        }, []).map((item, index) => (
-                          <Button
-                            key={index}
-                            variant="outlined"
-                            style={{ color: '#000000', borderColor: '#bae38c', marginBottom: '0.5rem' }} // Use hexadecimal value for colors
-                            fullWidth
-                            onClick={() => handleFileListingClick(item)}
-                          >
-                            {item["Dealership Name"]}
-                          </Button>
+                        {items.map((item, index) => (
+                          // Render a button for each past audit matching the selected brand
+                          item['Brand'] === popupItem && (
+                            <Button
+                              key={index}
+                              variant="outlined"
+                              style={{ color: '#000000', borderColor: '#bae38c', marginBottom: '0.5rem' }} // Use hexadecimal value for black color
+                              fullWidth
+                              onClick={() => handleFileListingClick(item)}
+                            >
+                              {item['Dealership Name']}
+                            </Button>
+                          )
                         ))}
                       </Box>
                     </DialogContent>
@@ -120,7 +142,6 @@ function ResultsPage() {
                       <MaterialUI.CustomButton onClick={closePopup}>Close</MaterialUI.CustomButton>
                     </DialogActions>
                   </Dialog>
-
                 </div>
 
               </Container>

@@ -29,36 +29,36 @@ const FormImport = () => {
 
   const handleLogoAdded = (fileItems) => {
     if (fileItems.length > 0) {
-      // set the state of file (this for one file)
-      setLogo(fileItems[0].file)
+      const allFiles = fileItems.map(item => item.file);
+      setLogo(allFiles);
     }
   };
 
   const handleCarsAdded = (fileItems) => {
     if (fileItems.length > 0) {
-      // set the state of file (this for one file)
-      setCars(fileItems[0].file)
+      const allFiles = fileItems.map(item => item.file);
+      setCars(allFiles);
     }
   };
 
   const handleParkingAdded = (fileItems) => {
     if (fileItems.length > 0) {
-      // set the state of file (this for one file)
-      setParking(fileItems[0].file)
+      const allFiles = fileItems.map(item => item.file);
+      setParking(allFiles);
     }
   };
 
   const handleHospitalityAdded = (fileItems) => {
     if (fileItems.length > 0) {
-      // set the state of file (this for one file)
-      setHospitality(fileItems[0].file)
+      const allFiles = fileItems.map(item => item.file);
+      setHospitality(allFiles);
     }
   };
 
   const handleSpatialAdded = (fileItems) => {
     if (fileItems.length > 0) {
-      // set the state of file (this for one file)
-      setSpatial(fileItems[0].file)
+      const allFiles = fileItems.map(item => item.file);
+      setSpatial(allFiles);
     }
   };
 
@@ -86,15 +86,42 @@ const FormImport = () => {
     }
     else {
       // create a form and append this file
-      // single image
       const formData = new FormData();
 
-      // default rn until rest of backend is implemented
-      formData.append('logo', logo);
-      formData.append('hospitality', hospitality);
-      formData.append('parking', parking);
-      formData.append('spatial', spatial);
-      formData.append('cars', cars);
+      // logo
+      if (logo && logo.length > 0) {
+        logo.forEach((file, index) => {
+            formData.append(`logo[${index}]`, file);
+        });
+      }
+      
+      // hospitality
+      if (hospitality && hospitality.length > 0) {
+        hospitality.forEach((file, index) => {
+            formData.append(`hospitality[${index}]`, file);
+        });
+      }
+    
+      // parking
+      if (parking && parking.length > 0) {
+        parking.forEach((file, index) => {
+            formData.append(`parking[${index}]`, file);
+        });
+      } 
+    
+      // spatial
+      if (spatial && spatial.length > 0) {
+        spatial.forEach((file, index) => {
+            formData.append(`spatial[${index}]`, file);
+        });
+      }
+    
+      // cars
+      if (cars && cars.length > 0) {
+        cars.forEach((file, index) => {
+            formData.append(`cars[${index}]`, file);
+        });
+      }
 
       // name
       formData.append('name', name);
@@ -223,7 +250,7 @@ const FormImport = () => {
       <div style={{ display: tabIndex === 0 ? 'block' : 'none' }}>
         <Box sx={{ marginTop: '1rem' }}>
           <FilePond
-            allowMultiple={false}
+            allowMultiple={true}
             onupdatefiles= {handleLogoAdded}
             stylePanelLayout={'compact'}
           />
@@ -233,7 +260,7 @@ const FormImport = () => {
       <div style={{ display: tabIndex === 1 ? 'block' : 'none' }}>
           <Box sx={{marginTop: '1rem'}}>
             <FilePond
-          allowMultiple={false}
+          allowMultiple={true}
           onupdatefiles={handleCarsAdded}
           stylePanelLayout={'compact'}
         />
@@ -243,7 +270,7 @@ const FormImport = () => {
       <div style={{ display: tabIndex === 2 ? 'block' : 'none' }}>
           <Box sx={{marginTop: '1rem'}}>
             <FilePond
-          allowMultiple={false}
+          allowMultiple={true}
           onupdatefiles={handleParkingAdded}
           stylePanelLayout={'compact'}
         />
@@ -253,7 +280,7 @@ const FormImport = () => {
       <div style={{ display: tabIndex === 3 ? 'block' : 'none' }}>
           <Box sx={{marginTop: '1rem'}}>
             <FilePond
-          allowMultiple={false}
+          allowMultiple={true}
           onupdatefiles={handleHospitalityAdded}
           stylePanelLayout={'compact'}
         />
@@ -263,7 +290,8 @@ const FormImport = () => {
       <div style={{ display: tabIndex === 4 ? 'block' : 'none' }}>
           <Box sx={{marginTop: '1rem'}}>
             <FilePond
-          allowMultiple={false}
+          allowMultiple={true}
+          maxFiles={3}
           onupdatefiles={handleSpatialAdded}
           stylePanelLayout={'compact'}
         />

@@ -66,69 +66,59 @@ def upload_video():
     database_info = [request.form['name'], request.form['dealership'], request.form['department'], request.form['country']]
 
     #FOR VIDEO ANALYSIS
-    # Check if the post request has the file part for all of the categories
-    required_categories = ['logo', 'hospitality', 'spatial', 'parking', 'cars']
 
-    if all(key not in request.files for key in required_categories):
-        return jsonify({'error': 'No file part in the request'}), 400
+    # spatial files in list
+    spatial_files = []
+    index = 0
+    while f'spatial[{index}]' in request.files:
+        file = request.files[f'spatial[{index}]']
+        spatial_files.append(file)
+        index += 1
+    print("spatial files;", spatial_files)
 
-    # logic for extracting files from different detection categories
-    if 'logo' in request.files:
-        logo = request.files['logo']
-    if 'hospitality' in request.files:
-        hospitality = request.files['hospitality']
-    if 'parking' in request.files:
-        parking = request.files['parking']
-    if 'cars' in request.files:
-        cars = request.files['cars']
-    if 'spatial' in request.files:
-         spatial = request.files['spatial']
+    # add the spatial awareness here. the files are stored in list spatial_files
 
-    processed_categories = []
+    # loop the detection categories
+    required_categories = ['logo', 'hospitality', 'parking', 'cars']
 
+    # logic for extracting file from different categories (works for multi files)
     for category in required_categories:
-        if category in request.files:
-            files = request.files.getlist(category)  # Get list of files for the category
-            for file in files:
+        files_list = []
+        index = 0
+        # gonna loop through all files and put it in a list
+        while f'{category}[{index}]' in request.files:
+            file = request.files[f'{category}[{index}]']
+            files_list.append(file)
+            index += 1
+
+        # process files in the list
+        for file in files_list:
+            try:
                 filename = secure_filename(file.filename)
                 save_path = os.path.join(app.root_path, 'static', 'main', 'media', filename)
                 file.save(save_path)
 
-                try:
-                    if category == 'logo':
-                        logo_detector = LogoDetector()
-                        logo_detector.detect_logos_image(save_path)
+                if category == 'logo':
+                    logo_detector = LogoDetector()
+                    logo_detector.detect_logos_image(save_path)
+                elif category == 'hospitality':
+                    assess_hospitality(save_path)
+                elif category == 'parking':
+                    count_parking_spaces(save_path)
+                elif category == 'cars':
+                    count_cars_in_footage(save_path)
 
-                    elif category == 'cars':
-                        count_cars_in_footage(save_path)
+                if os.path.exists(save_path):
+                    os.remove(save_path)
 
-                    elif category == 'hospitality':
-                        assess_hospitality(save_path)
-
-                    elif category == 'parking':
-                        count_parking_spaces(save_path)
-                    elif category == 'spatial':
-                        pass
-                        # need option to upload more than one image before processing because calibration
-                        # image needs to be processed first
-                        #compute_square_footage()
-                    if os.path.exists(save_path):
-                        # Delete the file after processing
-                        os.remove(save_path)
-
-                    processed_categories.append(category)
-                    
-                except Exception as e:
-                    error_message = f"Error during {category} processing: {str(e)}"
-                    print(error_message)
-                    return jsonify({'error': error_message}), 500
-
-    if processed_categories:
-        # call the function to upload the information to the database
-        add_to_database(database_info)
-        return jsonify({'message': f'{", ".join(processed_categories)} uploaded and processed successfully'}), 200
-    else:
-        return jsonify({'error': 'Unsupported file format'}), 400
+            except Exception as e:
+                error_message = f"Error during {category} processing: {str(e)}"
+                print(error_message)
+                return jsonify({'error': error_message}), 500
+                  
+    # add the form info to the database
+    add_to_database(database_info)
+    return jsonify({'message': 'Files uploaded and processed successfully'}), 200
 
 # checks if a user is an admin
 @app.route('/check-admin', methods=['POST'])
@@ -169,7 +159,6 @@ def add_to_database(database_info):
         "Brand": database_info[1],
         "Department": database_info[2],
         "Country": database_info[3],
-        #"Detection": # this would be like a nested list or something?
     }
 
     # go to the collection, create a new document (dealership name), create a new collection with (department)

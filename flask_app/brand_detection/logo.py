@@ -10,12 +10,12 @@ import numpy as np
 
 
 class LogoDetector:
-    def __init__(self, confidence_threshold=0.6, nms_threshold=0.4):
+    def __init__(self, filePath, confidence_threshold=0.6, nms_threshold=0.4):
         self.confidence_threshold = confidence_threshold  # Set confidence threshold for detection
         self.nms_threshold = nms_threshold  # Set Non-Maximum Suppression threshold
         self.logos = None
         self.annotations = []
-        
+        self.filePath = filePath
         # Initialize Firebase Admin SDK with your credentials
         self.bucket = storage.bucket()
 
@@ -77,8 +77,7 @@ class LogoDetector:
     def save_annotated_image_to_firebase(self, annotated_image):
         print("Saving annotated image to Firebase")
         # Specify the path where you want to store the file in Firebase Storage
-        folder_name = 'annotated_images'
-        image_filename = f"{folder_name}/annotated_image_{int(time.time())}.png"
+        image_filename = f"{self.filePath}/annotated_image_{int(time.time())}.png"
         blob = self.bucket.blob(image_filename)
         # Convert the OpenCV image to bytes
         _, buffer = cv2.imencode('.png', annotated_image)
@@ -97,16 +96,3 @@ class LogoDetector:
     #     cv2.imwrite(image_path, annotated_image)
 
     #     print(f'Saved annotated image: {image_path}')
-
-
-
-
-
-
-
-
-
-
-
-
-

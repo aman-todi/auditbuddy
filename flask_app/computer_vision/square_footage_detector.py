@@ -89,6 +89,7 @@ def resize_image(image_path, max_dimension=1000):
     else:
         # Return the original image if it doesn't need resizing
         return image
+    
 def compute_square_footage(files):
     distances_images = []
     square_footage_estimate = 0.0
@@ -146,12 +147,14 @@ def compute_square_footage(files):
         distances_list.append(dist)
         
         # Save the annotated image somehow that comes from this function
-        draw_box(file, marker, inches)
-        len_ft = distances_list[0] / 12
-        wi_ft = distances_list[1] / 12
-        square_footage_estimate = len_ft * wi_ft
-
-        return square_footage_estimate
-
+        annotated_image = draw_box(img, marker, dist)
+        annotated_path = os.path.join("flask_app", "static", "main", "annotated_images",f"annotated_image_{counter}.png")
+        cv2.imwrite(annotated_path, annotated_image)
+        counter += 1 
+    len_ft = distances_list[0] / 12
+    wi_ft = distances_list[1] / 12
+    square_footage_estimate = len_ft * wi_ft
+    
+    return square_footage_estimate
 
 

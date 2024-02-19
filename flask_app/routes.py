@@ -11,6 +11,7 @@ from werkzeug.utils import secure_filename
 from flask_app.video_analysis import count_cars_in_footage, assess_hospitality, count_parking_spaces
 from flask_app.brand_detection.logo import LogoDetector
 from flask_app.computer_vision.square_footage_detector import compute_square_footage
+from flask_app.score_audit import build_audit_score
 # firebase auth
 import firebase_admin
 import firebase_admin.auth as auth
@@ -148,33 +149,15 @@ def upload_video():
     submission = request.form['submission']
     print("submission",submission)
 
+    dealership_info = ( brandName, dealershipName, department, country, submission)
+
     # we should save the folders from each dealership somewhere in here
     database_info = [request.form['submission'],request.form['name'], request.form['dealership'], request.form['department'], request.form['country']]
 
-    #FOR VIDEO ANALYSIS
-
-    # spatial files in list
-    spatial_files = []
-    index = 0
-    while f'spatial[{index}]' in request.files:
-        file = request.files[f'spatial[{index}]']
-        spatial_files.append(file.filename)
-        filename = secure_filename(file.filename)
-        save_path = os.path.join(app.root_path, 'static', 'main', 'media', filename)
-        file.save(save_path)
-        index += 1
-    print("spatial files;", spatial_files)
-
-    # add the spatial awareness here. the files are stored in list spatial_files
-    print("Running Spatial")
-    calibration_image_found = compute_square_footage(spatial_files)
-    if calibration_image_found == -1:
-        error_message = f"No image named calibration was found"
-        print(error_message)
-        return jsonify({'error': error_message}), 404 
+    # Computer Vision Tasks
     
     # loop the detection categories
-    required_categories = ['logo', 'hospitality', 'parking', 'cars']
+    required_categories = ['logo', 'hospitality', 'parking', 'cars', 'spatial']
 
     # logic for extracting file from different categories (works for multi files)
     for category in required_categories:
@@ -199,18 +182,31 @@ def upload_video():
 
         # call computer vision functions to process the media
         if category == 'logo':
-            logo_detector = LogoDetector()
-            logo_detector.detect_logos_image(files_list[0]) # only one image supported for this feature currently
-        elif category == 'hospitality':
-            assess_hospitality(files_list)
-        elif category == 'parking':
-            count_parking_spaces(files_list)
-        elif category == 'cars':
-            count_cars_in_footage(files_list)
+            logo_detector = LogoDetector(dealership_info)
+            logo_result = logo_detector.detect_logos_image(files_list[0]) # only one image supported for this feature currently
 
+        elif category == 'cars':
+            num_cars = count_cars_in_footage(files_list)
+
+        elif category == 'parking':
+            num_parking = count_parking_spaces(files_list)
+
+        elif category == 'hospitality':
+            hospitality_finders = assess_hospitality(files_list)
+
+        elif category == 'spatial_files':
+            sq_footage = compute_square_footage(files_list)
+            if sq_footage == -1:
+                error_message = f"No image named calibration was found"
+                print(error_message)
+            
         for file in files_list:
             if os.path.exists(file):
                 os.remove(file)
+
+    # Build audit score
+    cv_results = (logo_result, num_cars, num_parking, hospitality_finders, sq_footage)
+    build_audit_score(cv_results)
                   
     # add the form info to the database
     add_to_database(database_info)

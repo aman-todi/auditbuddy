@@ -8,7 +8,7 @@ import * as MaterialUI from './MaterialUI';
 import HelpIcon from '@mui/icons-material/Help';
 
 // import ShowResults from './pages/audit-results';
-import { InputLabel, FormControl, MenuItem, Select, TextField, Container, Box, Tab, Tabs, Tooltip, Typography} from '@mui/material/';
+import { InputLabel, FormControl, MenuItem, Select, TextField, Container, Box, Tab, Tabs, Tooltip, Typography } from '@mui/material/';
 // axios
 import axios from 'axios';
 
@@ -20,7 +20,7 @@ const FormImport = () => {
   const [cars, setCars] = useState(null);
   const [hospitality, setHospitality] = useState(null);
   const [spatial, setSpatial] = useState(null);
-  
+
   // states to keep track of form
   const [department, setDepartment] = useState('');
   const [country, setCountry] = useState('');
@@ -91,35 +91,35 @@ const FormImport = () => {
       // logo
       if (logo && logo.length > 0) {
         logo.forEach((file, index) => {
-            formData.append(`logo[${index}]`, file);
+          formData.append(`logo[${index}]`, file);
         });
       }
-      
+
       // hospitality
       if (hospitality && hospitality.length > 0) {
         hospitality.forEach((file, index) => {
-            formData.append(`hospitality[${index}]`, file);
+          formData.append(`hospitality[${index}]`, file);
         });
       }
-    
+
       // parking
       if (parking && parking.length > 0) {
         parking.forEach((file, index) => {
-            formData.append(`parking[${index}]`, file);
+          formData.append(`parking[${index}]`, file);
         });
-      } 
-    
+      }
+
       // spatial
       if (spatial && spatial.length > 0) {
         spatial.forEach((file, index) => {
-            formData.append(`spatial[${index}]`, file);
+          formData.append(`spatial[${index}]`, file);
         });
       }
-    
+
       // cars
       if (cars && cars.length > 0) {
         cars.forEach((file, index) => {
-            formData.append(`cars[${index}]`, file);
+          formData.append(`cars[${index}]`, file);
         });
       }
 
@@ -131,6 +131,11 @@ const FormImport = () => {
       formData.append('country', country)
       // dealership
       formData.append('dealership', dealership)
+
+      // Get the current timestamp
+      const time = new Date().toISOString();
+
+      formData.append('submission', time)
 
       try {
         const response = await axios.post('http://localhost:8080/upload-video', formData, {
@@ -167,17 +172,17 @@ const FormImport = () => {
 
   return (
     <Container component="main" maxWidth="s">
-            <Typography variant="p" sx={{ display: "flex", alignItems: "center", marginBottom: "1rem" }}>
-              <span style={{ fontWeight: "bold", marginRight: "0.5rem"}}>Dealership</span>
-              <Tooltip disableFocusListener title="The information of the dealership being submitted">
-                <HelpIcon sx={{fontSize: "small"}}/>
-              </Tooltip>
-            </Typography>
-      <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, alignItems: "center"}}>
+      <Typography variant="p" sx={{ display: "flex", alignItems: "center", marginBottom: "1rem" }}>
+        <span style={{ fontWeight: "bold", marginRight: "0.5rem" }}>Dealership</span>
+        <Tooltip disableFocusListener title="The information of the dealership being submitted">
+          <HelpIcon sx={{ fontSize: "small" }} />
+        </Tooltip>
+      </Typography>
+      <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, alignItems: "center" }}>
         <TextField fullWidth required label="Dealership Name" variant="outlined" onChange={(event) => handleFormInput(event, setName)}
-          sx={{margin: "0.1rem"}}
+          sx={{ margin: "0.1rem" }}
         />
-        <FormControl required fullWidth  sx={{margin: "0.1rem"}}>
+        <FormControl required fullWidth sx={{ margin: "0.1rem" }}>
           <InputLabel>Brand</InputLabel>
           <Select
             value={dealership}
@@ -197,7 +202,7 @@ const FormImport = () => {
             <MenuItem value={"Volkswagen"}>Volkswagen</MenuItem>
           </Select>
         </FormControl>
-        <FormControl required fullWidth  sx={{margin: "0.1rem"}}>
+        <FormControl required fullWidth sx={{ margin: "0.1rem" }}>
           <InputLabel>Department</InputLabel>
           <Select
             value={department}
@@ -210,7 +215,7 @@ const FormImport = () => {
             <MenuItem value={"Body and Paint"}>Body & Paint</MenuItem>
           </Select>
         </FormControl>
-        <FormControl required fullWidth sx={{margin: "0.1rem"}}>
+        <FormControl required fullWidth sx={{ margin: "0.1rem" }}>
           <InputLabel>Country</InputLabel>
           <Select
             value={country}
@@ -224,82 +229,82 @@ const FormImport = () => {
       </Box>
 
       <Typography variant="p" sx={{ display: "flex", alignItems: "center", marginBottom: "1rem", marginTop: "1rem" }}>
-              <span style={{ fontWeight: "bold", marginRight: "0.5rem"}}>Detection</span>
-              <Tooltip disableFocusListener title="Upload files in the categories that you'd like to detect">
-                <HelpIcon sx={{fontSize: "small"}}/>
-              </Tooltip>
-            </Typography>
-      <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'center'}} indicatorColor="primary">
-      <Tabs value={tabIndex} onChange={handleTabChange} sx={{fontSize: '0.75rem'}}
-      TabIndicatorProps={{
-        style: {
-          backgroundColor: "#74b42c",
-        }
-      }}
-      >
-        <Tab label={<span style={{ color: 'rgb(50,50,50)' }}>LOGOS</span>}/>
-        <Tab label={<span style={{ color: 'rgb(50,50,50)' }}>DISPLAY CARS</span>}/>
-        <Tab label={<span style={{ color: 'rgb(50,50,50)' }}>PARKING SPACES</span>}/>
-        <Tab label={<span style={{ color: 'rgb(50,50,50)' }}>HOSPITALITY</span>}/>
-        <Tab label={<span style={{ color: 'rgb(50,50,50)' }}>SPATIAL</span>}/>
-      </Tabs>
+        <span style={{ fontWeight: "bold", marginRight: "0.5rem" }}>Detection</span>
+        <Tooltip disableFocusListener title="Upload files in the categories that you'd like to detect">
+          <HelpIcon sx={{ fontSize: "small" }} />
+        </Tooltip>
+      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} indicatorColor="primary">
+        <Tabs value={tabIndex} onChange={handleTabChange} sx={{ fontSize: '0.75rem' }}
+          TabIndicatorProps={{
+            style: {
+              backgroundColor: "#74b42c",
+            }
+          }}
+        >
+          <Tab label={<span style={{ color: 'rgb(50,50,50)' }}>LOGOS</span>} />
+          <Tab label={<span style={{ color: 'rgb(50,50,50)' }}>DISPLAY CARS</span>} />
+          <Tab label={<span style={{ color: 'rgb(50,50,50)' }}>PARKING SPACES</span>} />
+          <Tab label={<span style={{ color: 'rgb(50,50,50)' }}>HOSPITALITY</span>} />
+          <Tab label={<span style={{ color: 'rgb(50,50,50)' }}>SPATIAL</span>} />
+        </Tabs>
       </Box>
 
       <Box>
- 
-      <div style={{ display: tabIndex === 0 ? 'block' : 'none' }}>
-        <Box sx={{ marginTop: '1rem' }}>
-          <FilePond
-            allowMultiple={true}
-            onupdatefiles= {handleLogoAdded}
-            stylePanelLayout={'compact'}
-          />
-        </Box>
-      </div> 
 
-      <div style={{ display: tabIndex === 1 ? 'block' : 'none' }}>
-          <Box sx={{marginTop: '1rem'}}>
+        <div style={{ display: tabIndex === 0 ? 'block' : 'none' }}>
+          <Box sx={{ marginTop: '1rem' }}>
             <FilePond
-          allowMultiple={true}
-          onupdatefiles={handleCarsAdded}
-          stylePanelLayout={'compact'}
-        />
+              allowMultiple={true}
+              onupdatefiles={handleLogoAdded}
+              stylePanelLayout={'compact'}
+            />
           </Box>
-      </div>
+        </div>
 
-      <div style={{ display: tabIndex === 2 ? 'block' : 'none' }}>
-          <Box sx={{marginTop: '1rem'}}>
+        <div style={{ display: tabIndex === 1 ? 'block' : 'none' }}>
+          <Box sx={{ marginTop: '1rem' }}>
             <FilePond
-          allowMultiple={true}
-          onupdatefiles={handleParkingAdded}
-          stylePanelLayout={'compact'}
-        />
+              allowMultiple={true}
+              onupdatefiles={handleCarsAdded}
+              stylePanelLayout={'compact'}
+            />
           </Box>
-      </div>
+        </div>
 
-      <div style={{ display: tabIndex === 3 ? 'block' : 'none' }}>
-          <Box sx={{marginTop: '1rem'}}>
+        <div style={{ display: tabIndex === 2 ? 'block' : 'none' }}>
+          <Box sx={{ marginTop: '1rem' }}>
             <FilePond
-          allowMultiple={true}
-          onupdatefiles={handleHospitalityAdded}
-          stylePanelLayout={'compact'}
-        />
+              allowMultiple={true}
+              onupdatefiles={handleParkingAdded}
+              stylePanelLayout={'compact'}
+            />
           </Box>
-      </div>
+        </div>
 
-      <div style={{ display: tabIndex === 4 ? 'block' : 'none' }}>
-          <Box sx={{marginTop: '1rem'}}>
+        <div style={{ display: tabIndex === 3 ? 'block' : 'none' }}>
+          <Box sx={{ marginTop: '1rem' }}>
             <FilePond
-          allowMultiple={true}
-          maxFiles={3}
-          onupdatefiles={handleSpatialAdded}
-          stylePanelLayout={'compact'}
-        />
+              allowMultiple={true}
+              onupdatefiles={handleHospitalityAdded}
+              stylePanelLayout={'compact'}
+            />
           </Box>
-      </div>
+        </div>
+
+        <div style={{ display: tabIndex === 4 ? 'block' : 'none' }}>
+          <Box sx={{ marginTop: '1rem' }}>
+            <FilePond
+              allowMultiple={true}
+              maxFiles={3}
+              onupdatefiles={handleSpatialAdded}
+              stylePanelLayout={'compact'}
+            />
+          </Box>
+        </div>
       </Box>
-     
-      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "0.1rem"}}>
+
+      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "0.1rem" }}>
         <MaterialUI.CustomButton type="submit" onClick={handleUpload}>Analyze</MaterialUI.CustomButton>
       </Box>
     </Container>

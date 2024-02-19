@@ -21,6 +21,8 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import SettingsIcon from '@mui/icons-material/Settings';
 // authentication
 import { auth } from '../components/Authentication';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import { useAdmin } from './Admin';
 
 // custom button
 export const CustomButton = (props) => {
@@ -121,6 +123,8 @@ export const SideBar = () => {
         marginLeft: -3,
     };
 
+    const { admin } = useAdmin();
+
     return (
         <Drawer variant='permanent' anchor='left' sx={{width: 100}}>
             <Toolbar sx={{ marginTop: 7.5, width: 100 }}>
@@ -143,6 +147,19 @@ export const SideBar = () => {
                             <ListItemText primary="Results" />
                         </ListItemButton>
                     </ListItem>
+
+                    {admin ? (
+                        <React.Fragment>
+                        <Divider sx={{ ...colorSelected }}></Divider>
+                        <ListItem disablePadding>
+                            <ListItemButton sx={{ ...colorSelected }} selected={path === '/audit/admin-console'} component={Link} to="/audit/admin-console">
+                                <ListItemIcon sx={{minWidth: 40}}><AdminPanelSettingsIcon /></ListItemIcon>
+                                <ListItemText primary="Console" />
+                            </ListItemButton>
+                        </ListItem>
+                        </React.Fragment>
+                    ) : null}
+
                     <Divider sx={{ ...colorSelected }}></Divider>
                     <ListItem disablePadding>
                         <ListItemButton sx={{ ...colorSelected }}>

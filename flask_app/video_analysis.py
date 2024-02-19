@@ -16,45 +16,46 @@ def save_frame(frame, frame_number, output_folder):
     cv2.imwrite(filepath, frame)
 
 
-def count_cars_in_footage(path_to_video):
-    # Compute the number of distinct cars in a video
+def count_cars_in_footage(files_list):
+    # Compute the number of distinct cars from multiple videos
 
     # Initialize car detector and tracker
     car_detector = CarDetector()
-    car_tracker = Tracker(distance_threshold=145)
+    car_tracker = Tracker(distance_threshold=230)
 
-    # Load and segment video
-    cap = cv2.VideoCapture(path_to_video)
+    for video in files_list:
+        # Load and segment video
+        cap = cv2.VideoCapture(video)
 
-    frame_counter = 0
-    display_frequency = 50  # Set the frequency of frames to save
+        frame_counter = 0
+        display_frequency = 50  # Set the frequency of frames to save
 
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            break
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
 
-        # Increment the frame counter
-        frame_counter += 1
+            # Increment the frame counter
+            frame_counter += 1
 
-        # Detect and track cars
-        car_boxes = car_detector.detect_cars(frame)
-        car_tracker.update(car_boxes)
+            # Detect and track cars
+            car_boxes = car_detector.detect_cars(frame)
+            car_tracker.update(car_boxes)
 
-        # Draw bounding boxes and save the frame only if the counter matches the display frequency
-        if frame_counter % display_frequency == 0 or frame_counter == 1:
-            for box in car_boxes:
-                x, y, w, h = box
-                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-            save_frame(frame, frame_counter, 'car_frames')
-        
+            # Draw bounding boxes and save the frame only if the counter matches the display frequency
+            if frame_counter % display_frequency == 0 or frame_counter == 1:
+                for box in car_boxes:
+                    x, y, w, h = box
+                    cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                save_frame(frame, frame_counter, 'car_frames')
+            
+        cap.release()
+
     print("Count of cars found: ", car_tracker.get_total_count())
 
-    cap.release()
 
-
-def assess_hospitality(path_to_video):
-    # Build a list of hospitality indicators
+def assess_hospitality(files_list):
+    # Build a list of hospitality indicators from videos
 
     # HOSPITALITY
     hospitality_finder = HospitalityFinder()
@@ -63,86 +64,100 @@ def assess_hospitality(path_to_video):
     # Initialize snacks (class 2) tracker
     snacks_tracker = Tracker(distance_threshold=120)
     # Initialize seating (class 3) tracker
-    seating_tracker = Tracker(distance_threshold=160)
+    seating_tracker = Tracker(distance_threshold=200)
 
-    # Load and segment video
-    cap = cv2.VideoCapture(path_to_video)
+    for video in files_list:
 
-    frame_counter = 0
-    display_frequency = 50  # Set the frequency of frames to save
+        # Load and segment video
+        cap = cv2.VideoCapture(video)
 
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            break
+        frame_counter = 0
+        display_frequency = 50  # Set the frequency of frames to save
 
-        # Increment the frame counter
-        frame_counter += 1
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
 
-        # Find and track hospitality indicators
-        beverage_boxes, snacks_boxes, seating_boxes = hospitality_finder.detect_indicators(frame)
-        beverage_tracker.update(beverage_boxes)
-        snacks_tracker.update(snacks_boxes)
-        seating_tracker.update(seating_boxes)
+            # Increment the frame counter
+            frame_counter += 1
 
-        # Draw bounding boxes and save the frame only if the counter matches the display frequency
-        if frame_counter % display_frequency == 0 or frame_counter == 1:
+            # Find and track hospitality indicators
+            beverage_boxes, snacks_boxes, seating_boxes = hospitality_finder.detect_indicators(frame)
+            beverage_tracker.update(beverage_boxes)
+            snacks_tracker.update(snacks_boxes)
+            seating_tracker.update(seating_boxes)
 
-            # Draw boxes around beverages
-            for box in beverage_boxes:
-                x, y, w, h = box
-                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
+            # Draw bounding boxes and save the frame only if the counter matches the display frequency
+            if frame_counter % display_frequency == 0 or frame_counter == 1:
 
-            # Draw boxes around snacks
-            for box in snacks_boxes:
-                x, y, w, h = box
-                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
+                # Draw boxes around beverages
+                for box in beverage_boxes:
+                    x, y, w, h = box
+                    cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
 
-            # Draw boxes around seating areas
-            for box in seating_boxes:
-                x, y, w, h = box
-                cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
+                # Draw boxes around snacks
+                for box in snacks_boxes:
+                    x, y, w, h = box
+                    cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
 
-            save_frame(frame, frame_counter, 'hospitality_frames')
-        
+                # Draw boxes around seating areas
+                for box in seating_boxes:
+                    x, y, w, h = box
+                    cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
+
+                save_frame(frame, frame_counter, 'hospitality_frames')
+
+        cap.release()
+
     print("Count of beverages found: ", beverage_tracker.get_total_count())
     print("Count of snacks found: ", snacks_tracker.get_total_count())
     print("Count of seating found: ", seating_tracker.get_total_count())
 
-    cap.release()
 
-
-def count_parking_spaces(path_to_video):
+def count_parking_spaces(files_list):
     # Count the number of parking spaces for customers
-    parking_tracker = Tracker(distance_threshold=175)
 
-    cap = cv2.VideoCapture(path_to_video)
+    # ORIGINAL CODE, REVERT TO THIS AFTER TRAINING OF MODEL FINISHES
+    # parking_tracker = Tracker(distance_threshold=175)
 
-    frame_counter = 0
-    display_frequency = 50  # Set the frequency of frames to save
+    # for video in files_list:
+    #     cap = cv2.VideoCapture(video)
 
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            break
+    #     frame_counter = 0
+    #     display_frequency = 50  # Set the frequency of frames to save
 
-        # Increment the frame counter
-        frame_counter += 1
+    #     while True:
+    #         ret, frame = cap.read()
+    #         if not ret:
+    #             break
 
-        # Detect parking spaces in the current frame
-        parking_boxes = detect_parking_spaces(frame)
-        
-        # Update tracker with detected boxes
-        parking_tracker.update(parking_boxes)
+    #         # Increment the frame counter
+    #         frame_counter += 1
 
-        # Draw bounding boxes and save the frame only if the counter matches the display frequency
-        if frame_counter % display_frequency == 0 or frame_counter == 1:
-            for box in parking_boxes:
-                x, y, w, h = box
-                cv2.rectangle(frame, (int(x), int(y)), (int(x + w), int(y + h)), (0, 255, 0), 2)
-            save_frame(frame, frame_counter, 'parking_frames')
+    #         # Detect parking spaces in the current frame
+    #         parking_boxes = detect_parking_spaces(frame)
+            
+    #         # Update tracker with detected boxes
+    #         parking_tracker.update(parking_boxes)
 
-    print("Number of parking spaces: ", parking_tracker.get_total_count())
+    #         # Draw bounding boxes and save the frame only if the counter matches the display frequency
+    #         if frame_counter % display_frequency == 0 or frame_counter == 1:
+    #             for box in parking_boxes:
+    #                 x, y, w, h = box
+    #                 cv2.rectangle(frame, (int(x), int(y)), (int(x + w), int(y + h)), (0, 255, 0), 2)
+    #             save_frame(frame, frame_counter, 'parking_frames')
 
-    cap.release()
+    #     cap.release()
+    
+    # print("Number of parking spaces: ", parking_tracker.get_total_count())
+
+
+    # REMOVE CODE BELOW THIS LINE AFTER MODEL IS READY
+    parking_counter = 0
+
+    for image in files_list:
+        parking_counter += detect_parking_spaces(image)
+
+    print("Number of parking spaces: ", parking_counter)
 

@@ -16,6 +16,7 @@ import firebase_admin
 import firebase_admin.auth as auth
 from firebase_admin import credentials, storage, firestore
 from datetime import datetime
+import time
     
 ANNOTATED_IMAGES_FOLDER = os.path.join(app.root_path, 'static', 'main', 'annotated_images')
 
@@ -131,7 +132,11 @@ def get_annotated_images_spatial(brandName,dealershipName,department,submission)
 
 @app.route('/upload-video', methods=['POST'])
 def upload_video():
-    #FOR OTHER FORM INPUT
+
+    # simulate stopwatch
+    start_time = time.time()
+
+    # basic dealership info
     dealershipName = request.form['name']
     print("Brand Name: ", dealershipName)
     brandName = request.form['dealership']
@@ -145,7 +150,6 @@ def upload_video():
 
     # we should save the folders from each dealership somewhere in here
     database_info = [request.form['submission'],request.form['name'], request.form['dealership'], request.form['department'], request.form['country']]
-
 
     #FOR VIDEO ANALYSIS
 
@@ -176,39 +180,45 @@ def upload_video():
     for category in required_categories:
         files_list = []
         index = 0
-        # gonna loop through all files and put it in a list
+        # loop through all files and put it in a list
         while f'{category}[{index}]' in request.files:
             file = request.files[f'{category}[{index}]']
-            files_list.append(file)
-            index += 1
 
-        # process files in the list
-        for file in files_list:
             try:
                 filename = secure_filename(file.filename)
                 save_path = os.path.join(app.root_path, 'static', 'main', 'media', filename)
                 file.save(save_path)
-
-                if category == 'logo':
-                    filePath = f"{brandName}/{dealershipName}/{department}/{submission}/LogoResults"
-                    logo_detector = LogoDetector(filePath=filePath)
-                    logo_detector.detect_logos_image(save_path)
-                elif category == 'hospitality':
-                    assess_hospitality(save_path)
-                elif category == 'parking':
-                    count_parking_spaces(save_path)
-                elif category == 'cars':
-                    count_cars_in_footage(save_path)
-                if os.path.exists(save_path):
-                    os.remove(save_path)
+                files_list.append(save_path)
 
             except Exception as e:
                 error_message = f"Error during {category} processing: {str(e)}"
                 print(error_message)
                 return jsonify({'error': error_message}), 500
+
+            index += 1
+
+        # call computer vision functions to process the media
+        if category == 'logo':
+            logo_detector = LogoDetector()
+            logo_detector.detect_logos_image(files_list[0]) # only one image supported for this feature currently
+        elif category == 'hospitality':
+            assess_hospitality(files_list)
+        elif category == 'parking':
+            count_parking_spaces(files_list)
+        elif category == 'cars':
+            count_cars_in_footage(files_list)
+
+        for file in files_list:
+            if os.path.exists(file):
+                os.remove(file)
                   
     # add the form info to the database
     add_to_database(database_info)
+
+    end_time = time.time()
+
+    print(f"Total Execution Time: {end_time - start_time} seconds")
+
     return jsonify({'message': 'Files uploaded and processed successfully'}), 200
 
 # checks if a user is an admin

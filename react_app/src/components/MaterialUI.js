@@ -19,6 +19,7 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import BallotIcon from '@mui/icons-material/Ballot';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import SettingsIcon from '@mui/icons-material/Settings';
+import AddBusinessIcon from '@mui/icons-material/AddBusiness';
 // authentication
 import { auth } from '../components/Authentication';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
@@ -132,21 +133,28 @@ export const SideBar = () => {
                     <ListItem disablePadding>
                         <ListItemButton sx={{ ...colorSelected }} selected={path === '/audit'} component={Link} to="/audit">
                             <ListItemIcon sx={{minWidth: 40}}><AlignHorizontalLeftIcon></AlignHorizontalLeftIcon></ListItemIcon>
-                            <ListItemText primary="Dashboard" sx={{ width: 76 }} />
+                            <ListItemText
+                                primary={<Typography sx={{ fontSize: '0.9rem' }}>Dashboard</Typography>}
+                            />
                         </ListItemButton>
                     </ListItem>
                     <ListItem disablePadding>
                         <ListItemButton sx={{ ...colorSelected }} selected={path === '/audit/upload'} component={Link} to="/audit/upload">
                             <ListItemIcon sx={{minWidth: 40}}><CloudUploadIcon></CloudUploadIcon></ListItemIcon>
-                            <ListItemText primary="Upload" />
+                            <ListItemText
+                                primary={<Typography sx={{ fontSize: '0.9rem' }}>Upload</Typography>}
+                            />
                         </ListItemButton>
                     </ListItem>
                     <ListItem disablePadding>
                         <ListItemButton sx={{ ...colorSelected }} selected={path === '/audit/results'} component={Link} to="/audit/results">
                             <ListItemIcon sx={{minWidth: 40}}><BallotIcon></BallotIcon></ListItemIcon>
-                            <ListItemText primary="Results" />
+                            <ListItemText
+                                primary={<Typography sx={{ fontSize: '0.9rem' }}>Results</Typography>}
+                            />
                         </ListItemButton>
                     </ListItem>
+
 
                     {admin ? (
                         <React.Fragment>
@@ -154,7 +162,9 @@ export const SideBar = () => {
                         <ListItem disablePadding>
                             <ListItemButton sx={{ ...colorSelected }} selected={path === '/audit/admin-console'} component={Link} to="/audit/admin-console">
                                 <ListItemIcon sx={{minWidth: 40}}><AdminPanelSettingsIcon /></ListItemIcon>
-                                <ListItemText primary="Console" />
+                                <ListItemText
+                                    primary={<Typography sx={{ fontSize: '0.9rem' }}>Console</Typography>}
+                                />
                             </ListItemButton>
                         </ListItem>
                         </React.Fragment>
@@ -162,15 +172,27 @@ export const SideBar = () => {
 
                     <Divider sx={{ ...colorSelected }}></Divider>
                     <ListItem disablePadding>
+                        <ListItemButton sx={{ ...colorSelected }} selected={path === '/audit/dealerships'} component={Link} to="/audit/dealerships">
+                            <ListItemIcon sx={{minWidth: 40}}><AddBusinessIcon></AddBusinessIcon></ListItemIcon>
+                            <ListItemText
+                                primary={<Typography sx={{ fontSize: '0.9rem' }}>Dealerships</Typography>}
+                            />
+                        </ListItemButton>
+                    </ListItem>
+                    <ListItem disablePadding>
                         <ListItemButton sx={{ ...colorSelected }}>
                             <ListItemIcon sx={{minWidth: 40}}><HelpOutlineIcon></HelpOutlineIcon></ListItemIcon>
-                            <ListItemText primary="Contact" />
+                            <ListItemText
+                                primary={<Typography sx={{ fontSize: '0.9rem' }}>Contact</Typography>}
+                            />
                         </ListItemButton>
                     </ListItem>
                     <ListItem disablePadding>
                         <ListItemButton sx={{ ...colorSelected }}>
                             <ListItemIcon sx={{minWidth: 40}}><SettingsIcon></SettingsIcon></ListItemIcon>
-                            <ListItemText primary="Settings" />
+                            <ListItemText
+                                primary={<Typography sx={{ fontSize: '0.9rem' }}>Settings</Typography>}
+                            />
                         </ListItemButton>
                     </ListItem>
                 </List>

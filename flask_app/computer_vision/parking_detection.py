@@ -1,5 +1,5 @@
 from roboflow import Roboflow
-rf = Roboflow(api_key="08eejFeNCBXzo07TlLQP")
+rf = Roboflow(api_key="yYNNUjMbwKaGyWdzCMCz")
 project = rf.workspace().project("parking-space-ipm1b")
 model = project.version(4).model
 
@@ -11,4 +11,9 @@ def detect_parking_spaces(image_path):
     for p in out['predictions']:
         boxes.append((p['x'], p['y'], p['width'], p['height']))
 
-    return boxes
+    # revert to this
+    #return boxes
+    #
+        
+    # delete this
+    return len(boxes)

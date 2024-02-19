@@ -28,6 +28,31 @@ function ResultsPage() {
   // pop up content
   const [popupContent, setPopupContent] = useState(null);
 
+  // Search Bar Results
+  const [searchResults, setSearchResults] = useState([]);
+
+  const handleSearch = async (criteria) => {
+    try {
+      // Make a request to the backend with search criteria
+      console.log("Handling Searchs");
+      const response = await axios.post('/search-results', criteria);
+      // Log the response data
+      console.log("Search results:", response);
+      // Set search results in state
+      setSearchResults(response.data);
+      console.log("Length of Search", response.data.length);
+
+      const results = response.data;
+      // Set the popup content to display the search results
+      setPopupContent({ type: 'Submitted', other: 'Search', data: results });
+      console.log("Popup set!");
+    } catch (error) {
+      console.error("Error fetching search results:", error);
+    }
+  };
+
+
+
   // fetch data from the database
   const fetchResults = async () => {
     try {
@@ -48,12 +73,14 @@ function ResultsPage() {
 
   const getPopupTitle = (type) => {
     switch (type) {
-      case 'dealerships':
+      case 'Dealership Name':
         return 'Dealerships';
-      case 'departments':
+      case 'Department':
         return 'Departments';
-      case 'submissions':
+      case 'Submitted':
         return 'Submissions';
+      case 'Search':
+        return 'Search Results';
       default:
         return '';
     }
@@ -61,30 +88,24 @@ function ResultsPage() {
 
   // handle click on brand name
   const handleBrandClick = (brandName) => {
-    const dealerships = Array.from(new Set(items.filter(item => item['Brand'] === brandName)
-      .map(item => item['Dealership Name'])));
-
-    console.log("Dealerships", dealerships);
-    setPopupContent({ type: 'dealerships', data: dealerships, brandName });
+    const dealerships = Array.from(new Set(items.filter(item => item['Brand'] === brandName)));
+    setPopupContent({ type: 'Dealership Name', data: dealerships });
   }
 
   // handle click on dealership
-  const handleDealershipClick = (dealershipName) => {
-    const departments = Array.from(new Set(items.filter(item => item['Dealership Name'] === dealershipName && item['Brand'] === popupContent.brandName)
-      .map(item => item['Department'])));
-    setPopupContent({ type: 'departments', data: departments, brandName: popupContent.brandName, dealershipName });
+  const handleDealershipClick = (param) => {
+    const departments = Array.from(new Set(items.filter(item => item['Dealership Name'] === param['Dealership Name'] && item['Brand'] === param['Brand'])));
+    setPopupContent({ type: 'Department', data: departments });
   }
-
 
   // handle click on department
-  const handleDepartmentClick = (department) => {
-    const submissions = items.filter(item => item['Department'] === department && item['Dealership Name'] === popupContent.dealershipName && item['Brand'] === popupContent.brandName)
-      .map(item => item['Submitted']);
-    setPopupContent({ type: 'submissions', data: submissions, brandName: popupContent.brandName, dealershipName: popupContent.dealershipName, department });
+  const handleDepartmentClick = (param) => {
+    const submissions = items.filter(item => item['Department'] === param['Department'] && item['Dealership Name'] === param['Dealership Name'] && item['Brand'] === param['Brand']);
+    setPopupContent({ type: 'Submitted', data: submissions });
   }
 
-  const handleSubmissionClick = (submission) => {
-    navigate(`/audit/results/${encodeURIComponent(popupContent.brandName)}/${encodeURIComponent(popupContent.dealershipName)}/${encodeURIComponent(popupContent.department)}/${encodeURIComponent(submission)}`);
+  const handleSubmissionClick = (param) => {
+    navigate(`/audit/results/${encodeURIComponent(param['Brand'])}/${encodeURIComponent(param['Dealership Name'])}/${encodeURIComponent(param['Department'])}/${encodeURIComponent(param["Submitted"])}`);
   };
 
   // order to display the keys of database results
@@ -107,7 +128,7 @@ function ResultsPage() {
                 <h1>Results</h1>
                 <div>
                   {/* Search bar*/}
-                  <SearchBar />
+                  <SearchBar onSearch={handleSearch} />
                   <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
                     {/* Display brand names */}
                     {brand_names.map((brandName, index) => (
@@ -122,7 +143,7 @@ function ResultsPage() {
                   {/* Display popup content */}
                   {popupContent && (
                     <Dialog fullWidth open={true} onClose={closePopup} sx={{ marginLeft: 15, display: 'flex', flexDirection: 'column' }}>
-                      <DialogTitle>{getPopupTitle(popupContent.type)}</DialogTitle>
+                      <DialogTitle>{popupContent.type}</DialogTitle>
                       <DialogContent>
                         <Typography variant="h6" align="center">File Listing</Typography>
                         <Box sx={{ maxHeight: 400, overflowY: 'auto' }}>
@@ -133,17 +154,16 @@ function ResultsPage() {
                               style={{ color: '#000000', borderColor: '#bae38c', marginBottom: '0.5rem' }}
                               fullWidth
                               onClick={() => {
-                                if (popupContent.type === 'dealerships') {
+                                if (popupContent.type === 'Dealership Name') {
                                   handleDealershipClick(item);
-                                } else if (popupContent.type === 'departments') {
+                                } else if (popupContent.type === 'Department') {
                                   handleDepartmentClick(item);
                                 } else {
                                   handleSubmissionClick(item);
                                 }
                               }}
-
                             >
-                              {item}
+                              {item[popupContent.type]}
                             </Button>
                           ))}
                         </Box>
@@ -157,9 +177,10 @@ function ResultsPage() {
               </Container>
             </div>
           </header>
-        </React.Fragment>
-      ) : (<p>Not Authorized</p>)}
-    </React.Fragment>
+        </React.Fragment >
+      ) : (<p>Not Authorized</p>)
+      }
+    </React.Fragment >
   );
 }
 

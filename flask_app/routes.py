@@ -21,6 +21,9 @@ ANNOTATED_IMAGES_FOLDER = os.path.join(app.root_path, 'static', 'main', 'annotat
 
 bucket = storage.bucket()
 
+# Firestore database
+db = firestore.client()
+
 @app.route('/')
 def root():
 	return render_template('index.html')
@@ -249,8 +252,6 @@ def add_to_database(database_info):
 @app.route('/generate-results', methods=['POST'])
 def generate_results():
     try:
-        # Firestore database
-        db = firestore.client()
 
         # Access the 'results' collection
         collection_ref = db.collection('results')
@@ -278,3 +279,55 @@ def generate_results():
     except Exception as e:
         print("Error:", e)
         return jsonify({"error": str(e)}), 500
+    
+
+@app.route('/search-results', methods=['POST'])
+def search_results():
+    try:
+        # Get search criteria from request
+        print("Made it to search results")
+        data = request.json
+        dealership = data.get('dealership')
+        brand = data.get('brand')
+        department = data.get('department')
+        country = data.get('country')
+
+        print("Made it past Gets",data)
+        collection_ref = db.collection('results')
+
+        # Dictionary to hold results
+        results = []
+
+        # Fetch dealership documents explicitly
+        dealership_docs = collection_ref.list_documents()
+        for dealership_doc_ref in dealership_docs:
+            # Get the dealership name from the document reference
+
+            # Fetch all subcollections within the current dealership
+            subcollections = dealership_doc_ref.collections()
+            for subcollection_ref in subcollections:
+                # Fetch submission documents within each subcollection
+                submission_docs = subcollection_ref.stream()
+                for submission_doc in submission_docs:
+                    submission_data = submission_doc.to_dict()  # Get submission data
+                    results.append(submission_data)
+
+        filtered_results = []
+        for result in results:
+            if (not dealership or result['Dealership Name'].lower() == dealership) and \
+               (not brand or result['Brand'].lower() == brand) and \
+               (not department or result['Department'].lower() == department) and \
+               (not country or result['Country'].lower() == country):
+                filtered_results.append(result)
+
+        print("Got filtered results",len(filtered_results))
+        print(filtered_results)
+
+        # Return search results
+        return jsonify(filtered_results), 200
+    except Exception as e:
+        # Handle errors
+        error_message = f"Error fetching search results: {str(e)}"
+        print(error_message)
+        return jsonify({'error': error_message}), 500
+

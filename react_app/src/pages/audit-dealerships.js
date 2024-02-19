@@ -2,6 +2,8 @@ import React, {useState, useEffect} from 'react';
 import '../App.css';
 import * as MaterialUI from '../components/MaterialUI';
 import {auth} from '../components/Authentication';
+import AddDealershipImport from '../components/AddDealership';
+import UserDealershipImport from '../components/UserDealership';
 
 function DealershipsPage () {
 
@@ -20,7 +22,12 @@ function DealershipsPage () {
           <MaterialUI.SideBar></MaterialUI.SideBar>
           <header className="App-header" style={{marginLeft: 125}}>
           <div className="App">
-              <p>My Dealership</p>
+          <h1>Manage Dealerships</h1>
+          </div>
+          <div className="File">
+              <AddDealershipImport/>
+              <UserDealershipImport/>
+
               </div>
               </header>
             </React.Fragment>

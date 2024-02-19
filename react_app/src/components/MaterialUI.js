@@ -93,7 +93,7 @@ export const NavBar = (props) => {
         <AppBar position='fixed' style={style} sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
             <Toolbar>
                 <Typography sx={{fontSize: "0.85rem"}}>
-                    URBAN SCIENCE
+                    AUDITBUDDY
                 </Typography>
                 <Typography sx={{flexGrow: 1}}></Typography>
                 <NavButton><NavLink to="/">Home</NavLink></NavButton>
@@ -124,12 +124,20 @@ export const SideBar = () => {
         marginLeft: -3,
     };
 
+    // page authentication
+    const [user, setUser] = useState(auth.currentUser);
+
+    useEffect(() => {
+        auth.onAuthStateChanged((currentUser) => setUser(currentUser));
+    }, []);
+
     const { admin } = useAdmin();
 
     return (
         <Drawer variant='permanent' anchor='left' sx={{width: 100}}>
             <Toolbar sx={{ marginTop: 7.5, width: 100 }}>
                 <List>
+                    <Typography sx={{ fontSize: '0.9rem', marginLeft: -1 }} disablePadding><strong>Welcome,</strong> {user.email}</Typography>
                     <ListItem disablePadding>
                         <ListItemButton sx={{ ...colorSelected }} selected={path === '/audit'} component={Link} to="/audit">
                             <ListItemIcon sx={{minWidth: 40}}><AlignHorizontalLeftIcon></AlignHorizontalLeftIcon></ListItemIcon>

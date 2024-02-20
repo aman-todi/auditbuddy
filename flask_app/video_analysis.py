@@ -72,6 +72,7 @@ def count_cars_in_footage(files_list,dealership_info):
         cap.release()
 
     print("Count of cars found: ", car_tracker.get_total_count())
+    return car_tracker.get_total_count()
 
 
 def assess_hospitality(files_list,dealership_info):
@@ -131,9 +132,10 @@ def assess_hospitality(files_list,dealership_info):
 
         cap.release()
 
-    print("Count of beverages found: ", beverage_tracker.get_total_count())
-    print("Count of snacks found: ", snacks_tracker.get_total_count())
+    # print("Count of beverages found: ", beverage_tracker.get_total_count())
+    # print("Count of snacks found: ", snacks_tracker.get_total_count())
     print("Count of seating found: ", seating_tracker.get_total_count())
+    return seating_tracker.get_total_count()
 
 
 def count_parking_spaces(files_list):
@@ -181,4 +183,5 @@ def count_parking_spaces(files_list):
         parking_counter += detect_parking_spaces(image)
 
     print("Number of parking spaces: ", parking_counter)
+    return parking_counter
 

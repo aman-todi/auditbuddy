@@ -217,7 +217,7 @@ def upload_video():
             num_parking = count_parking_spaces(files_list)
 
         elif category == 'hospitality':
-            hospitality_finders = assess_hospitality(files_list,dealership_info)
+            num_seating = assess_hospitality(files_list,dealership_info)
 
         elif category == 'spatial':
             pass
@@ -227,8 +227,8 @@ def upload_video():
                 os.remove(file)
             
     # Build audit score
-    cv_results = (logo_result, num_cars, num_parking, hospitality_finders, sq_ft_result)
-    build_audit_results(cv_results)
+    cv_results = (logo_result, num_cars, num_parking, num_seating, sq_ft_result)
+    build_audit_results(cv_results, dealership_info)
                   
     # add the form info to the database
     add_to_database(database_info)

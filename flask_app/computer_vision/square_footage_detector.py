@@ -6,6 +6,14 @@ import os
 from werkzeug.utils import secure_filename
 from flask import current_app as app
 from PIL import Image, ExifTags
+import firebase_admin
+from firebase_admin import storage
+import os
+import time
+
+
+
+bucket = storage.bucket()
 
 # The distance in inches used for the callibration image
 callibration_distance = 36.0
@@ -63,7 +71,7 @@ def draw_box(image, marker, inches):
     cv2.drawContours(annotated_image, [box], -1, (0, 0, 255), 2)
     cv2.putText(annotated_image, "%.2fft" % (inches / 12),
                 (annotated_image.shape[1] - 230, annotated_image.shape[0] - 20), cv2.FONT_HERSHEY_SIMPLEX,
-                2.0, (0, 255, 0), 2)
+                2.0, (0, 0, 255), 2)
     
     return annotated_image
 
@@ -90,17 +98,23 @@ def resize_image(image_path, max_dimension=1000):
         # Return the original image if it doesn't need resizing
         return image
     
-def compute_square_footage(files):
+def compute_square_footage(files,dealership_info):
     distances_images = []
     square_footage_estimate = 0.0
     counter = 1
+    cal_index = -1
+    print("testing spatial stuff")
+    print("Files", files)
     for file in files:
         
         print(file)
-        path = os.path.join("flask_app", "static", "main", "media", file)
+        path = os.path.join(app.root_path, "static", "main", "media", file)
+        print("Made it past PATH", path)
         # Convert image to .PNG
         im = Image.open(path)
+        print("IT WAS OPENED?")
         im.save(file, "png")
+        print("IMAGE SAVED?")
         
         # The image sometimes gets rotated when being converted
         exif = im._getexif()
@@ -108,22 +122,25 @@ def compute_square_footage(files):
             im = remove_exif_orientation(im)
 
         # Save the converted image in PNG format with a new filename
-
+        print("Made it past first save")
         if file[-3:] != "png":
             png_filename = os.path.splitext(file)[0] + ".png"
-            png_save_path = os.path.join("flask_app", "static", "main", "media", png_filename)
+            png_save_path = os.path.join(app.root_path, "static", "main", "media", png_filename)
             im.save(png_save_path, "PNG")
             distances_images.append(png_filename)
             os.remove(path)
         else:
             distances_images.append(file)
         
-    try:
-        cal_index = distances_images.index("calibration.png")
-        print(cal_index)
-    except ValueError:
+    print(len(distances_images))
+    for i in range(len(distances_images)):
+        print(distances_images[i])
+        if "calibration.png" in distances_images[i]:
+            cal_index = i
+            print(cal_index)
+    if cal_index == -1:
         return -1.0
-    
+ 
 
     cal_image = resize_image(files[cal_index])
     marker = find_reference(cal_image)
@@ -133,6 +150,7 @@ def compute_square_footage(files):
     inches = compute_distance(reference_obj_width, focalLength, marker[0][1])
     
     distances_list = []
+    print("Testing distances")
     for file in distances_images:
         new_path = os.path.join("flask_app", "static", "main", "media", file)
         print("file in distance images")
@@ -148,13 +166,27 @@ def compute_square_footage(files):
         
         # Save the annotated image somehow that comes from this function
         annotated_image = draw_box(img, marker, dist)
-        annotated_path = os.path.join("flask_app", "static", "main", "annotated_images",f"annotated_image_{counter}.png")
-        cv2.imwrite(annotated_path, annotated_image)
+
+        save_annotated_image_to_firebase(annotated_image,dealership_info,counter)
+
         counter += 1 
+    print("Done testing distances")
     len_ft = distances_list[0] / 12
     wi_ft = distances_list[1] / 12
     square_footage_estimate = len_ft * wi_ft
     
     return square_footage_estimate
 
+
+def save_annotated_image_to_firebase(annotated_image,dealership_info,counter):
+    print("Saving annotated image to Firebase")
+    # Specify the path where you want to store the file in Firebase Storage
+    image_filename = f"{dealership_info[0]}/{dealership_info[1]}/{dealership_info[2]}/{dealership_info[4]}/SpatialResults/annotated_image_{counter}.png"
+    blob = bucket.blob(image_filename)
+    # Convert the OpenCV image to bytes
+    _, buffer = cv2.imencode('.png', annotated_image)
+    # Upload the file to Firebase Storage
+    blob.upload_from_string(buffer.tobytes(), content_type='image/png')
+    print(f'Saved annotated image to Firebase Storage: {blob.public_url}')
+    
 

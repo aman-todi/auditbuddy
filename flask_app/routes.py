@@ -155,9 +155,26 @@ def upload_video():
     database_info = [request.form['submission'],request.form['name'], request.form['dealership'], request.form['department'], request.form['country']]
 
     # Computer Vision Tasks
-    
+                # spatial files in list
+    spatial_files = []
+    index = 0
+    while f'spatial[{index}]' in request.files:
+        file = request.files[f'spatial[{index}]']
+        spatial_files.append(file.filename)
+        filename = secure_filename(file.filename)
+        save_path = os.path.join(app.root_path, 'static', 'main', 'media', filename)
+        file.save(save_path)
+        index += 1
+        print("spatial files;", spatial_files)
+        # add the spatial awareness here. the files are stored in list spatial_files
+    print("Running Spatial")
+    x = compute_square_footage(spatial_files,dealership_info)  
+    if x == -1:
+        error_message = f"No image named calibration was found"
+        print(error_message)
+        return jsonify({'error': error_message}), 404
     # loop the detection categories
-    required_categories = ['logo', 'hospitality', 'parking', 'cars', 'spatial']
+    required_categories = ['logo', 'hospitality', 'parking', 'cars','spatial']
 
     # logic for extracting file from different categories (works for multi files)
     for category in required_categories:
@@ -186,27 +203,28 @@ def upload_video():
             logo_result = logo_detector.detect_logos_image(files_list[0]) # only one image supported for this feature currently
 
         elif category == 'cars':
-            num_cars = count_cars_in_footage(files_list)
+            num_cars = count_cars_in_footage(files_list,dealership_info)
+
+        
 
         elif category == 'parking':
             num_parking = count_parking_spaces(files_list)
 
-        elif category == 'hospitality':
-            hospitality_finders = assess_hospitality(files_list)
 
-        elif category == 'spatial_files':
-            sq_footage = compute_square_footage(files_list)
-            if sq_footage == -1:
-                error_message = f"No image named calibration was found"
-                print(error_message)
-            
+        elif category == 'hospitality':
+            hospitality_finders = assess_hospitality(files_list,dealership_info)
+ 
+
+        elif category == 'spatial':
+            pass
+
         for file in files_list:
             if os.path.exists(file):
                 os.remove(file)
-
+            
     # Build audit score
-    cv_results = (logo_result, num_cars, num_parking, hospitality_finders, sq_footage)
-    build_audit_score(cv_results)
+    # cv_results = (logo_result, num_cars, num_parking, hospitality_finders, sq_footage)
+    #build_audit_score(cv_results)
                   
     # add the form info to the database
     add_to_database(database_info)

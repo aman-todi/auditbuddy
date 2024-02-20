@@ -89,7 +89,7 @@ function ResultsPage() {
     });
 
     // Set the popup content with unique filtered dealerships
-    setPopupContent({ type: 'Dealership Name', data: uniqueFilteredDealerships });
+    setPopupContent({ type: 'Dealership Name', data: uniqueFilteredDealerships, name: brandName });
   }
 
 
@@ -109,13 +109,13 @@ function ResultsPage() {
       return false;
     });
 
-    setPopupContent({ type: 'Department', data: uniqueFilteredDepartments });
+    setPopupContent({ type: 'Department', data: uniqueFilteredDepartments, name: param["Dealership Name"] });
   }
 
   // handle click on department
   const handleDepartmentClick = (param) => {
     const submissions = items.filter(item => item['Department'] === param['Department'] && item['Dealership Name'] === param['Dealership Name'] && item['Brand'] === param['Brand']);
-    setPopupContent({ type: 'Submitted', data: submissions });
+    setPopupContent({ type: 'Submitted', data: submissions, name: param["Department"] });
   }
 
   const handleSubmissionClick = (param) => {
@@ -157,7 +157,7 @@ function ResultsPage() {
                   {/* Display popup content */}
                   {popupContent && (
                     <Dialog fullWidth open={true} onClose={closePopup} sx={{ marginLeft: 15, display: 'flex', flexDirection: 'column' }}>
-                      <DialogTitle>{popupContent.type}</DialogTitle>
+                      <DialogTitle>{popupContent.name}</DialogTitle>
                       <DialogContent>
                         <Typography variant="h6" align="center">File Listing</Typography>
                         <Box sx={{ maxHeight: 400, overflowY: 'auto' }}>

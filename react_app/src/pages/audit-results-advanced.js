@@ -119,13 +119,7 @@ const AdvancedResultsPage = () => {
             <DialogContent>
               <Box display="flex" justifyContent="space-between">
                 {/* Left side: Description */}
-                <Box style={{ width: '50%', paddingRight: '10px' }}>
-                  <Typography variant="body1" gutterBottom>Description:</Typography>
-                  {/* Replace 'annotations' with the array containing descriptions */}
-                  {logoResults.map((annotation, index) => (
-                    <Typography key={index} variant="body2" gutterBottom>This is the description for this image</Typography>
-                  ))}
-                </Box>
+
                 {/* Right side: Annotated Image */}
                 <Box style={{ width: '50%', paddingLeft: '10px' }}>
                   {/* Map through logoResults array to display images */}
@@ -145,13 +139,7 @@ const AdvancedResultsPage = () => {
             <DialogContent>
               <Box display="flex" justifyContent="space-between">
                 {/* Left side: Description */}
-                <Box style={{ width: '50%', paddingRight: '10px' }}>
-                  <Typography variant="body1" gutterBottom>Description:</Typography>
-                  {/* Replace 'annotations' with the array containing descriptions */}
-                  {carResults.map((annotation, index) => (
-                    <Typography key={index} variant="body2" gutterBottom>This is the description for this image</Typography>
-                  ))}
-                </Box>
+
                 {/* Right side: Annotated Image */}
                 <Box style={{ width: '50%', paddingLeft: '10px' }}>
                   {/* Map through logoResults array to display images */}
@@ -169,13 +157,7 @@ const AdvancedResultsPage = () => {
             <DialogContent>
               <Box display="flex" justifyContent="space-between">
                 {/* Left side: Description */}
-                <Box style={{ width: '50%', paddingRight: '10px' }}>
-                  <Typography variant="body1" gutterBottom>Description:</Typography>
-                  {/* Replace 'annotations' with the array containing descriptions */}
-                  {parkingResults.map((annotation, index) => (
-                    <Typography key={index} variant="body2" gutterBottom>This is the description for this image</Typography>
-                  ))}
-                </Box>
+
                 {/* Right side: Annotated Image */}
                 <Box style={{ width: '50%', paddingLeft: '10px' }}>
                   {/* Map through logoResults array to display images */}
@@ -193,13 +175,7 @@ const AdvancedResultsPage = () => {
             <DialogContent>
               <Box display="flex" justifyContent="space-between">
                 {/* Left side: Description */}
-                <Box style={{ width: '50%', paddingRight: '10px' }}>
-                  <Typography variant="body1" gutterBottom>Description:</Typography>
-                  {/* Replace 'annotations' with the array containing descriptions */}
-                  {hospitalityResults.map((annotation, index) => (
-                    <Typography key={index} variant="body2" gutterBottom>This is the description for this image</Typography>
-                  ))}
-                </Box>
+
                 {/* Right side: Annotated Image */}
                 <Box style={{ width: '50%', paddingLeft: '10px' }}>
                   {/* Map through logoResults array to display images */}
@@ -217,13 +193,7 @@ const AdvancedResultsPage = () => {
             <DialogContent>
               <Box display="flex" justifyContent="space-between">
                 {/* Left side: Description */}
-                <Box style={{ width: '50%', paddingRight: '10px' }}>
-                  <Typography variant="body1" gutterBottom>Description:</Typography>
-                  {/* Replace 'annotations' with the array containing descriptions */}
-                  {spatialResults.map((annotation, index) => (
-                    <Typography key={index} variant="body2" gutterBottom>This is the description for this image</Typography>
-                  ))}
-                </Box>
+
                 {/* Right side: Annotated Image */}
                 <Box style={{ width: '50%', paddingLeft: '10px' }}>
                   {/* Map through logoResults array to display images */}

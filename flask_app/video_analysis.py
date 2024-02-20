@@ -6,17 +6,36 @@ from flask_app.computer_vision.tracker import Tracker
 from flask_app.computer_vision.car_detection import CarDetector
 from flask_app.computer_vision.hospitality_assessment import HospitalityFinder
 from flask_app.computer_vision.parking_detection import detect_parking_spaces
+import firebase_admin
+from firebase_admin import storage
+import os
+import time
+import numpy as np
 
-def save_frame(frame, frame_number, output_folder):
-    # Saves a frame to the specified folder with a given frame number
-    if not os.path.exists(output_folder):
-        os.makedirs(output_folder)
-    filename = f"frame_{frame_number:04d}.jpg"
-    filepath = os.path.join(output_folder, filename)
-    cv2.imwrite(filepath, frame)
+bucket = storage.bucket()
+
+# def save_frame(frame, frame_number, output_folder):
+#     # Saves a frame to the specified folder with a given frame number
+#     if not os.path.exists(output_folder):
+#         os.makedirs(output_folder)
+#     filename = f"frame_{frame_number:04d}.jpg"
+#     filepath = os.path.join(output_folder, filename)
+#     cv2.imwrite(filepath, frame)
 
 
-def count_cars_in_footage(files_list):
+def save_frame_to_firebase(frame,frame_number,output_folder,dealership_info):
+    print("Saving annotated image to Firebase")
+    # Specify the path where you want to store the file in Firebase Storage
+    image_filename = f"{dealership_info[0]}/{dealership_info[1]}/{dealership_info[2]}/{dealership_info[4]}/{output_folder}/frame_{frame_number:04d}.png"
+    blob = bucket.blob(image_filename)
+    # Convert the OpenCV image to bytes
+    _, buffer = cv2.imencode('.png', frame)
+    # Upload the file to Firebase Storage
+    blob.upload_from_string(buffer.tobytes(), content_type='image/png')
+    print(f'Saved annotated image to Firebase Storage: {blob.public_url}')
+
+
+def count_cars_in_footage(files_list,dealership_info):
     # Compute the number of distinct cars from multiple videos
 
     # Initialize car detector and tracker
@@ -47,14 +66,15 @@ def count_cars_in_footage(files_list):
                 for box in car_boxes:
                     x, y, w, h = box
                     cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-                save_frame(frame, frame_counter, 'car_frames')
+                annotated_frame = cv2.cvtColor(np.array(frame), cv2.COLOR_RGB2BGR)
+                save_frame_to_firebase(annotated_frame, frame_counter, 'CarResults',dealership_info)
             
         cap.release()
 
     print("Count of cars found: ", car_tracker.get_total_count())
 
 
-def assess_hospitality(files_list):
+def assess_hospitality(files_list,dealership_info):
     # Build a list of hospitality indicators from videos
 
     # HOSPITALITY
@@ -106,7 +126,8 @@ def assess_hospitality(files_list):
                     x, y, w, h = box
                     cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
 
-                save_frame(frame, frame_counter, 'hospitality_frames')
+                annotated_frame = cv2.cvtColor(np.array(frame), cv2.COLOR_RGB2BGR)
+                save_frame_to_firebase(annotated_frame, frame_counter, 'HospitalityResults',dealership_info)
 
         cap.release()
 

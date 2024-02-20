@@ -84,10 +84,10 @@ const AddDealershipImport = () => {
         </Tooltip>
       </Typography>
       <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, alignItems: "center" }}>
-        <TextField fullWidth required label="Dealership Name" variant="outlined" onChange={(event) => handleFormInput(event, setName)}
-          sx={{ margin: "0.1rem" }}
+        <TextField required label="Dealership Name" variant="outlined" onChange={(event) => handleFormInput(event, setName)}
+          sx={{ margin: "0.1rem", width:"85vw"}}
         />
-        <FormControl required fullWidth sx={{ margin: "0.1rem" }}>
+        <FormControl required sx={{ margin: "0.1rem", width: "30vw"}}>
           <InputLabel>Brand</InputLabel>
           <Select
             value={brand}
@@ -107,21 +107,12 @@ const AddDealershipImport = () => {
             <MenuItem value={"Volkswagen"}>Volkswagen</MenuItem>
           </Select>
         </FormControl>
-        <TextField fullWidth required label="Address" variant="outlined" onChange={(event) => handleFormInput(event, setAddress)}
-          sx={{ margin: "0.1rem" }}
+        </Box>
+        <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, alignItems: "center" }}>
+        <TextField required fullWidth label="Address" variant="outlined" onChange={(event) => handleFormInput(event, setAddress)}
+          sx={{ margin: "0.1rem"}}
         />
-        <FormControl required fullWidth sx={{ margin: "0.1rem" }}>
-          <InputLabel>Country</InputLabel>
-          <Select
-            value={country}
-            label="Country"
-            onChange={(event) => handleFormInput(event, setCountry)}
-          >
-            <MenuItem value={"USA"}>USA</MenuItem>
-            <MenuItem value={"Canada"}>Canada</MenuItem>
-          </Select>
-        </FormControl>
-      </Box>
+        </Box>
 
       <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "0.1rem" }}>
         <MaterialUI.CustomButton type="submit" onClick={handleUpload}>Add Dealership</MaterialUI.CustomButton>

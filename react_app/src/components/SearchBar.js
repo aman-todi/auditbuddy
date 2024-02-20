@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Box, TextField, InputLabel, Select, MenuItem, FormControl, Container } from '@mui/material';
+import { Box, TextField, InputLabel, Select, MenuItem, FormControl, Container, Typography, Tooltip} from '@mui/material';
 import * as MaterialUI from '../components/MaterialUI'
 import SearchIcon from '@mui/icons-material/Search';
+import HelpIcon from '@mui/icons-material/Help';
 
 
 export const SearchBar = ({ onSearch }) => {
@@ -44,13 +45,21 @@ export const SearchBar = ({ onSearch }) => {
   return (
     <Container component="main" maxWidth="s">
       <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, alignItems: "center" }}>
-        <TextField fullWidth label="ID" variant="outlined"
-          sx={{ margin: "0.1rem" }}
+      <Typography variant="p" sx={{ display: "flex", alignItems: "center", marginBottom: "1rem", marginTop: "1rem" }}>
+        <span style={{ fontWeight: "bold", marginRight: "0.5rem" }}>Search</span>
+        <Tooltip disableFocusListener title="Search for a specific dealership that matches the critera">
+          <HelpIcon sx={{ fontSize: "small" }} />
+        </Tooltip>
+      </Typography>
+      </Box>
+      <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, alignItems: "center" }}>
+        <TextField label="ID" variant="outlined"
+          sx={{ margin: "0.1rem", width: "25vw" }}
         />
-        <TextField fullWidth label="Dealership Name" variant="outlined" onChange={(event) => handleFormInput(event, setDealershipName, 'dealership')}
-          sx={{ margin: "0.1rem" }}
+        <TextField label="Dealership Name" variant="outlined" onChange={(event) => handleFormInput(event, setDealershipName, 'dealership')}
+          sx={{ margin: "0.1rem", width: "75vw" }}
         />
-        <FormControl fullWidth sx={{ margin: "0.1rem" }}>
+        <FormControl sx={{ margin: "0.1rem", width: "35vw" }}>
           <InputLabel>Brand</InputLabel>
           <Select
             value={brandName}
@@ -70,7 +79,7 @@ export const SearchBar = ({ onSearch }) => {
             <MenuItem value={"volkswagen"}>Volkswagen</MenuItem>
           </Select>
         </FormControl>
-        <FormControl fullWidth sx={{ margin: "0.1rem" }}>
+        <FormControl sx={{ margin: "0.1rem", width: "40vw" }}>
           <InputLabel>Department</InputLabel>
           <Select
             value={department}
@@ -83,7 +92,7 @@ export const SearchBar = ({ onSearch }) => {
             <MenuItem value={"bodyandpaint"}>Body & Paint</MenuItem>
           </Select>
         </FormControl>
-        <FormControl fullWidth sx={{ margin: "0.1rem" }}>
+        <FormControl sx={{ margin: "0.1rem", width: "30vw" }}>
           <InputLabel>Country</InputLabel>
           <Select
             value={country}
@@ -94,7 +103,7 @@ export const SearchBar = ({ onSearch }) => {
             <MenuItem value={"canada"}>Canada</MenuItem>
           </Select>
         </FormControl>
-        <FormControl fullWidth sx={{ margin: "0.1rem" }}>
+        <FormControl sx={{ margin: "0.1rem", width: "50vw" }}>
           <InputLabel>Date</InputLabel>
           <Select
             value={country}

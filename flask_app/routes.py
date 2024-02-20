@@ -163,15 +163,16 @@ def upload_video():
         save_path = os.path.join(app.root_path, 'static', 'main', 'media', filename)
         file.save(save_path)
         index += 1
-    print("spatial files;", spatial_files)
 
     # add the spatial awareness here. the files are stored in list spatial_files
     print("Running Spatial")
-    calibration_image_found = compute_square_footage(spatial_files)
-    if calibration_image_found == -1:
-        error_message = f"No image named calibration was found"
-        print(error_message)
-        return jsonify({'error': error_message}), 404 
+    print("spatial files len: ", len(spatial_files))
+    if len(spatial_files) != 0:
+        calibration_image_found = compute_square_footage(spatial_files)
+        if calibration_image_found == -1:
+            error_message = f"No image named calibration was found"
+            print(error_message)
+            return jsonify({'error': error_message}), 404 
     
     # loop the detection categories
     required_categories = ['logo', 'hospitality', 'parking', 'cars']

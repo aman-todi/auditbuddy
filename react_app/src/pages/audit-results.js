@@ -129,7 +129,7 @@ function ResultsPage() {
                 <div>
                   {/* Search bar*/}
                   <SearchBar onSearch={handleSearch} />
-                  <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', marginTop: '10vh' }}>
                     {/* Display brand names */}
                     {brand_names.map((brandName, index) => (
                       <Card variant="outlined" onClick={() => handleBrandClick(brandName)} key={index} sx={{ cursor: 'pointer', padding: 1, margin: 1, fontSize: '0.75rem', width: '20%', justifyContent: 'flex-start' }}>

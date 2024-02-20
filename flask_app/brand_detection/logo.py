@@ -10,12 +10,12 @@ import numpy as np
 
 
 class LogoDetector:
-    def __init__(self, dealership_info, confidence_threshold=0.6, nms_threshold=0.4):
+    def __init__(self, filePath, confidence_threshold=0.6, nms_threshold=0.4):
         self.confidence_threshold = confidence_threshold  # Set confidence threshold for detection
         self.nms_threshold = nms_threshold  # Set Non-Maximum Suppression threshold
         self.logos = None
         self.annotations = []
-        self.filePath = f"{dealership_info[0]}/{dealership_info[1]}/{dealership_info[2]}/{dealership_info[4]}/LogoResults"
+        self.filePath = filePath
         # Initialize Firebase Admin SDK with your credentials
         self.bucket = storage.bucket()
 

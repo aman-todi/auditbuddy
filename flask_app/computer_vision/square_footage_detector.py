@@ -19,23 +19,7 @@ bucket = storage.bucket()
 callibration_distance = 36.0
 # The width of the reference image in inches
 reference_obj_width = 18.0
-
-# Function to remove EXIF rotation metadata
-def remove_exif_orientation(image):
-    for orientation in ExifTags.TAGS.keys():
-        if ExifTags.TAGS[orientation] == 'Orientation':
-            break
-    exif = dict(image._getexif().items())
-
-    if orientation in exif:
-        if exif[orientation] == 3:
-            image = image.rotate(180, expand=True)
-        elif exif[orientation] == 6:
-            image = image.rotate(270, expand=True)
-        elif exif[orientation] == 8:
-            image = image.rotate(90, expand=True)
-    return image
-
+         
 # Finds the poster board in an image and deterimnes where the bounds of it are
 def find_reference(image):
 
@@ -62,11 +46,8 @@ def compute_distance(knownWidth, focalLength, perWidth):
     return (knownWidth * focalLength) / perWidth
 
 def draw_box(image, marker, inches):
-    # Make a copy of the input image to avoid modifying the original image
-    annotated_image = image.copy()
-
-    # Draw a box around the image
-    box = cv2.boxPoints(marker)
+    # draw a box around the image
+    box = cv2.cv.BoxPoints(image) if imutils.is_cv2() else cv2.boxPoints(marker)
     box = np.intp(box)
     cv2.drawContours(annotated_image, [box], -1, (0, 0, 255), 2)
     cv2.putText(annotated_image, "%.2fft" % (inches / 12),
@@ -106,7 +87,6 @@ def compute_square_footage(files,dealership_info):
     print("testing spatial stuff")
     print("Files", files)
     for file in files:
-        
         print(file)
         path = os.path.join(app.root_path, "static", "main", "media", file)
         print("Made it past PATH", path)
@@ -144,7 +124,11 @@ def compute_square_footage(files,dealership_info):
 
     cal_image = resize_image(files[cal_index])
     marker = find_reference(cal_image)
-    
+    print("Callibration Stats")
+    print("Pixels ", marker[1][0])
+    print("Inches ", inches)
+    print("FOCAL LENGTH:", focalLength)
+
     # compute the focal length from the callibration image 
     focalLength = (marker[1][0] * callibration_distance) / reference_obj_width
     inches = compute_distance(reference_obj_width, focalLength, marker[0][1])
@@ -161,9 +145,11 @@ def compute_square_footage(files,dealership_info):
         print(new_path)
         img = resize_image(new_path)
         marker = find_reference(img)
-        dist = compute_distance(reference_obj_width, focalLength, marker[1][0])
+        dist = compute_distance(reference_obj_width, focalLength, marker)
         distances_list.append(dist)
-        
+        print("Image Statistics")
+        print("Pixels ", marker[1][0])
+        print("Inches:", dist)
         # Save the annotated image somehow that comes from this function
         annotated_image = draw_box(img, marker, dist)
 

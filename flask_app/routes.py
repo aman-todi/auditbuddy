@@ -11,7 +11,7 @@ from werkzeug.utils import secure_filename
 from flask_app.video_analysis import count_cars_in_footage, assess_hospitality, count_parking_spaces
 from flask_app.brand_detection.logo import LogoDetector
 from flask_app.computer_vision.square_footage_detector import compute_square_footage
-from flask_app.score_audit import build_audit_score
+from flask_app.audit_results import build_audit_results
 # firebase auth
 import firebase_admin
 import firebase_admin.auth as auth
@@ -149,7 +149,7 @@ def upload_video():
     submission = request.form['submission']
     print("submission",submission)
 
-    dealership_info = ( brandName, dealershipName, department, country, submission)
+    dealership_info = (brandName, dealershipName, department, country, submission)
 
     # we should save the folders from each dealership somewhere in here
     database_info = [request.form['submission'],request.form['name'], request.form['dealership'], request.form['department'], request.form['country']]

@@ -169,13 +169,12 @@ def upload_video():
 
     # add the spatial awareness here. the files are stored in list spatial_files
     print("Running Spatial")
-    print("spatial files len: ", len(spatial_files))
-    if len(spatial_files) != 0:
-        calibration_image_found = compute_square_footage(spatial_files)
-        if calibration_image_found == -1:
-            error_message = f"No image named calibration was found"
-            print(error_message)
-            return jsonify({'error': error_message}), 404 
+    #if len(spatial_files) != 0:
+    calibration_image_found = compute_square_footage(spatial_files)
+    if calibration_image_found == -1:
+        error_message = f"No image named calibration was found"
+        print(error_message)
+        return jsonify({'error': error_message}), 404 
     
     # loop the detection categories
     required_categories = ['logo', 'hospitality', 'parking', 'cars', 'spatial']

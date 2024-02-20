@@ -71,31 +71,45 @@ function ResultsPage() {
     setPopupContent(null);
   }
 
-  const getPopupTitle = (type) => {
-    switch (type) {
-      case 'Dealership Name':
-        return 'Dealerships';
-      case 'Department':
-        return 'Departments';
-      case 'Submitted':
-        return 'Submissions';
-      case 'Search':
-        return 'Search Results';
-      default:
-        return '';
-    }
-  };
 
-  // handle click on brand name
   const handleBrandClick = (brandName) => {
-    const dealerships = Array.from(new Set(items.filter(item => item['Brand'] === brandName)));
-    setPopupContent({ type: 'Dealership Name', data: dealerships });
+    // Filter items based on the selected brand
+    const dealerships = items.filter(item => item['Brand'] === brandName);
+
+    // Track unique dealership names
+    const uniqueDealerships = new Set();
+
+    // Filter items for unique dealership names
+    const uniqueFilteredDealerships = dealerships.filter(item => {
+      if (!uniqueDealerships.has(item['Dealership Name'])) {
+        uniqueDealerships.add(item['Dealership Name']);
+        return true;
+      }
+      return false;
+    });
+
+    // Set the popup content with unique filtered dealerships
+    setPopupContent({ type: 'Dealership Name', data: uniqueFilteredDealerships });
   }
+
 
   // handle click on dealership
   const handleDealershipClick = (param) => {
     const departments = Array.from(new Set(items.filter(item => item['Dealership Name'] === param['Dealership Name'] && item['Brand'] === param['Brand'])));
-    setPopupContent({ type: 'Department', data: departments });
+
+    // Track unique dealership names
+    const uniqueDepartments = new Set();
+
+    // Filter items for unique dealership names
+    const uniqueFilteredDepartments = departments.filter(item => {
+      if (!uniqueDepartments.has(item['Department'])) {
+        uniqueDepartments.add(item['Department']);
+        return true;
+      }
+      return false;
+    });
+
+    setPopupContent({ type: 'Department', data: uniqueFilteredDepartments });
   }
 
   // handle click on department

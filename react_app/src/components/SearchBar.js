@@ -66,6 +66,7 @@ export const SearchBar = ({ onSearch }) => {
             label="Brand"
             onChange={(event) => handleFormInput(event, setBrand, 'brand')}
           >
+            <MenuItem value={""}></MenuItem>
             <MenuItem value={"audi"}>Audi</MenuItem>
             <MenuItem value={"bmw"}>BMW</MenuItem>
             <MenuItem value={"cadillac"}>Cadillac</MenuItem>
@@ -86,6 +87,7 @@ export const SearchBar = ({ onSearch }) => {
             label="Department"
             onChange={(event) => handleFormInput(event, setDepartment, 'department')}
           >
+            <MenuItem value={""}></MenuItem>
             <MenuItem value={"service"}>Service</MenuItem>
             <MenuItem value={"sales"}>Sales</MenuItem>
             <MenuItem value={"parts"}>Parts</MenuItem>
@@ -99,6 +101,7 @@ export const SearchBar = ({ onSearch }) => {
             label="Country"
             onChange={(event) => handleFormInput(event, setCountry, 'country')}
           >
+            <MenuItem value={""}></MenuItem>
             <MenuItem value={"usa"}>USA</MenuItem>
             <MenuItem value={"canada"}>Canada</MenuItem>
           </Select>

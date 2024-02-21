@@ -3,14 +3,12 @@
 }
 
 .App-header {
-  background-color: #F5F5F5;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(3px + 2vmin);
-  color: rgb(50, 50, 50);
 }
 
 .File {
@@ -29,3 +27,63 @@
 .UploadButton {
   align-items: center;
 }
+
+.settings-container {
+  margin-bottom: 35vh;
+  width: 40vw;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+
+}
+
+.title {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.divider {
+  border-top: 1px solid #ccc;
+  margin-bottom: 20px;
+}
+
+.section {
+  margin-bottom: 20px;
+}
+
+.subtitle {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.second-divider {
+  border-top: 1px solid #ccc;
+  margin-bottom: 10px;
+}
+
+.dark-toggle {
+  padding: 20px;
+  font-size: 16px;
+  background-color: #74b42d;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.dark-toggle:hover {
+  box-shadow: 0 0 11px rgba(33,33,33,.2); 
+}
+
+
+
+body {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+body.dark-mode {
+  background-color: #1f1f1f;
+  color: #ffffff;
+}
+

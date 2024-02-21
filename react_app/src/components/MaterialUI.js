@@ -188,7 +188,7 @@ export const SideBar = () => {
                         </ListItemButton>
                     </ListItem>
                     <ListItem disablePadding>
-                        <ListItemButton sx={{ ...colorSelected }}>
+                        <ListItemButton sx={{ ...colorSelected }} selected={path === '/audit/contact'} component={Link} to="/audit/contact">
                             <ListItemIcon sx={{minWidth: 40}}><HelpOutlineIcon></HelpOutlineIcon></ListItemIcon>
                             <ListItemText
                                 primary={<Typography sx={{ fontSize: '0.9rem' }}>Contact</Typography>}
@@ -196,7 +196,7 @@ export const SideBar = () => {
                         </ListItemButton>
                     </ListItem>
                     <ListItem disablePadding>
-                        <ListItemButton sx={{ ...colorSelected }}>
+                        <ListItemButton sx={{ ...colorSelected }} selected={path === '/audit/settings'} component={Link} to="/audit/settings">
                             <ListItemIcon sx={{minWidth: 40}}><SettingsIcon></SettingsIcon></ListItemIcon>
                             <ListItemText
                                 primary={<Typography sx={{ fontSize: '0.9rem' }}>Settings</Typography>}

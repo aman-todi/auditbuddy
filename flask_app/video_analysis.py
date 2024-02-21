@@ -40,14 +40,14 @@ def count_cars_in_footage(files_list,dealership_info):
 
     # Initialize car detector and tracker
     car_detector = CarDetector()
-    car_tracker = Tracker(distance_threshold=230)
+    car_tracker = Tracker(distance_threshold=160)
 
     for video in files_list:
         # Load and segment video
         cap = cv2.VideoCapture(video)
 
         frame_counter = 0
-        display_frequency = 50  # Set the frequency of frames to save
+        display_frequency = 100  # Set the frequency of frames to save
 
         while True:
             ret, frame = cap.read()
@@ -80,12 +80,13 @@ def assess_hospitality(files_list,dealership_info):
 
     # HOSPITALITY
     hospitality_finder = HospitalityFinder()
-    # Initialize beverage (class 1) tracker
-    beverage_tracker = Tracker(distance_threshold=120)
-    # Initialize snacks (class 2) tracker
-    snacks_tracker = Tracker(distance_threshold=120)
+    # # Initialize beverage (class 1) tracker
+    # beverage_tracker = Tracker(distance_threshold=120)
+    # # Initialize snacks (class 2) tracker
+    # snacks_tracker = Tracker(distance_threshold=120)
+
     # Initialize seating (class 3) tracker
-    seating_tracker = Tracker(distance_threshold=200)
+    seating_tracker = Tracker(distance_threshold=115)
 
     for video in files_list:
 
@@ -93,7 +94,7 @@ def assess_hospitality(files_list,dealership_info):
         cap = cv2.VideoCapture(video)
 
         frame_counter = 0
-        display_frequency = 50  # Set the frequency of frames to save
+        display_frequency = 100  # Set the frequency of frames to save
 
         while True:
             ret, frame = cap.read()
@@ -105,22 +106,22 @@ def assess_hospitality(files_list,dealership_info):
 
             # Find and track hospitality indicators
             beverage_boxes, snacks_boxes, seating_boxes = hospitality_finder.detect_indicators(frame)
-            beverage_tracker.update(beverage_boxes)
-            snacks_tracker.update(snacks_boxes)
+            # beverage_tracker.update(beverage_boxes)
+            # snacks_tracker.update(snacks_boxes)
             seating_tracker.update(seating_boxes)
 
             # Draw bounding boxes and save the frame only if the counter matches the display frequency
             if frame_counter % display_frequency == 0 or frame_counter == 1:
 
-                # Draw boxes around beverages
-                for box in beverage_boxes:
-                    x, y, w, h = box
-                    cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
+                # # Draw boxes around beverages
+                # for box in beverage_boxes:
+                #     x, y, w, h = box
+                #     cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
 
-                # Draw boxes around snacks
-                for box in snacks_boxes:
-                    x, y, w, h = box
-                    cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
+                # # Draw boxes around snacks
+                # for box in snacks_boxes:
+                #     x, y, w, h = box
+                #     cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
 
                 # Draw boxes around seating areas
                 for box in seating_boxes:

@@ -17,3 +17,19 @@ def detect_parking_spaces(image_path):
         
     # delete this
     return len(boxes)
+
+# import torch
+
+
+# def detect_parking_spaces(image_path):
+#     # Load the model
+#     print()
+#     model = torch.hub.load('ultralytics/yolov5', 'custom', path='flask_app/computer_vision/parking_weights.pt', force_reload=True)
+
+#     results = model(image_path)
+
+#     boxes = []
+#     for p in results['predictions']:
+#         boxes.append((p['x'], p['y'], p['width'], p['height']))
+
+#     return len(boxes)

@@ -155,7 +155,8 @@ def upload_video():
     database_info = [request.form['submission'],request.form['name'], request.form['dealership'], request.form['department'], request.form['country']]
 
     # Computer Vision Tasks
-                # spatial files in list
+    
+    # spatial files in list
     spatial_files = []
     spatial_paths = []
     index = 0
@@ -232,6 +233,12 @@ def upload_video():
                   
     # add the form info to the database
     add_to_database(database_info)
+
+    print("Logo detected:", logo_result)
+    print("Number of cars:", num_cars)
+    print("Number of parking spaces:", num_parking)
+    print("Seating capacity:", num_seating)
+    print("Square footage:", sq_ft_result)
 
     end_time = time.time()
 

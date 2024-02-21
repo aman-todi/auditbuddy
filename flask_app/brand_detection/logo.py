@@ -34,15 +34,13 @@ class LogoDetector:
         self.logos = response.logo_annotations
         print("Logos:")
 
-        if self.logos[0].score > 0.5:
-            annotated_image = self.create_annotated_image(image_path, self.logos[0])
+        for logo in self.logos:
+            # print(logo.description)
+            # print(logo.score)
+            annotated_image = self.create_annotated_image(image_path, logo)
             self.save_annotated_image_to_firebase(annotated_image)
-            print(self.logos[0].description)
-            return self.logos[0].description
-
-        else:
-            print("Undetectable")
-            return "Undetectable"
+            print(logo.description)
+            return logo.description
 
 
     # Creates the annotated images using pillow to find vertices of logo and create a bounding box with text

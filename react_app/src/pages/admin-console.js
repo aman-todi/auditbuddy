@@ -1,10 +1,11 @@
 import React, {useState, useEffect} from 'react';
 import '../App.css';
 import * as MaterialUI from '../components/MaterialUI';
-import {TextField, Container, Box, Typography, Tooltip} from '@mui/material/';
+import {TextField, Container, Box, Typography, Tooltip, FormControl, InputLabel, Select, MenuItem} from '@mui/material/';
 import HelpIcon from '@mui/icons-material/Help';
 import { auth } from '../components/Authentication';
 import axios from 'axios';
+import { useAdmin } from '../components/Admin';
 
 function AdminPage () {
 
@@ -18,8 +19,14 @@ function AdminPage () {
   // keep track of states
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirm, setConfirm] = useState('')
+  const [confirm, setConfirm] = useState('');
+  const [role, setRole] = useState('');
   const [error, setError] = useState(null);
+
+    // handles each form input states
+    const handleFormInput = (event, setFormInputState) => {
+      setFormInputState(event.target.value);
+    };
 
   // create user function
   const createUser = async () => {
@@ -28,11 +35,16 @@ function AdminPage () {
     {
       setError("Passwords do not match");
     }
+    else if (role == "")
+    {
+      setError("User role not selected")
+    }
     else {
         // create a form and append this file
         const formData = new FormData();
         formData.append('email', email);
         formData.append('password', password);
+        formData.append('role', role)
 
         try {
           const response = await axios.post('http://localhost:8080/create-user', formData, {
@@ -59,9 +71,11 @@ function AdminPage () {
     }
 };
 
+    const { admin } = useAdmin();
+
     return (
         <React.Fragment>
-        {user ? 
+        {admin ? 
         (
           <React.Fragment>
           <MaterialUI.SideBar></MaterialUI.SideBar>
@@ -80,6 +94,17 @@ function AdminPage () {
               <TextField  sx={{ margin: "0.1rem", width:"15vw"}} fullWidth value = {email} onChange={(e) => setEmail(e.target.value)} required id="email" label='Email' variant="outlined" margin="normal"/>
               <TextField  sx={{ margin: "0.1rem", width:"15vw"}} fullWidth value = {password} onChange={(e) => setPassword(e.target.value)} required id="password" label='Password' variant="outlined" margin="normal" type="password"/>
               <TextField  sx={{ margin: "0.1rem", width:"15vw"}} fullWidth value = {confirm} onChange={(e) => setConfirm(e.target.value)} required id="confirm" label='Confirm Password' variant="outlined" margin="normal" type="password"/>
+              <FormControl required sx={{ margin: "0.1rem", width: "10vw"}}>
+          <InputLabel>User Role</InputLabel>
+          <Select
+            value={role}
+            label="User Role"
+            onChange={(event) => handleFormInput(event, setRole)}
+          >
+            <MenuItem value={"Admin"}>Admin</MenuItem>
+            <MenuItem value={"Auditor"}>Auditor</MenuItem>
+          </Select>
+        </FormControl>
               </Box>
               <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "0.1rem" }}>
               <MaterialUI.CustomButton type ="submit" onClick={createUser}>Create User</MaterialUI.CustomButton>

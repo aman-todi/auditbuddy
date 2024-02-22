@@ -257,8 +257,18 @@ def check_admin():
     if not firebase_admin._apps:
         firebase_admin.initialize_app(cred)
 
-    # list of admins
-    admin = ["admin@email.com"]
+    # get the admins database
+    admins = {}
+    collection_ref = db.collection('admins')
+    for doc in collection_ref.stream():
+    # get document name (key) and email (value)
+        doc_name = doc.id
+        email = doc.to_dict().get('email')
+    
+        # add to the dictionary
+        admins[doc_name] = email
+
+    print("admin list: ", admins)
     # get the user token
     token = request.json.get('userToken')
     #decode the token
@@ -266,7 +276,7 @@ def check_admin():
     user_email = decoded_token['email']
 
     # check if the current user is an admin
-    if user_email in admin:
+    if user_email in admins.values():
         return jsonify({'isAdmin': True}), 200
 
     return jsonify({'isAdmin': False}), 200
@@ -282,13 +292,32 @@ def create_user():
     if not firebase_admin._apps:
         firebase_admin.initialize_app(cred)
 
+    db = firestore.client()
+
+
     # get user info from request
     email = request.form.get('email')
     password = request.form.get('password')
+    role = request.form.get('role')
 
     try:
-        # create user
-        user = auth.create_user(email=email, password=password)
+        # for admins, add to the database
+        last_id = 0
+        if role == "Admin":
+            user = auth.create_user(email=email, password=password)
+            # get the next id
+            collection_ref = db.collection("admins")
+            docs = list(collection_ref.stream())
+            next_id = int(docs[-1].id) + 1
+
+            # put the data in a json
+            data = {'email': email}
+            
+             # go to the collection, create a new document (admin id), and append the user email
+            db.collection("admins").document(str(next_id)).set(data)
+        elif role == "Auditor":
+            user = auth.create_user(email=email, password=password)
+     
         return jsonify({'email': user.email}), 201  # user email upon success
     except Exception as e:
         return jsonify({'error': str(e)}), 400  # error

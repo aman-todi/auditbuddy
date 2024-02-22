@@ -6,7 +6,6 @@ import axios from 'axios';
 // authentication
 import { auth } from './Authentication';
 
-
 // check if the logged in user is an admin
 export const checkAdmin = async (user) => {
     try 

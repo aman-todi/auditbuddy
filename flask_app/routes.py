@@ -246,7 +246,9 @@ def upload_video():
 
     return jsonify({'message': 'Files uploaded and processed successfully'}), 200
 
+#
 # checks if a user is an admin
+#
 @app.route('/check-admin', methods=['POST'])
 def check_admin():
     # initialize
@@ -269,12 +271,33 @@ def check_admin():
 
     return jsonify({'isAdmin': False}), 200
 
+#
+# creates a user through the admin console page
+#
+@app.route('/create-user', methods=['POST'])
+def create_user():
+    # initialize
+    path = os.path.join(app.root_path, 'static', 'main', 'config', 'valued-range-411422-d36068bfa11f.json')
+    cred = credentials.Certificate(path)
+    if not firebase_admin._apps:
+        firebase_admin.initialize_app(cred)
+
+    # get user info from request
+    email = request.form.get('email')
+    password = request.form.get('password')
+
+    try:
+        # create user
+        user = auth.create_user(email=email, password=password)
+        return jsonify({'email': user.email}), 201  # user email upon success
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400  # error
+
 # push results from the database
 def add_to_database(database_info):
 
      # firestore database
     db = firestore.client()
-
 
     # append the new data in the correct format for firebase
     data = {

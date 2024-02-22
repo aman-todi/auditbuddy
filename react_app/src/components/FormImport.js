@@ -8,7 +8,7 @@ import * as MaterialUI from './MaterialUI';
 import HelpIcon from '@mui/icons-material/Help';
 
 // import ShowResults from './pages/audit-results';
-import { InputLabel, FormControl, MenuItem, Select, TextField, Container, Box, Tab, Tabs, Tooltip, Typography } from '@mui/material/';
+import { InputLabel, FormControl, MenuItem, Select, TextField, Container, Box, Tab, Tabs, Tooltip, Typography, Alert } from '@mui/material/';
 // axios
 import axios from 'axios';
 
@@ -20,6 +20,7 @@ const FormImport = () => {
   const [cars, setCars] = useState(null);
   const [hospitality, setHospitality] = useState(null);
   const [spatial, setSpatial] = useState(null);
+  const [error, setError] = useState("")
 
   // states to keep track of form
   const [department, setDepartment] = useState('');
@@ -70,19 +71,19 @@ const FormImport = () => {
   const handleUpload = async () => {
     // form validation
     if (name === '') {
-      alert('Please enter the dealership name')
+      setError('Please enter the dealership name')
     }
     else if (dealership === '') {
-      alert('Please select a dealership')
+      setError('Please select a dealership')
     }
     else if (department === '') {
-      alert('Please select a department')
+      setError('Please select a department')
     }
     else if (country === '') {
-      alert('Please select a country')
+      setError('Please select a country')
     }
     else if (!logo && !cars && !parking && !spatial && !hospitality) {
-      alert('Please select a file in atleast one category')
+      setError('Please select a file in atleast one category')
     }
     else {
       // create a form and append this file
@@ -143,22 +144,20 @@ const FormImport = () => {
             'Content-Type': 'multipart/form-data'
           }
         });
-        alert(`File uploaded successfully: ${response.data.filename}`);
+        alert(`File(s) uploaded successfully:`);
       }
       catch (error) {
         if (error.response) {
           // The request was made and the server responded with a status code
           // that falls out of the range of 2xx
-          console.error('Error response:', error.response.data);
-          alert(`Error uploading file: ${error.response.data.error}`);
+          setError(`Error uploading file: ${error.response.data.error}`);
         } else if (error.request) {
           // The request was made but no response was received
-          console.error('Error request:', error.request);
-          alert('Error uploading file: No response from server');
+          setError('Error uploading file: No response from server');
         } else {
           // Something happened in setting up the request that triggered an Error
           console.error('Error message:', error.message);
-          alert('Error uploading file');
+          setError('Error uploading file');
         }
       }
     }
@@ -306,6 +305,7 @@ const FormImport = () => {
 
       <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "0.1rem" }}>
         <MaterialUI.CustomButton type="submit" onClick={handleUpload}>Analyze</MaterialUI.CustomButton>
+        {error && <p id="error">{error}</p>}
       </Box>
     </Container>
   );

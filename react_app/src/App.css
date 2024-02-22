@@ -87,3 +87,69 @@ body.dark-mode {
   color: #ffffff;
 }
 
+.contact-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  margin-top: 50px;
+ }
+ 
+ 
+ .contact-us {
+  margin-right: 10vw;
+  margin-left: 10vw;
+  margin-top: 30vh;
+ }
+ 
+ 
+ .contact-form {
+  width: 90%;
+  max-width: 400px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 20px;
+  margin-top: 15vh;
+  margin-right: 15vw;
+ }
+ 
+ 
+ .contact-form h2 {
+  margin-bottom: 20px;
+ }
+ 
+ 
+ .form-group {
+  margin-bottom: 20px;
+ }
+ 
+ 
+ .form-group label {
+  display: block;
+  font-weight: bold;
+ }
+ 
+ 
+ .form-group input,
+ .form-group textarea {
+  width: calc(100% - 20px);
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  margin: 0 auto;
+ }
+ 
+ 
+ button {
+  background-color: #74b42d;
+  color: #fff;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+ }
+ 
+ 
+ button:hover {
+  box-shadow: 0 0 11px rgba(33,33,33,.2);
+ }
+ 

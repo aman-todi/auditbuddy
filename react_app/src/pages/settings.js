@@ -14,7 +14,6 @@ function SettingsPage() {
 
     const toggleDarkMode = () => {
         setIsDarkMode(prevMode => !prevMode);
-        document.body.classList.toggle('dark-mode');
     };
 
     return (

@@ -12,6 +12,8 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
+import { makeStyles } from '@mui/material/styles';
+import { Card, CardContent, Grid, TextField } from '@mui/material';
 
 // icons
 import AlignHorizontalLeftIcon from '@mui/icons-material/AlignHorizontalLeft';
@@ -134,8 +136,8 @@ export const SideBar = () => {
     const { admin } = useAdmin();
 
     return (
-        <Drawer variant='permanent' anchor='left' sx={{width: 100}}>
-            <Toolbar sx={{ marginTop: 7.5, width: 100 }}>
+        <Drawer variant='permanent' anchor='left' sx={{width: 240}}>
+            <Toolbar sx={{ marginTop: 7.5, width: 240 }}>
                 <List>
                     <Typography sx={{ fontSize: '0.9rem', marginLeft: -1 }} disablePadding><strong>Welcome,</strong> {user.email}</Typography>
                     <ListItem disablePadding>
@@ -207,4 +209,48 @@ export const SideBar = () => {
             </Toolbar>
         </Drawer >
     );
+};
+
+export const ContactForm = () => {
+
+    return (
+
+        <Grid container justifyContent="center">
+          <Grid item xs={12} sm={8} md={6}>
+            <Card sx={{ maxWidth: 450, padding: "20px 5px", margin: "0 auto" }}>
+              <CardContent>
+                <Typography gutterBottom variant="h5">
+                  Contact Us
+                </Typography>
+                <Typography variant="body2" color="textSecondary" component="p" gutterBottom>
+                  Questions or concerns? Fill out the form to get in touch with us.
+                </Typography>
+                <form>
+                  <Grid container spacing={1}>
+                    <Grid item xs={12} sm={6}>
+                      <TextField placeholder="Enter first name" label="First Name" variant="outlined" fullWidth required />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField placeholder="Enter last name" label="Last Name" variant="outlined" fullWidth required />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField type="email" placeholder="Enter email" label="Email" variant="outlined" fullWidth required />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField label="Message" multiline rows={4} placeholder="Type your message here" variant="outlined" fullWidth required />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Button type="submit" variant="contained" fullWidth sx={{ backgroundColor: '#74b42d', color: 'white', '&:hover': {
+          backgroundColor: '#74b42d', 
+        },}}>Submit</Button>
+                    </Grid>
+                  </Grid>
+                </form>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+
+    );
+    
 };

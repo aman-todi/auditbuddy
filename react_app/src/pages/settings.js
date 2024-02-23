@@ -9,35 +9,15 @@ function SettingsPage() {
     useEffect(() => {
       auth.onAuthStateChanged((currentUser) => setUser(currentUser));
     }, []);
-  
-    const [isDarkMode, setIsDarkMode] = useState(false);
-
-    const toggleDarkMode = () => {
-        setIsDarkMode(prevMode => !prevMode);
-    };
 
     return (
         <React.Fragment>
                     {user ? 
         (
             <React.Fragment>
-            <div><MaterialUI.SideBar  isDarkMode={isDarkMode}></MaterialUI.SideBar></div>
+            <div><MaterialUI.SideBar></MaterialUI.SideBar></div>
             <header className="App-header" style={{marginLeft: 125}}>
-            <div className="settings-container">
-                <h1 className="title" >Settings</h1>
-                <hr className="divider" />
-                <div className="section">
-                    <h2 className="subtitle">Display</h2>
-                    <hr className="second-divider" />
-                    <button onClick={toggleDarkMode} className="dark-toggle">
-                        {isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-                    </button>
-                    <h2 className="subtitle">Account Preferences</h2>
-                    <hr className="second-divider" />
-                    <p></p>
-
-                </div>
-            </div>
+            <MaterialUI.SettingsPage></MaterialUI.SettingsPage>
             </header>
             </React.Fragment>
           ) : (<p>Not Authorized</p>)

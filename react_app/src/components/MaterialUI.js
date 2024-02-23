@@ -14,7 +14,7 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import { makeStyles } from '@mui/material/styles';
 import { Card, CardContent, Grid, TextField } from '@mui/material';
-
+import { Box, Switch } from '@mui/material';
 // icons
 import AlignHorizontalLeftIcon from '@mui/icons-material/AlignHorizontalLeft';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -136,8 +136,8 @@ export const SideBar = () => {
     const { admin } = useAdmin();
 
     return (
-        <Drawer variant='permanent' anchor='left' sx={{width: 240}}>
-            <Toolbar sx={{ marginTop: 7.5, width: 240 }}>
+        <Drawer variant='permanent' anchor='left' sx={{width: 100}}>
+            <Toolbar sx={{ marginTop: 7.5, width: 100 }}>
                 <List>
                     <Typography sx={{ fontSize: '0.9rem', marginLeft: -1 }} disablePadding><strong>Welcome,</strong> {user.email}</Typography>
                     <ListItem disablePadding>
@@ -254,3 +254,50 @@ export const ContactForm = () => {
     );
     
 };
+
+
+export const SettingsPage = ({ darkMode, toggleDarkMode }) => {
+    
+    return (
+      <Box
+        sx={{
+        width: 360,
+          padding: 2,
+          border: '1px solid',
+          borderColor: 'divider',
+          borderRadius: 'borderRadius',
+          marginBottom: '200px'
+
+        }}
+      >
+        <Typography variant="h5">Settings</Typography>
+        <Divider />
+        <Box sx={{ mt: 2 }}>
+          <Typography variant="subtitle1">Display</Typography>
+          <Divider />
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="body1">Dark Mode</Typography>
+            <Switch
+  sx={{
+    '& .MuiSwitch-thumb': {
+        color: '#74b42d', // Base color
+    },
+    "& .Mui-checked": {
+        color: "#454545"
+
+      },
+      "& .MuiSwitch-track": {
+        backgroundColor: "#000 !important"
+      }
+  }}
+    color="primary"
+    checked={darkMode}
+    onChange={toggleDarkMode}
+/>
+          </Box>
+        </Box>
+      </Box>
+    );
+  };
+
+

@@ -13,10 +13,21 @@ import AdvancedResultsPage from './pages/audit-results-advanced';
 import AdminPage from './pages/admin-console';
 import DealershipsPage from './pages/audit-dealerships';
 import { AdminCheck } from './components/Admin';
-
+import { ThemeProvider, createTheme } from "../node_modules/@mui/material/styles";
+import CssBaseline from "../node_modules/@mui/material/CssBaseline";
 
 function App() {
+
+  const darkTheme = createTheme({
+    palette: {
+      mode: 'dark',
+    },
+  });
+
   return (
+
+    //<ThemeProvider theme={darkTheme}>
+      //<CssBaseline />
     <React.Fragment>
       <AdminCheck>
       <BrowserRouter>
@@ -38,6 +49,7 @@ function App() {
       </BrowserRouter>
       </AdminCheck>
     </React.Fragment>
+    //</ThemeProvider>
   );
 }
 

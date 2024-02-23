@@ -12,7 +12,9 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
-
+import { makeStyles } from '@mui/material/styles';
+import { Card, CardContent, Grid, TextField } from '@mui/material';
+import { Box, Switch } from '@mui/material';
 // icons
 import AlignHorizontalLeftIcon from '@mui/icons-material/AlignHorizontalLeft';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -208,3 +210,94 @@ export const SideBar = () => {
         </Drawer >
     );
 };
+
+export const ContactForm = () => {
+
+    return (
+
+        <Grid container justifyContent="center">
+          <Grid item xs={12} sm={8} md={6}>
+            <Card sx={{ maxWidth: 450, padding: "20px 5px", margin: "0 auto" }}>
+              <CardContent>
+                <Typography gutterBottom variant="h5">
+                  Contact Us
+                </Typography>
+                <Typography variant="body2" color="textSecondary" component="p" gutterBottom>
+                  Questions or concerns? Fill out the form to get in touch with us.
+                </Typography>
+                <form>
+                  <Grid container spacing={1}>
+                    <Grid item xs={12} sm={6}>
+                      <TextField placeholder="Enter first name" label="First Name" variant="outlined" fullWidth required />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField placeholder="Enter last name" label="Last Name" variant="outlined" fullWidth required />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField type="email" placeholder="Enter email" label="Email" variant="outlined" fullWidth required />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField label="Message" multiline rows={4} placeholder="Type your message here" variant="outlined" fullWidth required />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Button type="submit" variant="contained" fullWidth sx={{ backgroundColor: '#74b42d', color: 'white', '&:hover': {
+          backgroundColor: '#74b42d', 
+        },}}>Submit</Button>
+                    </Grid>
+                  </Grid>
+                </form>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+
+    );
+    
+};
+
+
+export const SettingsPage = ({ darkMode, toggleDarkMode }) => {
+    
+    return (
+      <Box
+        sx={{
+        width: 360,
+          padding: 2,
+          border: '1px solid',
+          borderColor: 'divider',
+          borderRadius: 'borderRadius',
+          marginBottom: '200px'
+
+        }}
+      >
+        <Typography variant="h5">Settings</Typography>
+        <Divider />
+        <Box sx={{ mt: 2 }}>
+          <Typography variant="subtitle1">Display</Typography>
+          <Divider />
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="body1">Dark Mode</Typography>
+            <Switch
+  sx={{
+    '& .MuiSwitch-thumb': {
+        color: '#74b42d', // Base color
+    },
+    "& .Mui-checked": {
+        color: "#454545"
+
+      },
+      "& .MuiSwitch-track": {
+        backgroundColor: "#000 !important"
+      }
+  }}
+    color="primary"
+    checked={darkMode}
+    onChange={toggleDarkMode}
+/>
+          </Box>
+        </Box>
+      </Box>
+    );
+  };
+
+

@@ -3,7 +3,7 @@ import '../App.css';
 import * as MaterialUI from '../components/MaterialUI';
 import {auth} from '../components/Authentication';
 import AddDealershipImport from '../components/AddDealership';
-import UserDealershipImport from '../components/UserDealership';
+import UserDealershipImport from '../components/UserDealerships';
 
 function DealershipsPage () {
 
@@ -25,12 +25,14 @@ function DealershipsPage () {
           <h1>Manage Dealerships</h1>
           </div>
           <div className="File">
+            
               <AddDealershipImport/>
               <UserDealershipImport/>
 
-              </div>
-              </header>
+          </div>
+            </header>
             </React.Fragment>
+            
           ) : (<p>Not Authorized</p>)
         }
         </React.Fragment>

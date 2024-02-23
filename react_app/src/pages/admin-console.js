@@ -110,7 +110,7 @@ function AdminPage () {
               <MaterialUI.CustomButton type ="submit" onClick={createUser}>Create User</MaterialUI.CustomButton>
               {error && <p id="error">{error}</p>}
               </Box>
-              </Container>
+        </Container>
           </div>
           </header>
             </React.Fragment>

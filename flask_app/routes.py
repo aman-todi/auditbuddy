@@ -268,7 +268,6 @@ def check_admin():
         # add to the dictionary
         admins[doc_name] = email
 
-    print("admin list: ", admins)
     # get the user token
     token = request.json.get('userToken')
     #decode the token
@@ -293,7 +292,6 @@ def create_user():
         firebase_admin.initialize_app(cred)
 
     db = firestore.client()
-
 
     # get user info from request
     email = request.form.get('email')
@@ -343,6 +341,40 @@ def add_to_database(database_info):
     db.collection("results").document(database_info[1]).collection(database_info[3]).document(database_info[0]).set(data)
 
 
+#
+# populate dealerships table
+#
+@app.route('/user-dealerships', methods=['POST'])
+def user_dealerships():
+    # access the database
+    collection_ref = db.collection('dealerships')
+
+    # extract the data
+    docs = list(collection_ref.stream())
+    print("docs: ", docs)
+
+    return jsonify("test")
+
+#
+# add dealership to the database
+#
+@app.route('/add-dealership', methods=['POST'])
+def add_dealership():
+    # get form inputs
+    uid = request.form['uid']
+    name = request.form['name']
+    brand = request.form['brand']
+    city = request.form['city']
+    state = request.form['state']
+    uio = request.form['uio']
+    sales = request.form['sales']
+    print(uid, name, brand, city, state, uio, sales)
+
+    #input into the database
+    #collection_ref = db.collection('dealerships')
+
+    return jsonify("test")
+
 # pull results from the database
 @app.route('/generate-results', methods=['POST'])
 def generate_results():
@@ -375,7 +407,6 @@ def generate_results():
         print("Error:", e)
         return jsonify({"error": str(e)}), 500
     
-
 @app.route('/search-results', methods=['POST'])
 def search_results():
     try:

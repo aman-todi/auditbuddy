@@ -252,10 +252,10 @@ def upload_video():
 @app.route('/check-admin', methods=['POST'])
 def check_admin():
     # initialize
-    path = os.path.join(app.root_path, 'static', 'main', 'config', 'valued-range-411422-d36068bfa11f.json')
-    cred = credentials.Certificate(path)
-    if not firebase_admin._apps:
-        firebase_admin.initialize_app(cred)
+    #ath = os.path.join(app.root_path, 'static', 'main', 'config', 'valued-range-411422-d36068bfa11f.json')
+    #cred = credentials.Certificate(path)
+    #if not firebase_admin._apps:
+        #firebase_admin.initialize_app(cred)
 
     # get the admins database
     admins = {}
@@ -286,12 +286,12 @@ def check_admin():
 @app.route('/create-user', methods=['POST'])
 def create_user():
     # initialize
-    path = os.path.join(app.root_path, 'static', 'main', 'config', 'valued-range-411422-d36068bfa11f.json')
-    cred = credentials.Certificate(path)
-    if not firebase_admin._apps:
-        firebase_admin.initialize_app(cred)
+    #path = os.path.join(app.root_path, 'static', 'main', 'config', 'valued-range-411422-d36068bfa11f.json')
+    #cred = credentials.Certificate(path)
+    #if not firebase_admin._apps:
+        #firebase_admin.initialize_app(cred)
 
-    db = firestore.client()
+   #db = firestore.client()
 
     # get user info from request
     email = request.form.get('email')
@@ -300,7 +300,6 @@ def create_user():
 
     try:
         # for admins, add to the database
-        last_id = 0
         if role == "Admin":
             user = auth.create_user(email=email, password=password)
             # get the next id
@@ -324,7 +323,7 @@ def create_user():
 def add_to_database(database_info):
 
      # firestore database
-    db = firestore.client()
+    #db = firestore.client()
 
     # append the new data in the correct format for firebase
     data = {
@@ -346,14 +345,14 @@ def add_to_database(database_info):
 #
 @app.route('/user-dealerships', methods=['POST'])
 def user_dealerships():
+
     # access the database
     collection_ref = db.collection('dealerships')
 
-    # extract the data
-    docs = list(collection_ref.stream())
-    print("docs: ", docs)
+    # extract the data from database and put dict in list
+    docs = [doc.to_dict() for doc in collection_ref.stream()]
 
-    return jsonify("test")
+    return jsonify(docs)
 
 #
 # add dealership to the database
@@ -371,7 +370,8 @@ def add_dealership():
     print(uid, name, brand, city, state, uio, sales)
 
     #input into the database
-    #collection_ref = db.collection('dealerships')
+    collection_ref = db.collection('dealerships')
+
 
     return jsonify("test")
 

@@ -3,7 +3,7 @@ import '../App.css';
 import * as MaterialUI from '../components/MaterialUI';
 import {auth} from '../components/Authentication';
 import AddDealershipImport from '../components/AddDealership';
-import UserDealershipImport from '../components/UserDealerships';
+import DealershipListImport from '../components/DealershipList';
 
 function DealershipsPage () {
 
@@ -27,7 +27,7 @@ function DealershipsPage () {
           <div className="File">
             
               <AddDealershipImport/>
-              <UserDealershipImport/>
+              <DealershipListImport/>
 
           </div>
             </header>

@@ -137,7 +137,7 @@ export const SideBar = () => {
 
     return (
         <Drawer variant='permanent' anchor='left' sx={{width: 100}}>
-            <Toolbar sx={{ marginTop: 7.5, width: 100 }}>
+            <Toolbar sx={{ marginTop: 7.5, width: 145 }}>
                 <List>
                     <Typography sx={{ fontSize: '0.9rem', marginLeft: -1 }} disablePadding><strong>Welcome,</strong> {user.email}</Typography>
                     <ListItem disablePadding>
@@ -256,8 +256,10 @@ export const ContactForm = () => {
 };
 
 
-export const SettingsPage = ({ darkMode, toggleDarkMode }) => {
-    
+export const Settings = ({darkMode, toggleDarkMode}) => {
+    const handleDarkModeToggle = () => {
+        toggleDarkMode();
+    };
     return (
       <Box
         sx={{
@@ -267,7 +269,8 @@ export const SettingsPage = ({ darkMode, toggleDarkMode }) => {
           borderColor: 'divider',
           borderRadius: 'borderRadius',
           marginBottom: '200px'
-
+ 
+ 
         }}
       >
         <Typography variant="h5">Settings</Typography>
@@ -278,26 +281,28 @@ export const SettingsPage = ({ darkMode, toggleDarkMode }) => {
           <Box sx={{ mt: 2 }}>
             <Typography variant="body1">Dark Mode</Typography>
             <Switch
+            checked={darkMode}
+            onChange={handleDarkModeToggle}
   sx={{
     '& .MuiSwitch-thumb': {
-        color: '#74b42d', // Base color
+        color: '#74b42d',
     },
     "& .Mui-checked": {
         color: "#454545"
-
+ 
+ 
       },
       "& .MuiSwitch-track": {
         backgroundColor: "#000 !important"
       }
   }}
     color="primary"
-    checked={darkMode}
-    onChange={toggleDarkMode}
-/>
+ />
           </Box>
         </Box>
       </Box>
     );
   };
+ 
 
 

@@ -241,11 +241,11 @@ const FormImport = () => {
             }
           }}
         >
-          <Tab label={<span style={{ color: 'rgb(50,50,50)' }}>LOGOS</span>} />
-          <Tab label={<span style={{ color: 'rgb(50,50,50)' }}>DISPLAY CARS</span>} />
-          <Tab label={<span style={{ color: 'rgb(50,50,50)' }}>PARKING SPACES</span>} />
-          <Tab label={<span style={{ color: 'rgb(50,50,50)' }}>HOSPITALITY</span>} />
-          <Tab label={<span style={{ color: 'rgb(50,50,50)' }}>SPATIAL</span>} />
+          <Tab label={<span>LOGOS</span>} />
+          <Tab label={<span>DISPLAY CARS</span>} />
+          <Tab label={<span>PARKING SPACES</span>} />
+          <Tab label={<span>HOSPITALITY</span>} />
+          <Tab label={<span>SPATIAL</span>} />
         </Tabs>
       </Box>
 

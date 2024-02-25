@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 // navbar/sidebar
+import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import Button from '@mui/material/Button';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -260,6 +261,19 @@ export const Settings = ({darkMode, toggleDarkMode}) => {
     const handleDarkModeToggle = () => {
         toggleDarkMode();
     };
+    const [open, setOpen] = useState(false);
+
+    const handleOpen = () => {
+        setOpen(true);
+      };
+    
+      const handleClose = () => {
+        setOpen(false);
+      };
+      const handleSubmit = () => {
+
+        handleClose();
+      };
     return (
       <Box
         sx={{
@@ -283,22 +297,64 @@ export const Settings = ({darkMode, toggleDarkMode}) => {
             <Switch
             checked={darkMode}
             onChange={handleDarkModeToggle}
-  sx={{
-    '& .MuiSwitch-thumb': {
-        color: '#74b42d',
-    },
-    "& .Mui-checked": {
-        color: "#454545"
- 
- 
-      },
-      "& .MuiSwitch-track": {
-        backgroundColor: "#000 !important"
-      }
-  }}
-    color="primary"
- />
+            sx={{
+                '& .MuiSwitch-thumb': {
+                    color: '#74b42d',
+                },
+                "& .Mui-checked": {
+                    color: "#454545"
+            
+            
+                },
+                "& .MuiSwitch-track": {
+                    backgroundColor: "#000 !important"
+                }
+            }}
+                color="primary"
+            />
           </Box>
+
+          <Typography variant="subtitle1">Account</Typography>
+          <Divider />
+            <Box sx={{ mb: 4, mt: 2 }}>
+                <Button variant="contained" style={{ backgroundColor: '#74b42d'}} onClick={handleOpen}>
+                Change Password
+                </Button>
+                <Dialog open={open} onClose={handleClose} sx={{ marginLeft: '135px' }}>
+                    <DialogTitle>Reset Password</DialogTitle>
+                    <DialogContent>
+                        <form onSubmit={handleSubmit}>
+                            <TextField
+                            margin="dense"
+                            fullWidth
+                            label="Old Password"
+                            required
+                            />
+                            <TextField
+                            margin="dense"
+                            fullWidth
+                            label="New Password"
+                            required
+                            />
+                            <TextField
+                            margin="dense"
+                            fullWidth
+                            label="Confirm New Password"
+                            required
+                            />
+                        </form>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleClose} color="primary">
+                            Cancel
+                        </Button>
+                        <Button color="primary">
+                            Reset
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            </Box>
+
         </Box>
       </Box>
     );

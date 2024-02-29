@@ -262,7 +262,10 @@ export const Settings = ({darkMode, toggleDarkMode}) => {
         toggleDarkMode();
     };
     const [open, setOpen] = useState(false);
-
+    const [oldPassword, setOldPassword] = useState(''); 
+    const [newPassword, setNewPassword] = useState(''); 
+    const [confirmPassword, setConfirmPassword] = useState(''); 
+    const [error, setError] = useState(''); 
     const handleOpen = () => {
         setOpen(true);
       };
@@ -271,6 +274,37 @@ export const Settings = ({darkMode, toggleDarkMode}) => {
         setOpen(false);
       };
       const handleSubmit = () => {
+        if (newPassword !== confirmPassword) {
+            setError('Passwords do not match.'); 
+            console.log("ERROR")
+            return;
+        }
+
+        const requestBody = {
+            current_password: oldPassword,
+            new_password: newPassword
+        };
+
+        const requestOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+        };
+        fetch('/change-password', requestOptions)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to change password.');
+            }
+
+
+            handleClose(); 
+        })
+        .catch(error => {
+            console.error('Error changing password:', error); 
+
+        });
 
         handleClose();
       };
@@ -325,21 +359,30 @@ export const Settings = ({darkMode, toggleDarkMode}) => {
                     <DialogContent>
                         <form onSubmit={handleSubmit}>
                             <TextField
+                            type="password"
                             margin="dense"
                             fullWidth
                             label="Old Password"
+                            value={oldPassword} 
+                            onChange={(e) => setOldPassword(e.target.value)} 
                             required
                             />
                             <TextField
+                            type="password"
                             margin="dense"
                             fullWidth
                             label="New Password"
+                            value={newPassword} 
+                            onChange={(e) => setNewPassword(e.target.value)} 
                             required
                             />
                             <TextField
+                            type="password"
                             margin="dense"
                             fullWidth
                             label="Confirm New Password"
+                            value={confirmPassword} 
+                            onChange={(e) => setConfirmPassword(e.target.value)}
                             required
                             />
                         </form>
@@ -348,7 +391,7 @@ export const Settings = ({darkMode, toggleDarkMode}) => {
                         <Button onClick={handleClose} color="primary">
                             Cancel
                         </Button>
-                        <Button color="primary">
+                        <Button onClick={handleSubmit} color="primary">
                             Reset
                         </Button>
                     </DialogActions>

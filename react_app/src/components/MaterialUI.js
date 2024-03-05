@@ -25,6 +25,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import AddBusinessIcon from '@mui/icons-material/AddBusiness';
 // authentication
 import { auth } from '../components/Authentication';
+import { getAuth,updatePassword,reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import { useAdmin } from './Admin';
 
@@ -280,31 +281,30 @@ export const Settings = ({darkMode, toggleDarkMode}) => {
             return;
         }
 
-        const requestBody = {
-            current_password: oldPassword,
-            new_password: newPassword
-        };
+        const auth = getAuth();
+        const user = auth.currentUser;
 
-        const requestOptions = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestBody)
-        };
-        fetch('/change-password', requestOptions)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to change password.');
-            }
+        const credential = EmailAuthProvider.credential(user.email, oldPassword);
 
 
-            handleClose(); 
-        })
-        .catch(error => {
-            console.error('Error changing password:', error); 
+        reauthenticateWithCredential(user, credential)
+            .then(() => {
 
-        });
+                updatePassword(user, newPassword)
+                    .then(() => {
+
+                        handleClose();
+                    })
+                    .catch((error) => {
+                        console.error("Error updating password:", error);
+
+                    });
+            })
+            .catch((error) => {
+                console.error("Old password is not correct:", error);
+            });
+
+
 
         handleClose();
       };

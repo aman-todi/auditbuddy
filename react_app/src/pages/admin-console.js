@@ -6,6 +6,7 @@ import HelpIcon from '@mui/icons-material/Help';
 import { auth } from '../components/Authentication';
 import axios from 'axios';
 import { useAdmin } from '../components/Admin';
+import UserListImport from '../components/UserList';
 
 function AdminPage () {
 
@@ -52,6 +53,7 @@ function AdminPage () {
               'Content-Type': 'multipart/form-data'
             }
           });
+
           setError(`User created successfully: ${response.data.email}`);
         }
         catch (error) {
@@ -111,9 +113,10 @@ function AdminPage () {
               {error && <p id="error">{error}</p>}
               </Box>
         </Container>
+        <UserListImport></UserListImport>
           </div>
           </header>
-            </React.Fragment>
+          </React.Fragment>
           ) : (<p>Not Authorized</p>)
         }
         </React.Fragment>

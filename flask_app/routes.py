@@ -345,7 +345,6 @@ def add_to_database(database_info):
 #
 @app.route('/user-dealerships', methods=['POST'])
 def user_dealerships():
-
     # access the database
     collection_ref = db.collection('dealerships')
 
@@ -353,6 +352,39 @@ def user_dealerships():
     docs = [doc.to_dict() for doc in collection_ref.stream()]
 
     return jsonify(docs)
+
+#
+# populate user table in admin console
+#
+@app.route('/all-users', methods=['POST'])
+def all_users():
+
+    # list of all users
+    user_list = []
+
+    # access the database of all users
+    users = auth.list_users()
+
+    # iterate through each user
+    for user in users.iterate_all():
+
+        #jsonify the data
+        user_data = {
+            'email': user.email,
+            'role': "Auditor" 
+        }
+
+        # check if the user is an admin
+        collection_ref = db.collection("admins")
+        email_list = [doc.to_dict()['email'] for doc in collection_ref.stream()]
+
+        if user.email in email_list:
+            user_data['role'] = "Admin"
+        
+        user_list.append(user_data)
+
+
+    return jsonify(user_list)
 
 #
 # add dealership to the database
@@ -371,6 +403,9 @@ def add_dealership():
 
     #input into the database
     collection_ref = db.collection('dealerships')
+
+    # set up json for user data
+
 
 
     return jsonify("test")

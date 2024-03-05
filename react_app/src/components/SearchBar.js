@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Box, TextField, InputLabel, Select, MenuItem, FormControl, Container, Typography, Tooltip} from '@mui/material';
+import { Box, TextField, InputLabel, Select, MenuItem, FormControl, Container, Typography, Tooltip } from '@mui/material';
 import * as MaterialUI from '../components/MaterialUI'
 import SearchIcon from '@mui/icons-material/Search';
 import HelpIcon from '@mui/icons-material/Help';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs, { Dayjs } from 'dayjs';
 
 
 export const SearchBar = ({ onSearch }) => {
@@ -13,18 +17,34 @@ export const SearchBar = ({ onSearch }) => {
     dealership: '',
     brand: '',
     department: '',
-    country: ''
+    country: '',
+    date: dayjs().toISOString()
   });
+
 
   // Handles form input changes
   const handleFormInput = (event, setFormInputState, field) => {
-    const value = event.target.value;
-    setFormInputState(value); // Update the form input state
-    setSearchCriteria(prevState => ({
-      ...prevState,
-      [field]: value // Update the corresponding field in the search criteria
-    }));
+
+
+    if (field === 'date') {
+      // If the field is 'date', convert the Dayjs object to a Date object
+      const dateValue = event.toDate();
+      setSearchCriteria(prevState => ({
+        ...prevState,
+        [field]: dateValue.toISOString() // Convert Date object to ISO string
+      }));
+      // Update the date state directly
+      setDate(dateValue);
+    } else {
+      // For other fields, update as usual
+      setFormInputState(event.target.value);
+      setSearchCriteria(prevState => ({
+        ...prevState,
+        [field]: event.target.value
+      }));
+    }
   };
+
 
 
   // Handles search button click
@@ -40,17 +60,18 @@ export const SearchBar = ({ onSearch }) => {
   const [ID, setID] = useState('');
   const [country, setCountry] = useState('');
   const [brandName, setBrand] = useState('');
+  const [date, setDate] = useState(dayjs());
   const [dealershipName, setDealershipName] = useState('');
 
   return (
     <Container component="main" maxWidth="s">
       <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, alignItems: "center" }}>
-      <Typography variant="p" sx={{ display: "flex", alignItems: "center", marginBottom: "1rem", marginTop: "1rem" }}>
-        <span style={{ fontWeight: "bold", marginRight: "0.5rem" }}>Search</span>
-        <Tooltip disableFocusListener title="Search for a specific dealership that matches the critera">
-          <HelpIcon sx={{ fontSize: "small" }} />
-        </Tooltip>
-      </Typography>
+        <Typography variant="p" sx={{ display: "flex", alignItems: "center", marginBottom: "1rem", marginTop: "1rem" }}>
+          <span style={{ fontWeight: "bold", marginRight: "0.5rem" }}>Search</span>
+          <Tooltip disableFocusListener title="Search for a specific dealership that matches the critera">
+            <HelpIcon sx={{ fontSize: "small" }} />
+          </Tooltip>
+        </Typography>
       </Box>
       <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, alignItems: "center" }}>
         <TextField label="ID" variant="outlined"
@@ -106,19 +127,20 @@ export const SearchBar = ({ onSearch }) => {
             <MenuItem value={"canada"}>Canada</MenuItem>
           </Select>
         </FormControl>
-        <FormControl sx={{ margin: "0.1rem", width: "50vw" }}>
-          <InputLabel>Date</InputLabel>
-          <Select
-            value={country}
-            label="Date"
 
-          >
-          </Select>
-        </FormControl>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <Container components={['DatePicker']}>
+            <DatePicker
+              label="Date"
+              value={date}
+              onChange={(event) => handleFormInput(event, setDate, 'date')}
+            />
+          </Container>
+        </LocalizationProvider>
         <MaterialUI.CustomButton onClick={handleSearchClick}>
           <SearchIcon />
         </MaterialUI.CustomButton>
       </Box>
-    </Container>
+    </Container >
   );
 };

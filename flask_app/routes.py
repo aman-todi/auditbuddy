@@ -18,6 +18,7 @@ import firebase_admin.auth as auth
 from firebase_admin import credentials, storage, firestore
 from datetime import datetime
 import time
+from dateutil import parser
     
 ANNOTATED_IMAGES_FOLDER = os.path.join(app.root_path, 'static', 'main', 'annotated_images')
 
@@ -452,6 +453,7 @@ def search_results():
         brand = data.get('brand')
         department = data.get('department')
         country = data.get('country')
+        date = data.get('date')
 
         print("Made it past Gets",data)
         collection_ref = db.collection('results')
@@ -475,11 +477,26 @@ def search_results():
 
         filtered_results = []
         for result in results:
+            # Extract month, day, and year from submission date in the database
+            submission_date = parser.parse(result['Submitted'])
+            submission_month = submission_date.month
+            submission_day = submission_date.day
+            submission_year = submission_date.year
+
+            # Extract month, day, and year from the provided date for comparison
+            provided_date = parser.parse(date)
+            provided_month = provided_date.month
+            provided_day = provided_date.day
+            provided_year = provided_date.year
+
+            # Check if the submission date matches the provided date components
             if (not dealership or result['Dealership Name'].lower() == dealership) and \
                (not brand or result['Brand'].lower() == brand) and \
                (not department or result['Department'].lower() == department) and \
-               (not country or result['Country'].lower() == country):
+               (not country or result['Country'].lower() == country) and \
+               (not date or (submission_month == provided_month and submission_day == provided_day and submission_year == provided_year)):
                 filtered_results.append(result)
+
 
         print("Got filtered results",len(filtered_results))
         print(filtered_results)

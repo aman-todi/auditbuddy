@@ -393,20 +393,39 @@ def all_users():
 @app.route('/add-dealership', methods=['POST'])
 def add_dealership():
     # get form inputs
-    uid = request.form['uid']
     name = request.form['name']
     brand = request.form['brand']
     city = request.form['city']
     state = request.form['state']
     uio = request.form['uio']
     sales = request.form['sales']
-    print(uid, name, brand, city, state, uio, sales)
 
     #input into the database
     collection_ref = db.collection('dealerships')
 
-    # set up json for user data
+    # calculate the uid from the brand
+    #three first letters of the brand
+    abbreviation = brand[:3].upper()
 
+    #get the next number
+    collection_ref = db.collection("dealerships")
+    docs = list(collection_ref.stream())
+    next_id = int(docs[-1].id) + 1
+    new_uid = abbreviation + str(next_id)
+
+    # set up json for user data
+    data = {
+            'UID': new_uid,
+            'Dealership Name': name,
+            'Brand': brand,
+            'City': city,
+            'State': state,
+            'UIO': uio,
+            'Sales': sales
+            }
+            
+    # go to the collection, create a new document (user id), and append the user email
+    db.collection("dealerships").document(str(next_id)).set(data)
 
 
     return jsonify("test")

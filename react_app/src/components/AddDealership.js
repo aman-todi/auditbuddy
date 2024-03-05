@@ -19,7 +19,6 @@ const AddDealershipImport = () => {
   const [options, setOptions] = useState([]);
 
   // states to keep track of form
-  const [uid, setUID] = useState(''); // dealership uid
   const [name, setName] = useState(''); // dealership name
   const [brand, setBrand] = useState(''); // dealership brand
   const [city, setCity] = useState(''); // dealership city
@@ -35,10 +34,7 @@ const AddDealershipImport = () => {
 
   const handleUpload = async () => {
     // form validation
-    if (uid === '') {
-      setError('Please enter the UID')
-    }
-    else if (name === '') {
+    if (name === '') {
       setError('Please enter the dealership name')
     }
     else if (brand === '') {
@@ -60,8 +56,6 @@ const AddDealershipImport = () => {
       // create a form and append this file
       const formData = new FormData();
 
-      // uid
-      formData.append('uid', uid);
       // name
       formData.append('name', name);
       // brand
@@ -111,8 +105,6 @@ const AddDealershipImport = () => {
         </Tooltip>
       </Typography>
       <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, alignItems: "center", justifyContent: 'center' }}>
-        <TextField required label="UID" variant="outlined" onChange={(event) => handleFormInput(event, setUID)}
-          sx={{ margin: "0.1rem", width:"10vw"}}/>
         <TextField required label="Dealership Name" variant="outlined" onChange={(event) => handleFormInput(event, setName)}
           sx={{ margin: "0.1rem", width:"22.5vw"}}
         />

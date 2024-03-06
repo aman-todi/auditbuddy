@@ -150,6 +150,11 @@ def upload_video():
     submission = request.form['submission']
     print("submission",submission)
 
+    # uid, sales, and uio
+    print("uid", request.form['uid'])
+    print("sales", request.form['sales'])
+    print("uio", request.form['uio'])
+
     dealership_info = (brandName, dealershipName, department, country, submission)
 
     # we should save the folders from each dealership somewhere in here
@@ -252,12 +257,6 @@ def upload_video():
 #
 @app.route('/check-admin', methods=['POST'])
 def check_admin():
-    # initialize
-    #ath = os.path.join(app.root_path, 'static', 'main', 'config', 'valued-range-411422-d36068bfa11f.json')
-    #cred = credentials.Certificate(path)
-    #if not firebase_admin._apps:
-        #firebase_admin.initialize_app(cred)
-
     # get the admins database
     admins = {}
     collection_ref = db.collection('admins')
@@ -286,14 +285,6 @@ def check_admin():
 #
 @app.route('/create-user', methods=['POST'])
 def create_user():
-    # initialize
-    #path = os.path.join(app.root_path, 'static', 'main', 'config', 'valued-range-411422-d36068bfa11f.json')
-    #cred = credentials.Certificate(path)
-    #if not firebase_admin._apps:
-        #firebase_admin.initialize_app(cred)
-
-   #db = firestore.client()
-
     # get user info from request
     email = request.form.get('email')
     password = request.form.get('password')

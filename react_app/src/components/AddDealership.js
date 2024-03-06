@@ -141,6 +141,18 @@ const AddDealershipImport = () => {
         <TextField required label="# of Sales" variant="outlined" onChange={(event) => handleFormInput(event, setSales)}
           sx={{ margin: "0.1rem", width:"10vw"}}
         />
+
+         {/* <FormControl required fullWidth sx={{ margin: "0.1rem" }}>
+          <InputLabel>Country</InputLabel>
+          <Select
+            value={country}
+            label="Country"
+            onChange={(event) => handleFormInput(event, setCountry)}
+          >
+            <MenuItem value={"USA"}>USA</MenuItem>
+            <MenuItem value={"Canada"}>Canada</MenuItem>
+          </Select>
+        </FormControl> */}
         </Box>
 
       <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "0.1rem" }}>

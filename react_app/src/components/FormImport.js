@@ -61,7 +61,7 @@ const FormImport = () => {
     // department
     formData.append('department', department);
     // country
-    formData.append('country', 'USA');
+    formData.append('country', dealerships['Country']);
     // brand
     formData.append('dealership', dealerships['Brand']);
     // uid

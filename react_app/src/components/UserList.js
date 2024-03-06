@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 import Tooltip from '@mui/material/Tooltip';
 import HelpIcon from '@mui/icons-material/Help';
 // for user table
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress } from '@mui/material';
 
 const UserListImport = () => {
   // store user dealerships
@@ -53,7 +53,7 @@ const UserListImport = () => {
           <TableBody>
           {loading ? (
             <TableRow>
-            <TableCell colSpan={3}>Loading...</TableCell>
+            <TableCell colSpan={3} align="center"><CircularProgress color="success" /></TableCell>
             </TableRow>
             ) : (
                 users.map((user, index) => (

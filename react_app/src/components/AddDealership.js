@@ -1,12 +1,8 @@
 import React, { useState } from 'react';
 import '../App.css';
-// filepond
-import 'filepond/dist/filepond.min.css';
 // material ui
 import * as MaterialUI from './MaterialUI';
 import HelpIcon from '@mui/icons-material/Help';
-
-// import ShowResults from './pages/audit-results';
 import { InputLabel, FormControl, MenuItem, Select, TextField, Container, Box, Tooltip, Typography, Alert} from '@mui/material/';
 // axios
 import axios from 'axios';
@@ -15,8 +11,6 @@ const AddDealershipImport = () => {
 
   // error message
   const [error, setError] = useState('')
-  // address auto complete
-  const [options, setOptions] = useState([]);
 
   // states to keep track of form
   const [name, setName] = useState(''); // dealership name
@@ -25,6 +19,7 @@ const AddDealershipImport = () => {
   const [state, setState] = useState(''); // dealership state
   const [uio, setUIO] = useState(''); // dealership uio
   const [sales, setSales] = useState(''); // dealership sales
+  const [country, setCountry] = useState(''); // dealership country
 
 
   // handles each form input states
@@ -44,7 +39,11 @@ const AddDealershipImport = () => {
       setError('Please input a city')
     }
     else if (state === '') {
-      setError('Please input a state')
+      setError('Please input a state/province')
+    }
+    else if (country === '')
+    {
+      setError('Please input a country')
     }
     else if (uio === '') {
       setError('Please input the UIO')
@@ -67,7 +66,9 @@ const AddDealershipImport = () => {
       // sales
       formData.append('sales', sales);
       // uio
-      formData.append('uio', uio)
+      formData.append('uio', uio);
+      // country
+      formData.append('country', country);
 
       try {
         const response = await axios.post('http://localhost:8080/add-dealership', formData, {
@@ -98,6 +99,7 @@ const AddDealershipImport = () => {
 
   return (
     <Container component= "main" maxWidth="s">
+      {/* add dealership header */}
       <Typography variant="p" sx={{ display: "flex", alignItems: "center", marginBottom: "1rem" }}>
         <span style={{ fontWeight: "bold", marginRight: "0.5rem" }}>Add Dealership</span>
         <Tooltip disableFocusListener title="The information of the dealership being added">
@@ -105,10 +107,12 @@ const AddDealershipImport = () => {
         </Tooltip>
       </Typography>
       <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, alignItems: "center", justifyContent: 'center' }}>
-        <TextField required label="Dealership Name" variant="outlined" onChange={(event) => handleFormInput(event, setName)}
-          sx={{ margin: "0.1rem", width:"22.5vw"}}
+        {/* dealership name */}
+        <TextField required fullWidth label="Dealership Name" variant="outlined" onChange={(event) => handleFormInput(event, setName)}
+          sx={{ margin: "0.1rem"}}
         />
-         <FormControl required sx={{ margin: "0.1rem", width: "10vw"}}>
+        {/* select brand */}
+         <FormControl required fullWidth sx={{ margin: "0.1rem"}}>
           <InputLabel>Brand</InputLabel>
           <Select
             value={brand}
@@ -128,21 +132,25 @@ const AddDealershipImport = () => {
             <MenuItem value={"Volkswagen"}>Volkswagen</MenuItem>
           </Select>
         </FormControl>
+         {/* set uio */}
+         <TextField required fullWidth label="UIO" variant="outlined" onChange={(event) => handleFormInput(event, setUIO)}
+          sx={{ margin: "0.1rem"}}
+        />
+        {/* set sales */}
+        <TextField required fullWidth label="# of Sales" variant="outlined" onChange={(event) => handleFormInput(event, setSales)}
+          sx={{ margin: "0.1rem"}}
+        />
         </Box>
         <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, alignItems: "center", justifyContent: 'center' }}>
-        <TextField required label="City" variant="outlined" onChange={(event) => handleFormInput(event, setCity)}
-          sx={{ margin: "0.1rem", width:"15vw"}}/>
-        <TextField required label="State" variant="outlined" inputProps={{ maxLength: 2 }} onChange={(event) => handleFormInput(event, setState)}
-          sx={{ margin: "0.1rem", width:"7.5vw"}}
+        {/* select city */}
+        <TextField required fullWidth label="City" variant="outlined" onChange={(event) => handleFormInput(event, setCity)}
+          sx={{ margin: "0.1rem"}}/>
+        {/* select state/province */}
+        <TextField required fullWidth label="State/Province" variant="outlined" inputProps={{ maxLength: 2 }} onChange={(event) => handleFormInput(event, setState)}
+          sx={{ margin: "0.1rem"}}
         />
-        <TextField required label="UIO" variant="outlined" onChange={(event) => handleFormInput(event, setUIO)}
-          sx={{ margin: "0.1rem", width:"10vw"}}
-        />
-        <TextField required label="# of Sales" variant="outlined" onChange={(event) => handleFormInput(event, setSales)}
-          sx={{ margin: "0.1rem", width:"10vw"}}
-        />
-
-         {/* <FormControl required fullWidth sx={{ margin: "0.1rem" }}>
+        {/* set country */}
+         <FormControl required fullWidth sx={{ margin: "0.1rem" }}>
           <InputLabel>Country</InputLabel>
           <Select
             value={country}
@@ -152,9 +160,9 @@ const AddDealershipImport = () => {
             <MenuItem value={"USA"}>USA</MenuItem>
             <MenuItem value={"Canada"}>Canada</MenuItem>
           </Select>
-        </FormControl> */}
+        </FormControl>
         </Box>
-
+      {/* add dealership button and error */}
       <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "0.1rem" }}>
       {error ? (
         <Alert severity={error === 'Dealership added successfully' ? 'success' : 'error'}>

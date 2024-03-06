@@ -27,17 +27,15 @@ bucket = storage.bucket()
 # Firestore database
 db = firestore.client()
 
+# route home
 @app.route('/')
 def root():
 	return render_template('index.html')
 
+# route other paths
 @app.route('/<path:path>')
 def index(path):
     return render_template('index.html')
-
-@app.route('/test')
-def test():
-	return jsonify(test = "test ajax call")
 
 @app.route('/get-logo-results/<brandName>/<dealershipName>/<department>/<submission>')
 def get_annotated_images(brandName,dealershipName,department,submission):
@@ -174,8 +172,6 @@ def upload_video():
         file.save(save_path)
         spatial_paths.append(save_path)
         index += 1
-        print("spatial files;", spatial_files)
-        # add the spatial awareness here. the files are stored in list spatial_files
     print("Running Spatial")
     sq_ft_result = compute_square_footage(spatial_files,dealership_info)  
 
@@ -314,9 +310,6 @@ def create_user():
 # push results from the database
 def add_to_database(database_info):
 
-     # firestore database
-    #db = firestore.client()
-
     # append the new data in the correct format for firebase
     data = {
         # add the submission date here
@@ -390,6 +383,7 @@ def add_dealership():
     state = request.form['state']
     uio = request.form['uio']
     sales = request.form['sales']
+    country = request.form['country']
 
     # access the database
     collection_ref = db.collection('dealerships')
@@ -421,7 +415,8 @@ def add_dealership():
             'City': city,
             'State': state,
             'UIO': uio,
-            'Sales': sales
+            'Sales': sales, 
+            'Country': country
             }
             
     # go to the collection, create a new document (user id), and append the user email

@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {TextField, Container, Box} from '@mui/material/';
+import {TextField, Container, Box, Alert} from '@mui/material/';
 import * as MaterialUI from '../components/MaterialUI';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../components/Authentication';
@@ -18,8 +18,8 @@ function LoginPage() {
         .then((userCredential) =>{
             console.log(userCredential);
     
-            // redirect to the audit page after 3 seconds
-            let countdown = 3;
+            // redirect to the audit page after 1 second
+            let countdown = 1;
             setInterval(() => {
               if (countdown === 0) 
               {
@@ -27,7 +27,7 @@ function LoginPage() {
               }
               else
               {
-                setError(`Login successful. Redirecting in ${countdown} seconds`);
+                setError('Login successful');
               }
               countdown -= 1;
           }, 1000);
@@ -49,7 +49,11 @@ function LoginPage() {
                 <TextField fullWidth value = {email} onChange={(e) => setEmail(e.target.value)} required id="email" label='Email' variant="outlined" margin="normal"/>
                 <TextField fullWidth value = {password} onChange={(e) => setPassword(e.target.value)} required id="password" label='Password' variant="outlined" margin="normal" type="password"/>
                 <MaterialUI.CustomButton type ="submit" onClick={signIn}>Login</MaterialUI.CustomButton>
-                {error && <p id="error">{error}</p>}
+                {error ? (
+                    <Alert severity={error === 'Login successful' ? 'success' : 'error'}>
+                        {error}
+                    </Alert>
+                ) : null}
             </Box>
         </Container>
         </header>

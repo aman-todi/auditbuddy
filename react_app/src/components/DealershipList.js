@@ -5,12 +5,14 @@ import Typography from '@mui/material/Typography';
 import Tooltip from '@mui/material/Tooltip';
 import HelpIcon from '@mui/icons-material/Help';
 // for dealership table
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress } from '@mui/material';
 
 
 const DealershipListImport = () => {
   // store user dealerships
   const [dealerships, setDealerships] = useState([]);
+  // check loading
+  const [loading, setLoading] = useState(true);
 
   // get the dealerships when user enter page
   useEffect(() => {
@@ -22,6 +24,7 @@ const DealershipListImport = () => {
 
         // set dealerships
         setDealerships(response.data);
+        setLoading(false);
         console.log(response.data)
       } catch (error) {
         console.error('Error fetching user dealerships:', error);
@@ -33,7 +36,7 @@ const DealershipListImport = () => {
   }, []);
 
   return (
-    <Container component="main" maxWidth="s">
+    <Container component="main">
       <Typography variant="p" sx={{ display: "flex", alignItems: "center", marginBottom: "1rem" }}>
         <span style={{ fontWeight: "bold", marginRight: "0.5rem" }}>Dealership List</span>
         <Tooltip disableFocusListener title="List of all dealerships">
@@ -51,10 +54,29 @@ const DealershipListImport = () => {
               <TableCell>State</TableCell>
               <TableCell>UIO</TableCell>
               <TableCell>Sales</TableCell>
+              <TableCell>Country</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {dealerships.map((dealership, index) => (
+          {loading ? (
+            <TableRow>
+            <TableCell colSpan={8} align="center"><CircularProgress color="success" /></TableCell>
+            </TableRow>
+            ) : (
+                dealerships.map((dealership, index) => (
+                <TableRow key={index}>
+                  <TableCell>{dealership['UID']}</TableCell>
+                  <TableCell>{dealership['Dealership Name']}</TableCell>
+                  <TableCell>{dealership['Brand']}</TableCell>
+                  <TableCell>{dealership['City']}</TableCell>
+                  <TableCell>{dealership['State']}</TableCell>
+                  <TableCell>{dealership['UIO']}</TableCell>
+                  <TableCell>{dealership['Sales']}</TableCell>
+                  <TableCell>{dealership['Country']}</TableCell>
+                </TableRow>
+              ))
+            )}
+            {/* {dealerships.map((dealership, index) => (
               <TableRow key={index}>
                 <TableCell>{dealership['UID']}</TableCell>
                 <TableCell>{dealership['Dealership Name']}</TableCell>
@@ -63,8 +85,9 @@ const DealershipListImport = () => {
                 <TableCell>{dealership['State']}</TableCell>
                 <TableCell>{dealership['UIO']}</TableCell>
                 <TableCell>{dealership['Sales']}</TableCell>
+                <TableCell>{dealership['Country']}</TableCell>
               </TableRow>
-            ))}
+            ))} */}
           </TableBody>
         </Table>
       </TableContainer>

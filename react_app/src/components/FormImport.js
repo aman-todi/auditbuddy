@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../App.css';
 // filepond
 import { FilePond } from 'react-filepond';
@@ -22,11 +22,36 @@ const FormImport = () => {
   const [spatial, setSpatial] = useState(null);
   const [error, setError] = useState("")
 
+  const [UID, setUID] = useState('');
   // states to keep track of form
   const [department, setDepartment] = useState('');
   const [country, setCountry] = useState('');
   const [dealership, setDealership] = useState('');
   const [name, setName] = useState('');
+
+    // store user dealerships
+    const [dealerships, setDealerships] = useState(null);
+    const [dealershipsList, setDealershipsList] = useState([]);
+
+    // get the dealerships when user enter page
+    useEffect(() => {
+  
+      // axios request to get dealerships
+      const fetchUserDealerships = async () => {
+        try {
+          const response = await axios.post('http://localhost:8080/user-dealerships');
+  
+          // set dealerships
+          setDealershipsList(response.data);
+          console.log(response.data)
+        } catch (error) {
+          console.error('Error fetching user dealerships:', error);
+        }
+      };
+  
+      // fetch dealerships
+      fetchUserDealerships();
+    }, []);
 
   const handleLogoAdded = (fileItems) => {
     if (fileItems.length > 0) {
@@ -74,7 +99,7 @@ const FormImport = () => {
       setError('Please enter the dealership name')
     }
     else if (dealership === '') {
-      setError('Please select a dealership')
+      setError('Please select a brand')
     }
     else if (department === '') {
       setError('Please select a department')
@@ -178,10 +203,24 @@ const FormImport = () => {
         </Tooltip>
       </Typography>
       <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, alignItems: "center" }}>
-        <TextField fullWidth required label="Dealership Name" variant="outlined" onChange={(event) => handleFormInput(event, setName)}
-          sx={{ margin: "0.1rem" }}
-        />
-        <FormControl required fullWidth sx={{ margin: "0.1rem" }}>
+
+      <FormControl required fullWidth sx={{ margin: "0.1rem" }}>
+        <InputLabel>Dealership</InputLabel>
+        <Select
+          value={name}
+          label="Dealerships"
+          onChange={(event) => handleFormInput(event, setName)}
+        >
+          {dealershipsList.map((dealership, index) => (
+            <MenuItem key={index} value={dealership['Dealership Name']}>
+              {dealership['UID']} {dealership['Dealership Name']}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      </Box>
+      <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, alignItems: "center" }}>
+      <FormControl required fullWidth sx={{ margin: "0.1rem" }}>
           <InputLabel>Brand</InputLabel>
           <Select
             value={dealership}
@@ -201,7 +240,7 @@ const FormImport = () => {
             <MenuItem value={"Volkswagen"}>Volkswagen</MenuItem>
           </Select>
         </FormControl>
-        <FormControl required fullWidth sx={{ margin: "0.1rem" }}>
+      <FormControl required fullWidth sx={{ margin: "0.1rem" }}>
           <InputLabel>Department</InputLabel>
           <Select
             value={department}
@@ -225,7 +264,7 @@ const FormImport = () => {
             <MenuItem value={"Canada"}>Canada</MenuItem>
           </Select>
         </FormControl>
-      </Box>
+        </Box>
 
       <Typography variant="p" sx={{ display: "flex", alignItems: "center", marginBottom: "1rem", marginTop: "1rem" }}>
         <span style={{ fontWeight: "bold", marginRight: "0.5rem" }}>Detection</span>

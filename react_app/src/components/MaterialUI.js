@@ -263,50 +263,65 @@ export const Settings = ({darkMode, toggleDarkMode}) => {
         toggleDarkMode();
     };
     const [open, setOpen] = useState(false);
-    const [oldPassword, setOldPassword] = useState(''); 
-    const [newPassword, setNewPassword] = useState(''); 
-    const [confirmPassword, setConfirmPassword] = useState(''); 
-    const [error, setError] = useState(''); 
+    const [oldPassword, setOldPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [error, setError] = useState('');
     const handleOpen = () => {
         setOpen(true);
       };
-    
+   
       const handleClose = () => {
         setOpen(false);
       };
       const handleSubmit = () => {
         if (newPassword !== confirmPassword) {
-            setError('Passwords do not match.'); 
+            setError('Passwords do not match.');
             console.log("ERROR")
             return;
         }
-
+ 
+ 
         const auth = getAuth();
         const user = auth.currentUser;
-
+ 
+ 
         const credential = EmailAuthProvider.credential(user.email, oldPassword);
-
-
+ 
+ 
+ 
+ 
         reauthenticateWithCredential(user, credential)
             .then(() => {
-
-                updatePassword(user, newPassword)
-                    .then(() => {
-
-                        handleClose();
-                    })
-                    .catch((error) => {
-                        console.error("Error updating password:", error);
-
-                    });
+                if (newPassword.length < 6) {
+                    setError('Password should be at least 6 characters long.');
+                } else {
+                    updatePassword(user, newPassword)
+                        .then(() => {
+ 
+ 
+                            handleClose();
+                        })
+                        .catch((error) => {
+                            console.error("Error updating password, please log out and log in again to reset.", error);
+ 
+ 
+                        });
+                }
             })
+           
             .catch((error) => {
                 console.error("Old password is not correct:", error);
+                setError('Old password is not correct.');
+ 
+ 
             });
-
-
-
-        handleClose();
+ 
+ 
+ 
+ 
+ 
+ 
       };
     return (
       <Box
@@ -317,8 +332,6 @@ export const Settings = ({darkMode, toggleDarkMode}) => {
           borderColor: 'divider',
           borderRadius: 'borderRadius',
           marginBottom: '200px'
- 
- 
         }}
       >
         <Typography variant="h5">Settings</Typography>
@@ -337,8 +350,8 @@ export const Settings = ({darkMode, toggleDarkMode}) => {
                 },
                 "& .Mui-checked": {
                     color: "#454545"
-            
-            
+           
+           
                 },
                 "& .MuiSwitch-track": {
                     backgroundColor: "#000 !important"
@@ -347,7 +360,8 @@ export const Settings = ({darkMode, toggleDarkMode}) => {
                 color="primary"
             />
           </Box>
-
+ 
+ 
           <Typography variant="subtitle1">Account</Typography>
           <Divider />
             <Box sx={{ mb: 4, mt: 2 }}>
@@ -363,8 +377,8 @@ export const Settings = ({darkMode, toggleDarkMode}) => {
                             margin="dense"
                             fullWidth
                             label="Old Password"
-                            value={oldPassword} 
-                            onChange={(e) => setOldPassword(e.target.value)} 
+                            value={oldPassword}
+                            onChange={(e) => setOldPassword(e.target.value)}
                             required
                             />
                             <TextField
@@ -372,8 +386,8 @@ export const Settings = ({darkMode, toggleDarkMode}) => {
                             margin="dense"
                             fullWidth
                             label="New Password"
-                            value={newPassword} 
-                            onChange={(e) => setNewPassword(e.target.value)} 
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
                             required
                             />
                             <TextField
@@ -381,11 +395,14 @@ export const Settings = ({darkMode, toggleDarkMode}) => {
                             margin="dense"
                             fullWidth
                             label="Confirm New Password"
-                            value={confirmPassword} 
+                            value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             required
                             />
                         </form>
+                        <span style={{ color: 'red' }}>{error}</span>
+ 
+ 
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={handleClose} color="primary">
@@ -397,11 +414,13 @@ export const Settings = ({darkMode, toggleDarkMode}) => {
                     </DialogActions>
                 </Dialog>
             </Box>
-
+ 
+ 
         </Box>
       </Box>
     );
   };
+ 
  
 
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import * as MaterialUI from '../components/MaterialUI';
 import { useParams } from 'react-router-dom';
-import { Container, Grid, Paper, Typography, Button, Dialog, DialogActions, DialogContent, DialogTitle, Card, CardContent, FormControl, Box } from '@mui/material';
+import { Container, Grid, Paper, Typography, Button, Dialog, DialogActions, DialogContent, DialogTitle, Card, CardContent, FormControl, Box, useTheme, useMediaQuery} from '@mui/material';
 
 
 
@@ -89,10 +89,13 @@ const AdvancedResultsPage = () => {
 
   const brandStandards = ['Logo Results', 'Car Detection', 'Parking Space', 'Hospitality', 'Spatial'];
 
+   // for mobile responsiveness
+   const theme = useTheme();
+   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
     <React.Fragment>
-      <Container maxWidth="lg" style={{ marginTop: '6rem', marginLeft: '12rem' }}> {/* Apply margin: auto */}
+      <Container maxWidth="lg" style={{ marginTop: '6rem', marginLeft: isMobile ? 0 : 125 }}>
         <MaterialUI.SideBar />
         <Typography variant="h4" gutterBottom align="center">AuditBuddy Results for {decodedSubmission} at {decodedDealershipName}</Typography>
         <Grid container spacing={3} justifyContent="center">

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 // navbar/sidebar
-import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, useMediaQuery, useTheme} from '@mui/material';
 import Button from '@mui/material/Button';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -112,7 +112,16 @@ export const NavBar = (props) => {
     );
 };
 
-export const SideBar = () => {
+export const SideBar = (props) => {
+
+    // for mobile responsiveness
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const toggleSidebar = () => {
+        setSidebarOpen(!sidebarOpen);
+    };
+
     const location = useLocation();
     const path = location.pathname;
     const colorSelected = {
@@ -138,7 +147,25 @@ export const SideBar = () => {
     const { admin } = useAdmin();
 
     return (
-        <Drawer variant='permanent' anchor='left' sx={{width: 100}}>
+        <React.Fragment>
+        {isMobile && (
+            // fixed button at the button to toggle
+            <CustomButton
+                sx={{
+                    position: 'fixed',
+                    bottom: theme.spacing(2),
+                    right: theme.spacing(2),
+                    zIndex: (theme) => theme.zIndex.drawer + 1,
+                }}
+                onClick={toggleSidebar}
+            >
+                Menu
+            </CustomButton>
+        )}
+        <Drawer variant= { isMobile ? 'temporary' : 'permanent' } anchor='left' sx={{width: 100}}
+            open={isMobile ? sidebarOpen : null}
+            onClose={toggleSidebar}
+        >
             <Toolbar sx={{ marginTop: 7.5, width: 145 }}>
                 <List>
                     <Typography sx={{ fontSize: '0.9rem', marginLeft: -1 }} disablePadding><strong>Welcome,</strong> {user.email}</Typography>
@@ -210,6 +237,7 @@ export const SideBar = () => {
                 </List>
             </Toolbar>
         </Drawer >
+        </React.Fragment>
     );
 };
 

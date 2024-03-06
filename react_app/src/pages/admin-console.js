@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import '../App.css';
 import * as MaterialUI from '../components/MaterialUI';
-import {TextField, Container, Box, Typography, Tooltip, FormControl, InputLabel, Select, MenuItem} from '@mui/material/';
+import {TextField, Container, Box, Typography, Tooltip, FormControl, InputLabel, Select, MenuItem, useTheme, useMediaQuery} from '@mui/material/';
 import HelpIcon from '@mui/icons-material/Help';
 import { auth } from '../components/Authentication';
 import axios from 'axios';
@@ -75,13 +75,17 @@ function AdminPage () {
 
     const { admin } = useAdmin();
 
+     // for mobile responsiveness
+     const theme = useTheme();
+     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
     return (
         <React.Fragment>
         {admin ? 
         (
           <React.Fragment>
           <MaterialUI.SideBar></MaterialUI.SideBar>
-          <header className="App-header" style={{marginLeft: 125}}>
+          <header className="App-header" style={{ marginLeft: isMobile ? 0 : 125 }}>
           <div className="App">
               <h1>Admin Console</h1>
               <Container component= "main" maxWidth="s">

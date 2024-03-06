@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '../App.css';
 import * as MaterialUI from '../components/MaterialUI';
-import { Container, Grid, Paper, Typography, Button, Dialog, DialogActions, DialogContent, DialogTitle, Card, CardContent, FormControl, Box } from '@mui/material';
+import { Container, Grid, Paper, Typography, Button, Dialog, DialogActions, DialogContent, DialogTitle, Card, CardContent, FormControl, Box, useTheme, useMediaQuery } from '@mui/material';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import { auth } from '../components/Authentication';
 import { SearchBar } from '../components/SearchBar';
@@ -131,12 +131,16 @@ function ResultsPage() {
     fetchResults();
   }, []);
 
+   // for mobile responsiveness
+   const theme = useTheme();
+   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   return (
     <React.Fragment>
       {user ? (
         <React.Fragment>
           <MaterialUI.SideBar />
-          <header className="App-header" style={{ marginLeft: 125 }}>
+          <header className="App-header" style={{ marginLeft: isMobile ? 0 : 125 }}>
             <div className="App">
               <Container maxWidth="lg" style={{ marginTop: '6rem' }}>
                 <h1>Results</h1>

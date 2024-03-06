@@ -75,7 +75,7 @@ const AddDealershipImport = () => {
             'Content-Type': 'multipart/form-data'
           }
         });
-        alert(`Dealership added successfully:`);
+        setError(`Dealership added successfully`);
       }
       catch (error) {
         if (error.response) {

@@ -400,9 +400,18 @@ def add_dealership():
     uio = request.form['uio']
     sales = request.form['sales']
 
-    #input into the database
+    # access the database
     collection_ref = db.collection('dealerships')
 
+    # check if the dealership already exists
+    # extract the data from database and put dict in list
+    docs = [doc.to_dict() for doc in collection_ref.stream()]
+
+    exists = any(doc['Dealership Name'] == name and doc['City'] == city and doc['State'] == state for doc in docs)
+
+    if exists:
+        return jsonify({'error': 'Dealership already exists'}), 400
+  
     # calculate the uid from the brand
     #three first letters of the brand
     abbreviation = brand[:3].upper()
@@ -428,7 +437,7 @@ def add_dealership():
     db.collection("dealerships").document(str(next_id)).set(data)
 
 
-    return jsonify("test")
+    return jsonify("Dealership added successfully"), 200
 
 # pull results from the database
 @app.route('/generate-results', methods=['POST'])

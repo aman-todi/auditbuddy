@@ -169,7 +169,7 @@ const FormImport = () => {
             'Content-Type': 'multipart/form-data'
           }
         });
-        alert(`File(s) uploaded successfully:`);
+        setError(`File(s) uploaded successfully:`);
       }
       catch (error) {
         if (error.response) {
@@ -343,8 +343,12 @@ const FormImport = () => {
       </Box>
 
       <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "0.1rem" }}>
+      {error ? (
+        <Alert severity={error === 'File(s) uploaded successfully:' ? 'success' : 'error'}>
+          {error}
+        </Alert>
+      ) : null}
         <MaterialUI.CustomButton type="submit" onClick={handleUpload}>Analyze</MaterialUI.CustomButton>
-        {error && <p id="error">{error}</p>}
       </Box>
     </Container>
   );

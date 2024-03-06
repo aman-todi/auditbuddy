@@ -7,7 +7,7 @@ import * as MaterialUI from './MaterialUI';
 import HelpIcon from '@mui/icons-material/Help';
 
 // import ShowResults from './pages/audit-results';
-import { InputLabel, FormControl, MenuItem, Select, TextField, PaperProps, Container, Box, Tab, Tabs, Tooltip, Typography, Autocomplete} from '@mui/material/';
+import { InputLabel, FormControl, MenuItem, Select, TextField, Container, Box, Tooltip, Typography, Alert} from '@mui/material/';
 // axios
 import axios from 'axios';
 
@@ -142,9 +142,14 @@ const AddDealershipImport = () => {
           sx={{ margin: "0.1rem", width:"10vw"}}
         />
         </Box>
+
       <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "0.1rem" }}>
+      {error ? (
+        <Alert severity={error === 'Dealership added successfully' ? 'success' : 'error'}>
+          {error}
+        </Alert>
+      ) : null}
         <MaterialUI.CustomButton type="submit" onClick={handleUpload}>Add Dealership</MaterialUI.CustomButton>
-        {error && <p id="error">{error}</p>}
       </Box>
     </Container>
   );

@@ -40,8 +40,8 @@ const DealershipListImport = () => {
           <HelpIcon sx={{ fontSize: "small" }} />
         </Tooltip>
       </Typography>
-      <TableContainer component={Paper}>
-        <Table>
+      <TableContainer component={Paper} sx={{ maxHeight: "15rem" }}>
+        <Table stickyHeader>
           <TableHead>
             <TableRow>
               <TableCell>UID</TableCell>

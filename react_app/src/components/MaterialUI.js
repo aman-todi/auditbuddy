@@ -100,7 +100,7 @@ export const NavBar = (props) => {
                     AUDITBUDDY
                 </Typography>
                 <Typography sx={{flexGrow: 1}}></Typography>
-                <NavButton><NavLink to="/">Home</NavLink></NavButton>
+                {!user && <NavButton><NavLink to="/">Home</NavLink></NavButton>}
                 {user ? (
                 <React.Fragment>
                     <NavButton><NavLink to="/audit">Audit</NavLink></NavButton>

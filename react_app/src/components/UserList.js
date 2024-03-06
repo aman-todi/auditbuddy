@@ -42,9 +42,8 @@ const UserListImport = () => {
           <HelpIcon sx={{ fontSize: "small" }} />
         </Tooltip>
       </Typography>
-      <div style={{ overflowY: "scroll", maxHeight: "15rem" }}>
-      <TableContainer component={Paper}>
-        <Table>
+      <TableContainer component={Paper} sx={{ maxHeight: "15rem" }}>
+        <Table stickyHeader>
           <TableHead>
             <TableRow>
               <TableCell>Email</TableCell>
@@ -67,7 +66,6 @@ const UserListImport = () => {
           </TableBody>
         </Table>
       </TableContainer>
-      </div>
     </Container>
   );
 };

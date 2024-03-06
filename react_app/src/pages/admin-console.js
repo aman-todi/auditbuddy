@@ -97,20 +97,20 @@ function AdminPage () {
               </Typography>
 
               <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, alignItems: "center" }}>
-              <TextField  sx={{ margin: "0.1rem", width:"15vw"}} fullWidth value = {email} onChange={(e) => setEmail(e.target.value)} required id="email" label='Email' variant="outlined" margin="normal"/>
-              <TextField  sx={{ margin: "0.1rem", width:"15vw"}} fullWidth value = {password} onChange={(e) => setPassword(e.target.value)} required id="password" label='Password' variant="outlined" margin="normal" type="password"/>
-              <TextField  sx={{ margin: "0.1rem", width:"15vw"}} fullWidth value = {confirm} onChange={(e) => setConfirm(e.target.value)} required id="confirm" label='Confirm Password' variant="outlined" margin="normal" type="password"/>
-              <FormControl required sx={{ margin: "0.1rem", width: "10vw"}}>
-          <InputLabel>User Role</InputLabel>
-          <Select
-            value={role}
-            label="User Role"
-            onChange={(event) => handleFormInput(event, setRole)}
-          >
-            <MenuItem value={"Admin"}>Admin</MenuItem>
-            <MenuItem value={"Auditor"}>Auditor</MenuItem>
-          </Select>
-        </FormControl>
+              <TextField  sx={{ margin: "0.1rem"}} fullWidth value = {email} onChange={(e) => setEmail(e.target.value)} required id="email" label='Email' variant="outlined" margin="normal"/>
+              <TextField  sx={{ margin: "0.1rem"}} fullWidth value = {password} onChange={(e) => setPassword(e.target.value)} required id="password" label='Password' variant="outlined" margin="normal" type="password"/>
+              <TextField  sx={{ margin: "0.1rem"}} fullWidth value = {confirm} onChange={(e) => setConfirm(e.target.value)} required id="confirm" label='Confirm Password' variant="outlined" margin="normal" type="password"/>
+              <FormControl required fullWidth sx={{ margin: "0.1rem"}}>
+                <InputLabel>User Role</InputLabel>
+                  <Select
+                    value={role}
+                    label="User Role"
+                    onChange={(event) => handleFormInput(event, setRole)}
+                  >
+                    <MenuItem value={"Admin"}>Admin</MenuItem>
+                    <MenuItem value={"Auditor"}>Auditor</MenuItem>
+                  </Select>
+              </FormControl>
               </Box>
               <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "0.1rem" }}>
               <MaterialUI.CustomButton type ="submit" onClick={createUser}>Create User</MaterialUI.CustomButton>

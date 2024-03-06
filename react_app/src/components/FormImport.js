@@ -195,15 +195,15 @@ const FormImport = () => {
   };
 
   return (
-    <Container component="main" maxWidth="s">
+    <Container component="main">
       <Typography variant="p" sx={{ display: "flex", alignItems: "center", marginBottom: "1rem" }}>
         <span style={{ fontWeight: "bold", marginRight: "0.5rem" }}>Dealership</span>
         <Tooltip disableFocusListener title="The information of the dealership being submitted">
           <HelpIcon sx={{ fontSize: "small" }} />
         </Tooltip>
       </Typography>
+      
       <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, alignItems: "center" }}>
-
       <FormControl required fullWidth sx={{ margin: "0.1rem" }}>
         <InputLabel>Dealership</InputLabel>
         <Select
@@ -274,6 +274,8 @@ const FormImport = () => {
       </Typography>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} indicatorColor="primary">
         <Tabs value={tabIndex} onChange={handleTabChange} sx={{ fontSize: '0.75rem' }}
+          variant="scrollable"
+          scrollButtons="auto"
           TabIndicatorProps={{
             style: {
               backgroundColor: "#74b42c",
@@ -344,7 +346,7 @@ const FormImport = () => {
 
       <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "0.1rem" }}>
       {error ? (
-        <Alert severity={error === 'File(s) uploaded successfully:' ? 'success' : 'error'}>
+        <Alert severity={error === 'Dealership added successfully' ? 'success' : 'error'}>
           {error}
         </Alert>
       ) : null}

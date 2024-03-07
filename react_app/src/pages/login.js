@@ -72,6 +72,7 @@ function LoginPage() {
                 <TextField fullWidth value = {email} onChange={(e) => setEmail(e.target.value)} required id="email" label='Email' variant="outlined" margin="normal"/>
                 <TextField fullWidth value = {password} onChange={(e) => setPassword(e.target.value)} required id="password" label='Password' variant="outlined" margin="normal" type="password"/>
                 <MaterialUI.CustomButton type ="submit" onClick={signIn}>Login</MaterialUI.CustomButton>
+                <Link sx={{ marginTop: 2}} variant="body2" onClick={handleOpen} >Forgot password?</Link>
                 {error ? (
                     <Alert severity={error === 'Login successful' ? 'success' : 'error'}>
                         {error}

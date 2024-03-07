@@ -12,7 +12,7 @@ function LoginPage() {
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);
     const [passEmail, setPassEmail] = useState('');
-
+    const [success, setSuccess] = useState('');
     // sign in function
     const signIn = (e) => {
         e.preventDefault();
@@ -53,6 +53,7 @@ function LoginPage() {
         const auth = getAuth();
         sendPasswordResetEmail(auth, passEmail)
           .then(() => {
+            setSuccess("Reset email sent.");
             console.log("sucessful")
           })
           .catch((error) => {
@@ -96,6 +97,7 @@ function LoginPage() {
                 <Button onClick={handleClose}>
                     Cancel
                 </Button>
+                <Box sx={{ marginLeft: 1 }}><span style={{ color: 'green' }} >{success}</span></Box>
                 </DialogContent>
             </Dialog>
         </Container>

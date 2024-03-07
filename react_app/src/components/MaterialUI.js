@@ -295,11 +295,13 @@ export const Settings = ({darkMode, toggleDarkMode}) => {
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
     const handleOpen = () => {
         setOpen(true);
       };
    
       const handleClose = () => {
+        setSuccess(null);
         setOpen(false);
       };
       const handleSubmit = () => {
@@ -326,9 +328,8 @@ export const Settings = ({darkMode, toggleDarkMode}) => {
                 } else {
                     updatePassword(user, newPassword)
                         .then(() => {
- 
- 
-                            handleClose();
+                            setSuccess("Password changed successfully");
+                            setError(null);
                         })
                         .catch((error) => {
                             console.error("Error updating password, please log out and log in again to reset.", error);
@@ -429,12 +430,13 @@ export const Settings = ({darkMode, toggleDarkMode}) => {
                             />
                         </form>
                         <span style={{ color: 'red' }}>{error}</span>
+                        <span style={{ color: 'green' }}>{success}</span>
  
  
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={handleClose} color="primary">
-                            Cancel
+                            Close
                         </Button>
                         <Button onClick={handleSubmit} color="primary">
                             Reset

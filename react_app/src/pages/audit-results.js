@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '../App.css';
 import * as MaterialUI from '../components/MaterialUI';
-import { Container, Grid, Paper, Typography, Button, Dialog, DialogActions, DialogContent, DialogTitle, Card, CardContent, FormControl, Box, useTheme, useMediaQuery } from '@mui/material';
+import { Container, Grid, Paper, Typography, Button, Dialog, DialogActions, DialogContent, DialogTitle, Card, CardContent, FormControl, Box, useTheme, useMediaQuery, CircularProgress } from '@mui/material';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import { auth } from '../components/Authentication';
 import { SearchBar } from '../components/SearchBar';
@@ -10,27 +10,58 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function ResultsPage() {
+
+  // navigate to another page
   const navigate = useNavigate();
 
   // page authentication
   const [user, setUser] = useState(auth.currentUser);
-
   useEffect(() => {
-    console.log('Current user:', auth.currentUser);
     auth.onAuthStateChanged((currentUser) => {
-      console.log('Auth state changed:', currentUser);
       setUser(currentUser);
     });
   }, []);
 
+  // for mobile responsiveness
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  // fetch data from the database
+  const fetchResults = async () => {
+    try {
+      // make request to the backend
+      const response = await axios.post('/generate-results');
+      // set state of items to the data
+      setItems(response.data);
+      // show that the items are finished loading
+      setLoading(false);
+    } catch (error) {
+      // errors
+      console.error("Error fetching results:", error);
+    }
+  }
+  // fetch results when the user goes on the page
+  useEffect(() => {
+    fetchResults();
+  }, []);
+
   // items in the database
   const [items, setItems] = useState([]);
+  // loading indicator of the results
+  const [loading, setLoading] = useState(true);
+
   // pop up content
   const [popupContent, setPopupContent] = useState(null);
+
+  // close the pop up
+  const closePopup = () => {
+    setPopupContent(null);
+  }
 
   // Search Bar Results
   const [searchResults, setSearchResults] = useState([]);
 
+  // handle search functionality
   const handleSearch = async (criteria) => {
     try {
       // Make a request to the backend with search criteria
@@ -51,27 +82,7 @@ function ResultsPage() {
     }
   };
 
-
-
-  // fetch data from the database
-  const fetchResults = async () => {
-    try {
-      // make request to the backend
-      const response = await axios.post('/generate-results');
-      // set state of items to the data
-      setItems(response.data);
-    } catch (error) {
-      // errors
-      console.error("Error fetching results:", error);
-    }
-  }
-
-  // close the pop up
-  const closePopup = () => {
-    setPopupContent(null);
-  }
-
-
+  // clicking of brand cards
   const handleBrandClick = (brandName) => {
     // Filter items based on the selected brand
     const dealerships = items.filter(item => item['Brand'] === brandName);
@@ -91,7 +102,6 @@ function ResultsPage() {
     // Set the popup content with unique filtered dealerships
     setPopupContent({ type: 'Dealership Name', data: uniqueFilteredDealerships, name: brandName });
   }
-
 
   // handle click on dealership
   const handleDealershipClick = (param) => {
@@ -125,16 +135,6 @@ function ResultsPage() {
   // order to display the keys of database results
   const brand_names = ['Audi', 'Honda', 'BMW', 'Ford', 'Chevrolet', 'Lincoln', 'Mercedes', 'Volkswagen']
 
-
-  // fetch results when the user goes on the page
-  useEffect(() => {
-    fetchResults();
-  }, []);
-
-   // for mobile responsiveness
-   const theme = useTheme();
-   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
   return (
     <React.Fragment>
       {user ? (
@@ -148,14 +148,30 @@ function ResultsPage() {
                   {/* Search bar*/}
                   <SearchBar onSearch={handleSearch} />
                   <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', marginTop: '10vh' }}>
-                    {/* Display brand names */}
+
+                  {/* Display brand name cards */}
+                  {loading ? (
+                    <CircularProgress color="success" />
+                  ) : (
+                    <>
                     {brand_names.map((brandName, index) => (
+                      <Card variant="outlined" onClick={() => handleBrandClick(brandName)} key={index} sx={{ cursor: 'pointer', padding: 1, margin: 1, fontSize: '0.75rem', width: '20%', justifyContent: 'flex-start' }}>
+                        <CardContent>
+                        <Typography>{brandName}</Typography>
+                        </CardContent>
+                      </Card>
+                    ))}
+                    </>
+                  )}
+
+                    {/* Display brand name cards */}
+                    {/* {brand_names.map((brandName, index) => (
                       <Card variant="outlined" onClick={() => handleBrandClick(brandName)} key={index} sx={{ cursor: 'pointer', padding: 1, margin: 1, fontSize: '0.75rem', width: '20%', justifyContent: 'flex-start' }}>
                         <CardContent>
                           <Typography>{brandName}</Typography>
                         </CardContent>
                       </Card>
-                    ))}
+                    ))} */}
                   </div>
 
                   {/* Display popup content */}

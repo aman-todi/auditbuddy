@@ -3,7 +3,7 @@ import '../App.css';
 import * as MaterialUI from '../components/MaterialUI';
 import {auth} from '../components/Authentication';
 import AddDealershipImport from '../components/AddDealership';
-import DealershipListImport from '../components/DealershipList';
+import {DealershipListImport} from '../components/DealershipList';
 import { useTheme, useMediaQuery } from '@mui/material';
 
 function DealershipsPage () {
@@ -14,6 +14,13 @@ function DealershipsPage () {
   useEffect(() => {
     auth.onAuthStateChanged((currentUser) => setUser(currentUser));
   }, []);
+
+   // handle user table refresh
+   const [refresh, setRefresh] = useState(false);
+
+   const handleRefresh = () => {
+     setRefresh(!refresh);
+   };
 
    // for mobile responsiveness
    const theme = useTheme();
@@ -31,8 +38,8 @@ function DealershipsPage () {
           </div>
           <div className="File">
             
-              <AddDealershipImport/>
-              <DealershipListImport/>
+              <AddDealershipImport refresh={handleRefresh}/>
+              <DealershipListImport refresh={refresh}/>
 
           </div>
             </header>

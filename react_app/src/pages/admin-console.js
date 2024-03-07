@@ -6,7 +6,7 @@ import HelpIcon from '@mui/icons-material/Help';
 import { auth } from '../components/Authentication';
 import axios from 'axios';
 import { useAdmin } from '../components/Admin';
-import UserListImport from '../components/UserList';
+import {UserListImport, fetchData} from '../components/UserList';
 
 function AdminPage () {
 
@@ -17,6 +17,13 @@ function AdminPage () {
     auth.onAuthStateChanged((currentUser) => setUser(currentUser));
   }, []);
 
+  // handle user table refresh
+  const [refresh, setRefresh] = useState(false);
+
+  const handleRefresh = () => {
+    setRefresh(!refresh);
+  };
+
   // keep track of states
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -24,10 +31,10 @@ function AdminPage () {
   const [role, setRole] = useState('');
   const [error, setError] = useState(null);
 
-    // handles each form input states
-    const handleFormInput = (event, setFormInputState) => {
-      setFormInputState(event.target.value);
-    };
+  // handles each form input states
+  const handleFormInput = (event, setFormInputState) => {
+    setFormInputState(event.target.value);
+  };
 
   // create user function
   const createUser = async () => {
@@ -54,7 +61,10 @@ function AdminPage () {
             }
           });
 
+          // change state to refresh table
+          handleRefresh();
           setError(`User created successfully: ${response.data.email}`);
+
         }
         catch (error) {
           if (error.response) 
@@ -117,7 +127,7 @@ function AdminPage () {
               {error && <p id="error">{error}</p>}
               </Box>
         </Container>
-        <UserListImport></UserListImport>
+        <UserListImport refresh={refresh}></UserListImport>
           </div>
           </header>
           </React.Fragment>

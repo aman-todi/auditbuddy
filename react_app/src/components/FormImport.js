@@ -6,8 +6,6 @@ import 'filepond/dist/filepond.min.css';
 // material ui
 import * as MaterialUI from './MaterialUI';
 import HelpIcon from '@mui/icons-material/Help';
-
-// import ShowResults from './pages/audit-results';
 import { InputLabel, FormControl, MenuItem, Select, Container, Box, Tab, Tabs, Tooltip, Typography, Alert } from '@mui/material/';
 // axios
 import axios from 'axios';

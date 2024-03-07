@@ -7,7 +7,7 @@ import { InputLabel, FormControl, MenuItem, Select, TextField, Container, Box, T
 // axios
 import axios from 'axios';
 
-const AddDealershipImport = () => {
+const AddDealershipImport = ({refresh}) => {
 
   // error message
   const [error, setError] = useState('')
@@ -69,6 +69,9 @@ const AddDealershipImport = () => {
       formData.append('uio', uio);
       // country
       formData.append('country', country);
+      // date
+      const currentDate = new Date();
+      formData.append('updated', currentDate);
 
       try {
         const response = await axios.post('http://localhost:8080/add-dealership', formData, {
@@ -76,6 +79,7 @@ const AddDealershipImport = () => {
             'Content-Type': 'multipart/form-data'
           }
         });
+        refresh();
         setError(`Dealership added successfully`);
       }
       catch (error) {

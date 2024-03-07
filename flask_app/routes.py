@@ -384,6 +384,7 @@ def add_dealership():
     uio = request.form['uio']
     sales = request.form['sales']
     country = request.form['country']
+    updated = request.form['updated']
 
     # access the database
     collection_ref = db.collection('dealerships')
@@ -416,7 +417,8 @@ def add_dealership():
             'State': state,
             'UIO': uio,
             'Sales': sales, 
-            'Country': country
+            'Country': country,
+            'Updated': updated
             }
             
     # go to the collection, create a new document (user id), and append the user email

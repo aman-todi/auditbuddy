@@ -1,15 +1,17 @@
 import React, {useState} from 'react';
-import {TextField, Container, Box, Alert} from '@mui/material/';
+import {TextField, Container, Box, Link, Dialog, DialogTitle, DialogContent, Button, Alert} from '@mui/material/';
 import * as MaterialUI from '../components/MaterialUI';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../components/Authentication';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, getAuth, sendPasswordResetEmail } from 'firebase/auth';
 
 function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
     const navigate = useNavigate();
+    const [open, setOpen] = useState(false);
+    const [passEmail, setPassEmail] = useState('');
 
     // sign in function
     const signIn = (e) => {

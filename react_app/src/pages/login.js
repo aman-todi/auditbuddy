@@ -38,6 +38,27 @@ function LoginPage() {
         })
     };
 
+    const handleOpen = () => {
+        setOpen(true);
+    };
+    
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const handleSubmit = () => {
+        console.log(passEmail)
+        const auth = getAuth();
+        sendPasswordResetEmail(auth, passEmail)
+          .then(() => {
+            console.log("sucessful")
+          })
+          .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+          });
+    };
+
     return (
         <React.Fragment>
         <header className="App-header">
@@ -55,6 +76,25 @@ function LoginPage() {
                     </Alert>
                 ) : null}
             </Box>
+            <Dialog open={open} onClose={handleClose}>
+                <DialogTitle>Forgot Password</DialogTitle>
+                <DialogContent>
+                <TextField
+                    sx={{ marginTop: .5}}
+                    label="Email Address"
+                    type="email"
+                    fullWidth
+                    value={passEmail}
+                    onChange={(e) => setPassEmail(e.target.value)}
+                />
+                <Button onClick={handleSubmit}>
+                    Submit
+                </Button>
+                <Button onClick={handleClose}>
+                    Cancel
+                </Button>
+                </DialogContent>
+            </Dialog>
         </Container>
         </header>
         </React.Fragment>

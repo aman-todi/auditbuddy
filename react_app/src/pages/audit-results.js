@@ -92,8 +92,8 @@ function ResultsPage() {
 
     // Filter items for unique dealership names
     const uniqueFilteredDealerships = dealerships.filter(item => {
-      if (!uniqueDealerships.has(item['Dealership Name'])) {
-        uniqueDealerships.add(item['Dealership Name']);
+      if (!uniqueDealerships.has(item['UID'])) {
+        uniqueDealerships.add(item['UID']);
         return true;
       }
       return false;
@@ -105,7 +105,7 @@ function ResultsPage() {
 
   // handle click on dealership
   const handleDealershipClick = (param) => {
-    const departments = Array.from(new Set(items.filter(item => item['Dealership Name'] === param['Dealership Name'] && item['Brand'] === param['Brand'])));
+    const departments = Array.from(new Set(items.filter(item => item['Dealership Name'] === param['Dealership Name'] && item['Brand'] === param['Brand'] && item['UID'] === param['UID'])));
 
     // Track unique dealership names
     const uniqueDepartments = new Set();
@@ -125,7 +125,7 @@ function ResultsPage() {
 
   // handle click on department
   const handleDepartmentClick = (param) => {
-    const submissions = items.filter(item => item['Department'] === param['Department'] && item['Dealership Name'] === param['Dealership Name'] && item['Brand'] === param['Brand']);
+    const submissions = items.filter(item => item['Department'] === param['Department'] && item['Dealership Name'] === param['Dealership Name'] && item['Brand'] === param['Brand'] && param['UID'] === item["UID"]);
     setPopupContent({ type: 'Submitted', data: submissions, name: param["Department"] });
   }
 
@@ -189,7 +189,7 @@ function ResultsPage() {
                                 }
                               }}
                             >
-                              {item[popupContent.type]}
+                              {popupContent.type === 'Dealership Name' ? `${item['UID']} - ${item['Dealership Name']}` : item[popupContent.type]}
                             </Button>
                           ))}
                         </Box>

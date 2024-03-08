@@ -119,7 +119,8 @@ function ResultsPage() {
       return false;
     });
 
-    setPopupContent({ type: 'Department', data: uniqueFilteredDepartments, name: param["Dealership Name"] });
+    // after clicking dealership, display the uid and dealership name as title
+    setPopupContent({ type: 'Department', data: uniqueFilteredDepartments, name: param["UID"] + ' - ' + param["Dealership Name"] });
   }
 
   // handle click on department
@@ -133,7 +134,7 @@ function ResultsPage() {
   };
 
   // order to display the keys of database results
-  const brand_names = ['Audi', 'Honda', 'BMW', 'Ford', 'Chevrolet', 'Lincoln', 'Mercedes', 'Volkswagen']
+  const brand_names = ['Audi', 'BMW', 'Chevrolet', 'Ford', 'Honda','Lincoln', 'Mercedes', 'Volkswagen']
 
   return (
     <React.Fragment>
@@ -163,15 +164,6 @@ function ResultsPage() {
                     ))}
                     </>
                   )}
-
-                    {/* Display brand name cards */}
-                    {/* {brand_names.map((brandName, index) => (
-                      <Card variant="outlined" onClick={() => handleBrandClick(brandName)} key={index} sx={{ cursor: 'pointer', padding: 1, margin: 1, fontSize: '0.75rem', width: '20%', justifyContent: 'flex-start' }}>
-                        <CardContent>
-                          <Typography>{brandName}</Typography>
-                        </CardContent>
-                      </Card>
-                    ))} */}
                   </div>
 
                   {/* Display popup content */}

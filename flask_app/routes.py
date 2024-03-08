@@ -156,7 +156,7 @@ def upload_video():
     dealership_info = (brandName, dealershipName, department, country, submission)
 
     # we should save the folders from each dealership somewhere in here
-    database_info = [request.form['submission'],request.form['name'], request.form['dealership'], request.form['department'], request.form['country']]
+    database_info = [request.form['submission'],request.form['name'], request.form['dealership'], request.form['department'], request.form['country'], request.form['uid'], request.form['sales'], request.form['uio']]
 
     # Computer Vision Tasks
     
@@ -318,7 +318,7 @@ def add_to_database(database_info):
         "Brand": database_info[2],
         "Department": database_info[3],
         "Country": database_info[4],
-        #"Detection": # this would be like a nested list or something?
+        "UID": database_info[5]
     }
 
     # go to the collection, create a new document (dealership name), create a new collection with (department)

@@ -4,7 +4,7 @@ import numpy as np
 import cv2
 
 class CarDetector:
-    def __init__(self, confidence_threshold=0.6, nms_threshold=0.4):
+    def __init__(self, confidence_threshold=0.8, nms_threshold=0.4):
         # Load YOLO model with given weights and cfg files
         self.net = cv2.dnn.readNet("flask_app/computer_vision/yolo/yolov3.weights", "flask_app/computer_vision/yolo/yolov3.cfg")
         layer_names = self.net.getLayerNames()
@@ -47,7 +47,7 @@ class CarDetector:
         indices = cv2.dnn.NMSBoxes(boxes, confidences, self.confidence_threshold, self.nms_threshold)
 
         # Use list comprehension to filter car boxes based on class ID
-        car_boxes = [boxes[i] for i in indices if class_ids[i] == 2]  # Filter out non-car objects
+        car_boxes = [boxes[i] for i in indices if (class_ids[i] == 2 or class_ids[i] == 7)]  # Filter out non-car objects
 
         return car_boxes  # Return boxes of detected cars
 

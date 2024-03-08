@@ -95,7 +95,7 @@ function LoginPage() {
                     Submit
                 </Button>
                 <Button onClick={handleClose}>
-                    Cancel
+                    Close
                 </Button>
                 <Box sx={{ marginLeft: 1 }}><span style={{ color: 'green' }} >{success}</span></Box>
                 </DialogContent>

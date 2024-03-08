@@ -6,12 +6,10 @@ flask_cors
 Pillow
 opencv-python-headless
 google-cloud-vision==2.7.0
-roboflow
 firebase-admin
 flask-firebase-admin
 imutils
 matplotlib
-torch
 pandas
 
 

@@ -185,7 +185,7 @@ def upload_video():
         return jsonify({'error': error_message}), 404
 
     # loop the detection categories
-    required_categories = ['logo', 'hospitality', 'parking', 'cars','spatial']
+    required_categories = ['logo', 'cars', 'parking','hospitality', 'spatial']
 
     # logic for extracting file from different categories (works for multi files)
     for category in required_categories:
@@ -217,7 +217,7 @@ def upload_video():
             num_cars = count_cars_in_footage(files_list,dealership_info)
 
         elif category == 'parking':
-            num_parking = count_parking_spaces(files_list)
+            num_parking = count_parking_spaces(files_list,dealership_info)
 
         elif category == 'hospitality':
             num_seating = assess_hospitality(files_list,dealership_info)

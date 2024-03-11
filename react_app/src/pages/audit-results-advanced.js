@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import * as MaterialUI from '../components/MaterialUI';
-import { useParams } from 'react-router-dom';
 import { Container, Grid, Paper, Typography, Button, Dialog, DialogActions, DialogContent, DialogTitle, Card, CardContent, FormControl, Box, useTheme, useMediaQuery } from '@mui/material';
-
-
-import { Container, Typography, Grid, Paper } from '@mui/material';
 import ResponsiveAppBar from '../components/ResponsiveAppBar';
 import AdvancedResultsTabContent from '../components/AdvancedResultsTabContent';
 
@@ -37,23 +33,15 @@ const AdvancedResultsPage = () => {
   };
 
 
-  const openPopup = (brandStandard) => {
-    setPopupItem(brandStandard);
-  };
-
-
-  const closePopup = () => {
-    setPopupItem(null);
-  };
-
   const brandStandards = ['Logo Results', 'Car Detection', 'Parking Space', 'Hospitality', 'Spatial'];
 
   // for mobile responsiveness
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  // marginLeft: isMobile ? 0 : 125 
 
   return (
-    <Container maxWidth="lg" style={{ marginRight: '3rem', paddingTop: '5rem', marginLeft: isMobile ? 0 : 125 }}>
+    <Container maxWidth="lg" style={{ marginRight: '3rem', paddingTop: '5rem' }}>
       <MaterialUI.SideBar />
       <Typography variant="h4" gutterBottom align="center" style={{ marginBottom: '2rem', marginTop: '3rem' }}>
         AuditBuddy Results for {decodedSubmission} at {decodedDealershipName}

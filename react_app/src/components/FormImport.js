@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../App.css';
 // filepond
-import { FilePond } from 'react-filepond';
+import { FilePond, registerPlugin } from 'react-filepond';
 import 'filepond/dist/filepond.min.css';
 // material ui
 import * as MaterialUI from './MaterialUI';
@@ -9,6 +9,11 @@ import HelpIcon from '@mui/icons-material/Help';
 import { InputLabel, FormControl, MenuItem, Select, Container, Box, Tab, Tabs, Tooltip, Typography, Alert } from '@mui/material/';
 // axios
 import axios from 'axios';
+
+// for the file validation
+import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
+
+registerPlugin(FilePondPluginFileValidateType);
 
 const FormImport = () => {
 
@@ -219,8 +224,10 @@ const FormImport = () => {
         {/* logo files input  */}
         <div style={{ display: tabIndex === 0 ? 'block' : 'none' }}>
           <Box sx={{ marginTop: '1rem' }}>
+          <Alert severity="warning">Supports images only</Alert>
             <FilePond
               allowMultiple={true}
+              acceptedFileTypes={['image/*']}
               onupdatefiles={handleFileAdded(setLogo)}
               stylePanelLayout={'compact'}
             />
@@ -263,9 +270,11 @@ const FormImport = () => {
         {/* spatial files input  */}
         <div style={{ display: tabIndex === 4 ? 'block' : 'none' }}>
           <Box sx={{ marginTop: '1rem' }}>
+          <Alert severity="warning">Supports images only</Alert>
             <FilePond
               allowMultiple={true}
               maxFiles={3}
+              acceptedFileTypes={['image/*']}
               onupdatefiles={handleFileAdded(setSpatial)}
               stylePanelLayout={'compact'}
             />

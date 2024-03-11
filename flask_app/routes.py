@@ -39,6 +39,27 @@ def index(path):
 def test():
 	return jsonify(test = "test ajax call")
 
+
+@app.route('/get-graph-results/<brandName>/<dealershipName>/<department>/<submission>')
+def get_annotated_images_graph(brandName,dealershipName,department,submission):
+    try:
+        # Construct the folder path based on the dealershipName
+        folder_path = f'{brandName}/{dealershipName}/{department}/{submission}/GraphResults/'
+        # Fetch annotated images from Firebase Storage and return their URLs
+        blobs = bucket.list_blobs(prefix=folder_path)
+        
+        # Extract public URLs of the annotated images only if it is a png (It will grab the folder as well if not)
+        image_urls = [blob.public_url for blob in blobs if os.path.splitext(blob.name)[1] == '.png']
+
+        print("Length of URLS", len(image_urls))
+
+        return jsonify({'images': image_urls}), 200
+    except Exception as e:
+        # Handle any errors that occur during image retrieval
+        error_message = f"Error fetching annotated images: {str(e)}"
+        print(error_message)
+        return jsonify({'error': error_message}), 500
+
 @app.route('/get-logo-results/<brandName>/<dealershipName>/<department>/<submission>')
 def get_annotated_images(brandName,dealershipName,department,submission):
     try:
@@ -473,4 +494,9 @@ def search_results():
         error_message = f"Error fetching search results: {str(e)}"
         print(error_message)
         return jsonify({'error': error_message}), 500
+    
+
+
+
+
 

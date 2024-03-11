@@ -15,7 +15,8 @@ class LogoDetector:
         self.nms_threshold = nms_threshold  # Set Non-Maximum Suppression threshold
         self.logos = None
         self.annotations = []
-        self.filePath = filePath
+        self.filePath = f"{filePath[0]}/{filePath[1]}/{filePath[2]}/{filePath[4]}/LogoResults"
+        print(self.filePath)
         # Initialize Firebase Admin SDK with your credentials
         self.bucket = storage.bucket()
 

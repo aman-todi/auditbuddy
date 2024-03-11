@@ -2,7 +2,12 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
+import os
+from flask import current_app as app
+import firebase_admin
 from firebase_admin import storage
+import io
+import cv2
 
 # Evaluation factors ideal ratios
 cars_ratio = 0.05
@@ -15,6 +20,59 @@ cars_min = 8
 parking_min = 10
 seating_min = 6
 sq_footage_min = 500
+
+bucket = storage.bucket()
+
+def upload_to_firebase(file_bytes, file_name):
+    # Upload bytes to Firebase Storage
+    blob = bucket.blob(file_name)
+    blob.upload_from_string(file_bytes.getvalue(), content_type='image/png')
+    print(f'Saved annotated image to Firebase Storage: {blob.public_url}')
+
+def visualize_category_eval(dealership_info, categories, scores):
+    # Create a bar plot to visualize performance by category
+    fig, ax = plt.subplots(figsize=(10, 6))
+    y_pos = np.arange(len(categories))
+    ax.bar(y_pos, scores, align='center', alpha=0.5, color='b')
+    ax.set_xticks(y_pos)
+    ax.set_xticklabels(categories)
+    ax.set_xlabel('Categories')
+    ax.set_ylabel('Scores')
+    ax.set_yticks(np.arange(0, 5))
+    ax.set_yticklabels(['0', 'Poor', 'Unsatisfactory', 'Good', 'Great'])
+    ax.set_title('Evaluation Grades by Category')
+
+    # Generate a temporary file to save the plot
+    file_path = f"{dealership_info[0]}/{dealership_info[1]}/{dealership_info[2]}/{dealership_info[4]}/GraphResults/visualization_bar.png"
+    image_bytes = io.BytesIO()
+    plt.savefig(image_bytes, format='png')
+    image_bytes.seek(0)
+
+    # Upload the bytes to Firebase Storage
+    upload_to_firebase(image_bytes, file_path)
+
+    plt.close(fig)
+
+def visualize_overall_score(dealership_info, total_score, max_score=16):
+    # Create a pie chart to visualize overall performance
+    fig, ax = plt.subplots(figsize=(6, 6))
+    labels = [f'Score {total_score}', f'Remaining {max_score - total_score}']
+    sizes = [total_score, max_score - total_score]
+    colors = ['#467be3', '#e9edf7']
+    ax.pie(sizes, labels=labels, colors=colors, startangle=90, autopct='%1.1f%%')
+    ax.set_title('Overall Score')
+
+    file_path = f"{dealership_info[0]}/{dealership_info[1]}/{dealership_info[2]}/{dealership_info[4]}/GraphResults/visualization_pie.png"
+    image_bytes = io.BytesIO()
+    plt.savefig(image_bytes, format='png')
+    image_bytes.seek(0)
+
+    # Upload the bytes to Firebase Storage
+    upload_to_firebase(image_bytes, file_path)
+
+    plt.close(fig)
+
+
 
 
 def build_audit_results(cv_results, dealership_info, past_sales=150, uio=300):
@@ -124,35 +182,12 @@ def build_audit_results(cv_results, dealership_info, past_sales=150, uio=300):
     categories = ['Logo', 'Cars', 'Parking', 'Hospitality', 'Square Ft']
     scores = [grades[category][1] for category in categories]
 
-    def visualize_category_eval():
-        # Create a bar plot to visualize performance by category
-        plt.figure(figsize=(10, 6))
-        y_pos = np.arange(len(categories))
-        plt.bar(y_pos, scores, align='center', alpha=0.5, color='b')
-        plt.xticks(y_pos, categories)
-        plt.xlabel('Categories')
-        plt.ylabel('Scores')
-        plt.yticks(np.arange(0, 5), ['0', 'Poor', 'Unsatisfactory', 'Good', 'Great'])
-        plt.title('Evaluation Grades by Category')
-        plt.show()
+    grades = calculate_evaluation_grades()
+    print("Grades by category: ", grades)
 
-    visualize_category_eval()
+    # Extract categories and their scores
+    categories = ['Logo', 'Cars', 'Parking', 'Hospitality', 'Square Ft']
+    scores = [grades[category][1] for category in categories]
 
-    def visualize_overall_score(max_score=16):
-        # Create a pie chart to visualize overall performance
-        plt.figure(figsize=(6, 6))
-        labels = [f'Score {total_score}', f'Remaining {max_score - total_score}']
-        sizes = [total_score, max_score - total_score]
-        colors = ['#467be3', '#e9edf7']
-        plt.pie(sizes, labels=labels, colors=colors, startangle=90, autopct='%1.1f%%')
-        plt.title('Overall Score')
-        plt.show()
-
-    visualize_overall_score()
-
-
-
-
-
-
-    
+    visualize_category_eval(dealership_info, categories, scores)
+    visualize_overall_score(dealership_info, total_score)

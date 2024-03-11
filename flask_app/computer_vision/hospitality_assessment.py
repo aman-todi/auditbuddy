@@ -4,7 +4,7 @@ import numpy as np
 import cv2
 
 class HospitalityFinder:
-    def __init__(self, confidence_threshold=0.8, nms_threshold=0.2):
+    def __init__(self, confidence_threshold=0.7, nms_threshold=0.4):
         # Load YOLO model with given weights and cfg files
         self.net = cv2.dnn.readNet("flask_app/computer_vision/yolo/yolov3.weights", "flask_app/computer_vision/yolo/yolov3.cfg")
         layer_names = self.net.getLayerNames()

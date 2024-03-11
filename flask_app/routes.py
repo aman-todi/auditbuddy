@@ -37,6 +37,31 @@ def root():
 def index(path):
     return render_template('index.html')
 
+@app.route('/test')
+def test():
+	return jsonify(test = "test ajax call")
+
+
+@app.route('/get-graph-results/<brandName>/<dealershipName>/<department>/<submission>')
+def get_annotated_images_graph(brandName,dealershipName,department,submission):
+    try:
+        # Construct the folder path based on the dealershipName
+        folder_path = f'{brandName}/{dealershipName}/{department}/{submission}/GraphResults/'
+        # Fetch annotated images from Firebase Storage and return their URLs
+        blobs = bucket.list_blobs(prefix=folder_path)
+        
+        # Extract public URLs of the annotated images only if it is a png (It will grab the folder as well if not)
+        image_urls = [blob.public_url for blob in blobs if os.path.splitext(blob.name)[1] == '.png']
+
+        print("Length of URLS", len(image_urls))
+
+        return jsonify({'images': image_urls}), 200
+    except Exception as e:
+        # Handle any errors that occur during image retrieval
+        error_message = f"Error fetching annotated images: {str(e)}"
+        print(error_message)
+        return jsonify({'error': error_message}), 500
+
 @app.route('/get-logo-results/<brandName>/<dealershipName>/<department>/<submission>')
 def get_annotated_images(brandName,dealershipName,department,submission):
     try:
@@ -156,7 +181,7 @@ def upload_video():
     dealership_info = (brandName, dealershipName, department, country, submission)
 
     # we should save the folders from each dealership somewhere in here
-    database_info = [request.form['submission'],request.form['name'], request.form['dealership'], request.form['department'], request.form['country']]
+    database_info = [request.form['submission'],request.form['name'], request.form['dealership'], request.form['department'], request.form['country'], request.form['uid'], request.form['sales'], request.form['uio']]
 
     # Computer Vision Tasks
     
@@ -185,7 +210,7 @@ def upload_video():
         return jsonify({'error': error_message}), 404
 
     # loop the detection categories
-    required_categories = ['logo', 'hospitality', 'parking', 'cars','spatial']
+    required_categories = ['logo', 'cars', 'parking','hospitality', 'spatial']
 
     # logic for extracting file from different categories (works for multi files)
     for category in required_categories:
@@ -217,7 +242,7 @@ def upload_video():
             num_cars = count_cars_in_footage(files_list,dealership_info)
 
         elif category == 'parking':
-            num_parking = count_parking_spaces(files_list)
+            num_parking = count_parking_spaces(files_list,dealership_info)
 
         elif category == 'hospitality':
             num_seating = assess_hospitality(files_list,dealership_info)
@@ -318,7 +343,7 @@ def add_to_database(database_info):
         "Brand": database_info[2],
         "Department": database_info[3],
         "Country": database_info[4],
-        #"Detection": # this would be like a nested list or something?
+        "UID": database_info[5]
     }
 
     # go to the collection, create a new document (dealership name), create a new collection with (department)
@@ -524,4 +549,9 @@ def search_results():
         error_message = f"Error fetching search results: {str(e)}"
         print(error_message)
         return jsonify({'error': error_message}), 500
+    
+
+
+
+
 

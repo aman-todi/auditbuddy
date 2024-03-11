@@ -1,11 +1,12 @@
 import React, {useState, useEffect} from 'react';
 import '../App.css';
 import * as MaterialUI from '../components/MaterialUI';
-import {TextField, Container, Box, Typography, Tooltip, FormControl, InputLabel, Select, MenuItem} from '@mui/material/';
+import {TextField, Container, Box, Typography, Tooltip, FormControl, InputLabel, Select, MenuItem, useTheme, useMediaQuery} from '@mui/material/';
 import HelpIcon from '@mui/icons-material/Help';
 import { auth } from '../components/Authentication';
 import axios from 'axios';
 import { useAdmin } from '../components/Admin';
+import {UserListImport, fetchData} from '../components/UserList';
 
 function AdminPage () {
 
@@ -16,6 +17,13 @@ function AdminPage () {
     auth.onAuthStateChanged((currentUser) => setUser(currentUser));
   }, []);
 
+  // handle user table refresh
+  const [refresh, setRefresh] = useState(false);
+
+  const handleRefresh = () => {
+    setRefresh(!refresh);
+  };
+
   // keep track of states
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -23,10 +31,10 @@ function AdminPage () {
   const [role, setRole] = useState('');
   const [error, setError] = useState(null);
 
-    // handles each form input states
-    const handleFormInput = (event, setFormInputState) => {
-      setFormInputState(event.target.value);
-    };
+  // handles each form input states
+  const handleFormInput = (event, setFormInputState) => {
+    setFormInputState(event.target.value);
+  };
 
   // create user function
   const createUser = async () => {
@@ -52,7 +60,11 @@ function AdminPage () {
               'Content-Type': 'multipart/form-data'
             }
           });
+
+          // change state to refresh table
+          handleRefresh();
           setError(`User created successfully: ${response.data.email}`);
+
         }
         catch (error) {
           if (error.response) 
@@ -73,13 +85,17 @@ function AdminPage () {
 
     const { admin } = useAdmin();
 
+     // for mobile responsiveness
+     const theme = useTheme();
+     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
     return (
         <React.Fragment>
         {admin ? 
         (
           <React.Fragment>
           <MaterialUI.SideBar></MaterialUI.SideBar>
-          <header className="App-header" style={{marginLeft: 125}}>
+          <header className="App-header" style={{ marginLeft: isMobile ? 0 : 125 }}>
           <div className="App">
               <h1>Admin Console</h1>
               <Container component= "main" maxWidth="s">
@@ -91,29 +107,30 @@ function AdminPage () {
               </Typography>
 
               <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, alignItems: "center" }}>
-              <TextField  sx={{ margin: "0.1rem", width:"15vw"}} fullWidth value = {email} onChange={(e) => setEmail(e.target.value)} required id="email" label='Email' variant="outlined" margin="normal"/>
-              <TextField  sx={{ margin: "0.1rem", width:"15vw"}} fullWidth value = {password} onChange={(e) => setPassword(e.target.value)} required id="password" label='Password' variant="outlined" margin="normal" type="password"/>
-              <TextField  sx={{ margin: "0.1rem", width:"15vw"}} fullWidth value = {confirm} onChange={(e) => setConfirm(e.target.value)} required id="confirm" label='Confirm Password' variant="outlined" margin="normal" type="password"/>
-              <FormControl required sx={{ margin: "0.1rem", width: "10vw"}}>
-          <InputLabel>User Role</InputLabel>
-          <Select
-            value={role}
-            label="User Role"
-            onChange={(event) => handleFormInput(event, setRole)}
-          >
-            <MenuItem value={"Admin"}>Admin</MenuItem>
-            <MenuItem value={"Auditor"}>Auditor</MenuItem>
-          </Select>
-        </FormControl>
+              <TextField  sx={{ margin: "0.1rem"}} fullWidth value = {email} onChange={(e) => setEmail(e.target.value)} required id="email" label='Email' variant="outlined" margin="normal"/>
+              <TextField  sx={{ margin: "0.1rem"}} fullWidth value = {password} onChange={(e) => setPassword(e.target.value)} required id="password" label='Password' variant="outlined" margin="normal" type="password"/>
+              <TextField  sx={{ margin: "0.1rem"}} fullWidth value = {confirm} onChange={(e) => setConfirm(e.target.value)} required id="confirm" label='Confirm Password' variant="outlined" margin="normal" type="password"/>
+              <FormControl required fullWidth sx={{ margin: "0.1rem"}}>
+                <InputLabel>User Role</InputLabel>
+                  <Select
+                    value={role}
+                    label="User Role"
+                    onChange={(event) => handleFormInput(event, setRole)}
+                  >
+                    <MenuItem value={"Admin"}>Admin</MenuItem>
+                    <MenuItem value={"Auditor"}>Auditor</MenuItem>
+                  </Select>
+              </FormControl>
               </Box>
               <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "0.1rem" }}>
               <MaterialUI.CustomButton type ="submit" onClick={createUser}>Create User</MaterialUI.CustomButton>
               {error && <p id="error">{error}</p>}
               </Box>
         </Container>
+        <UserListImport refresh={refresh}></UserListImport>
           </div>
           </header>
-            </React.Fragment>
+          </React.Fragment>
           ) : (<p>Not Authorized</p>)
         }
         </React.Fragment>

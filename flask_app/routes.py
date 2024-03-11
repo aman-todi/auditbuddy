@@ -27,10 +27,12 @@ bucket = storage.bucket()
 # Firestore database
 db = firestore.client()
 
+# route home
 @app.route('/')
 def root():
 	return render_template('index.html')
 
+# route other paths
 @app.route('/<path:path>')
 def index(path):
     return render_template('index.html')
@@ -171,10 +173,15 @@ def upload_video():
     submission = request.form['submission']
     print("submission",submission)
 
+    # uid, sales, and uio
+    print("uid", request.form['uid'])
+    print("sales", request.form['sales'])
+    print("uio", request.form['uio'])
+
     dealership_info = (brandName, dealershipName, department, country, submission)
 
     # we should save the folders from each dealership somewhere in here
-    database_info = [request.form['submission'],request.form['name'], request.form['dealership'], request.form['department'], request.form['country']]
+    database_info = [request.form['submission'],request.form['name'], request.form['dealership'], request.form['department'], request.form['country'], request.form['uid'], request.form['sales'], request.form['uio']]
 
     # Computer Vision Tasks
     
@@ -190,8 +197,6 @@ def upload_video():
         file.save(save_path)
         spatial_paths.append(save_path)
         index += 1
-        print("spatial files;", spatial_files)
-        # add the spatial awareness here. the files are stored in list spatial_files
     print("Running Spatial")
     sq_ft_result = compute_square_footage(spatial_files,dealership_info)  
 
@@ -205,7 +210,7 @@ def upload_video():
         return jsonify({'error': error_message}), 404
 
     # loop the detection categories
-    required_categories = ['logo', 'hospitality', 'parking', 'cars','spatial']
+    required_categories = ['logo', 'cars', 'parking','hospitality', 'spatial']
 
     # logic for extracting file from different categories (works for multi files)
     for category in required_categories:
@@ -237,7 +242,7 @@ def upload_video():
             num_cars = count_cars_in_footage(files_list,dealership_info)
 
         elif category == 'parking':
-            num_parking = count_parking_spaces(files_list)
+            num_parking = count_parking_spaces(files_list,dealership_info)
 
         elif category == 'hospitality':
             num_seating = assess_hospitality(files_list,dealership_info)
@@ -273,12 +278,6 @@ def upload_video():
 #
 @app.route('/check-admin', methods=['POST'])
 def check_admin():
-    # initialize
-    #ath = os.path.join(app.root_path, 'static', 'main', 'config', 'valued-range-411422-d36068bfa11f.json')
-    #cred = credentials.Certificate(path)
-    #if not firebase_admin._apps:
-        #firebase_admin.initialize_app(cred)
-
     # get the admins database
     admins = {}
     collection_ref = db.collection('admins')
@@ -307,14 +306,6 @@ def check_admin():
 #
 @app.route('/create-user', methods=['POST'])
 def create_user():
-    # initialize
-    #path = os.path.join(app.root_path, 'static', 'main', 'config', 'valued-range-411422-d36068bfa11f.json')
-    #cred = credentials.Certificate(path)
-    #if not firebase_admin._apps:
-        #firebase_admin.initialize_app(cred)
-
-   #db = firestore.client()
-
     # get user info from request
     email = request.form.get('email')
     password = request.form.get('password')
@@ -344,9 +335,6 @@ def create_user():
 # push results from the database
 def add_to_database(database_info):
 
-     # firestore database
-    #db = firestore.client()
-
     # append the new data in the correct format for firebase
     data = {
         # add the submission date here
@@ -355,7 +343,7 @@ def add_to_database(database_info):
         "Brand": database_info[2],
         "Department": database_info[3],
         "Country": database_info[4],
-        #"Detection": # this would be like a nested list or something?
+        "UID": database_info[5]
     }
 
     # go to the collection, create a new document (dealership name), create a new collection with (department)
@@ -367,7 +355,6 @@ def add_to_database(database_info):
 #
 @app.route('/user-dealerships', methods=['POST'])
 def user_dealerships():
-
     # access the database
     collection_ref = db.collection('dealerships')
 
@@ -377,25 +364,93 @@ def user_dealerships():
     return jsonify(docs)
 
 #
+# populate user table in admin console
+#
+@app.route('/all-users', methods=['POST'])
+def all_users():
+
+    # list of all users
+    user_list = []
+
+    # access the database of all users
+    users = auth.list_users()
+
+    # iterate through each user
+    for user in users.iterate_all():
+
+        #jsonify the data
+        user_data = {
+            'email': user.email,
+            'role': "Auditor" 
+        }
+
+        # check if the user is an admin
+        collection_ref = db.collection("admins")
+        email_list = [doc.to_dict()['email'] for doc in collection_ref.stream()]
+
+        if user.email in email_list:
+            user_data['role'] = "Admin"
+        
+        user_list.append(user_data)
+
+
+    return jsonify(user_list)
+
+#
 # add dealership to the database
 #
 @app.route('/add-dealership', methods=['POST'])
 def add_dealership():
     # get form inputs
-    uid = request.form['uid']
     name = request.form['name']
     brand = request.form['brand']
     city = request.form['city']
     state = request.form['state']
     uio = request.form['uio']
     sales = request.form['sales']
-    print(uid, name, brand, city, state, uio, sales)
+    country = request.form['country']
+    updated = request.form['updated']
 
-    #input into the database
+    # access the database
     collection_ref = db.collection('dealerships')
 
+    # check if the dealership already exists
+    # extract the data from database and put dict in list
+    docs = [doc.to_dict() for doc in collection_ref.stream()]
 
-    return jsonify("test")
+    exists = any(doc['Dealership Name'] == name and doc['City'] == city and doc['State'] == state for doc in docs)
+
+    if exists:
+        return jsonify({'error': 'Dealership already exists'}), 400
+  
+    # calculate the uid from the brand
+    #three first letters of the brand
+    abbreviation = brand[:3].upper()
+
+    #get the next number
+    collection_ref = db.collection("dealerships")
+    docs = list(collection_ref.stream())
+    next_id = int(docs[-1].id) + 1
+    new_uid = abbreviation + str(next_id)
+
+    # set up json for user data
+    data = {
+            'UID': new_uid,
+            'Dealership Name': name,
+            'Brand': brand,
+            'City': city,
+            'State': state,
+            'UIO': uio,
+            'Sales': sales, 
+            'Country': country,
+            'Updated': updated
+            }
+            
+    # go to the collection, create a new document (user id), and append the user email
+    db.collection("dealerships").document(str(next_id)).set(data)
+
+
+    return jsonify("Dealership added successfully"), 200
 
 # pull results from the database
 @app.route('/generate-results', methods=['POST'])

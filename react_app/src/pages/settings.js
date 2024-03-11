@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import '../App.css';
 import * as MaterialUI from '../components/MaterialUI';
 import { auth } from '../components/Authentication';
+import {useTheme, useMediaQuery} from '@mui/material';
 
 
 function SettingsPage({ darkMode, toggleDarkMode }) {
@@ -12,6 +13,9 @@ function SettingsPage({ darkMode, toggleDarkMode }) {
      auth.onAuthStateChanged((currentUser) => setUser(currentUser));
    }, []);
 
+    // for mobile responsiveness
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
    return (
        <React.Fragment>
@@ -19,7 +23,7 @@ function SettingsPage({ darkMode, toggleDarkMode }) {
        (
            <React.Fragment>
            <div><MaterialUI.SideBar></MaterialUI.SideBar></div>
-           <header className="App-header" style={{marginLeft: 125}}>
+           <header className="App-header" style={{ marginLeft: isMobile ? 0 : 125 }}>
            <MaterialUI.Settings darkMode={darkMode} toggleDarkMode={toggleDarkMode} ></MaterialUI.Settings>
            </header>
            </React.Fragment>

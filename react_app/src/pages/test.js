@@ -18,7 +18,7 @@ function TestPage () {
         (
           <React.Fragment>
           <MaterialUI.SideBar></MaterialUI.SideBar>
-          <header className="App-header" style={{marginLeft: 125}}>
+          <header className="App-header">
           <div className="App">
               <h1>Dashboard</h1>
               </div>

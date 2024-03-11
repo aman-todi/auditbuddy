@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../App.css';
 // filepond
 import { FilePond } from 'react-filepond';
@@ -6,9 +6,7 @@ import 'filepond/dist/filepond.min.css';
 // material ui
 import * as MaterialUI from './MaterialUI';
 import HelpIcon from '@mui/icons-material/Help';
-
-// import ShowResults from './pages/audit-results';
-import { InputLabel, FormControl, MenuItem, Select, TextField, Container, Box, Tab, Tabs, Tooltip, Typography, Alert } from '@mui/material/';
+import { InputLabel, FormControl, MenuItem, Select, Container, Box, Tab, Tabs, Tooltip, Typography, Alert } from '@mui/material/';
 // axios
 import axios from 'axios';
 
@@ -22,120 +20,83 @@ const FormImport = () => {
   const [spatial, setSpatial] = useState(null);
   const [error, setError] = useState("")
 
-  // states to keep track of form
+  // state to keep track department
   const [department, setDepartment] = useState('');
-  const [country, setCountry] = useState('');
-  const [dealership, setDealership] = useState('');
-  const [name, setName] = useState('');
+  // state to store selected user dealership
+  const [dealerships, setDealerships] = useState([]);
+  // store the preset dealerships
+  const [dealershipsList, setDealershipsList] = useState([]);
 
-  const handleLogoAdded = (fileItems) => {
-    if (fileItems.length > 0) {
-      const allFiles = fileItems.map(item => item.file);
-      setLogo(allFiles);
-    }
-  };
+    // get the preset dealerships when user enter page
+    useEffect(() => {
+  
+      // axios request to get dealerships
+      const fetchUserDealerships = async () => {
+        try {
+          const response = await axios.post('http://localhost:8080/user-dealerships');
+  
+          // set dealerships
+          setDealershipsList(response.data);
+          console.log(response.data)
+        } catch (error) {
+          console.error('Error fetching user dealerships:', error);
+        }
+      };
+  
+      // fetch dealerships
+      fetchUserDealerships();
+    }, []);
 
-  const handleCarsAdded = (fileItems) => {
-    if (fileItems.length > 0) {
-      const allFiles = fileItems.map(item => item.file);
-      setCars(allFiles);
-    }
-  };
-
-  const handleParkingAdded = (fileItems) => {
-    if (fileItems.length > 0) {
-      const allFiles = fileItems.map(item => item.file);
-      setParking(allFiles);
-    }
-  };
-
-  const handleHospitalityAdded = (fileItems) => {
-    if (fileItems.length > 0) {
-      const allFiles = fileItems.map(item => item.file);
-      setHospitality(allFiles);
-    }
-  };
-
-  const handleSpatialAdded = (fileItems) => {
-    if (fileItems.length > 0) {
-      const allFiles = fileItems.map(item => item.file);
-      setSpatial(allFiles);
-    }
-  };
-
-  // handles each form input states
-  const handleFormInput = (event, setFormInputState) => {
-    setFormInputState(event.target.value);
-  };
-
+  // handle uploading and submitting to analyze
   const handleUpload = async () => {
-    // form validation
-    if (name === '') {
-      setError('Please enter the dealership name')
-    }
-    else if (dealership === '') {
-      setError('Please select a dealership')
-    }
-    else if (department === '') {
+
+    // create a form and append this file
+    const formData = new FormData();
+
+    // extract information from dealership
+    // name
+    formData.append('name', dealerships['Dealership Name']);
+    // department
+    formData.append('department', department);
+    // country
+    formData.append('country', dealerships['Country']);
+    // brand
+    formData.append('dealership', dealerships['Brand']);
+    // uid
+    formData.append('uid', dealerships['UID']);
+    // sales
+    formData.append('sales', dealerships['Sales']);
+    // uio
+    formData.append('uio', dealerships['UIO']);
+
+    // error checking
+    if (department === '')
+    {
       setError('Please select a department')
-    }
-    else if (country === '') {
-      setError('Please select a country')
     }
     else if (!logo && !cars && !parking && !spatial && !hospitality) {
       setError('Please select a file in atleast one category')
     }
     else {
-      // create a form and append this file
-      const formData = new FormData();
 
-      // logo
-      if (logo && logo.length > 0) {
-        logo.forEach((file, index) => {
-          formData.append(`logo[${index}]`, file);
-        });
+      // append files to form data
+      function appendFilesToFormData(files, formData, key) {
+        if (files && files.length > 0) {
+          files.forEach((file, index) => {
+            formData.append(`${key}[${index}]`, file);
+          });
+        }
       }
-
-      // hospitality
-      if (hospitality && hospitality.length > 0) {
-        hospitality.forEach((file, index) => {
-          formData.append(`hospitality[${index}]`, file);
-        });
-      }
-
-      // parking
-      if (parking && parking.length > 0) {
-        parking.forEach((file, index) => {
-          formData.append(`parking[${index}]`, file);
-        });
-      }
-
-      // spatial
-      if (spatial && spatial.length > 0) {
-        spatial.forEach((file, index) => {
-          formData.append(`spatial[${index}]`, file);
-        });
-      }
-
-      // cars
-      if (cars && cars.length > 0) {
-        cars.forEach((file, index) => {
-          formData.append(`cars[${index}]`, file);
-        });
-      }
-
-      // name
-      formData.append('name', name);
-      // department
-      formData.append('department', department);
-      // country
-      formData.append('country', country)
-      // dealership
-      formData.append('dealership', dealership)
+      
+      // call files to append to form
+      appendFilesToFormData(logo, formData, 'logo');
+      appendFilesToFormData(hospitality, formData, 'hospitality');
+      appendFilesToFormData(parking, formData, 'parking');
+      appendFilesToFormData(spatial, formData, 'spatial');
+      appendFilesToFormData(cars, formData, 'cars');
 
       // Get the current timestamp
       const time = new Date().toISOString();
-
       formData.append('submission', time)
 
       try {
@@ -144,7 +105,7 @@ const FormImport = () => {
             'Content-Type': 'multipart/form-data'
           }
         });
-        alert(`File(s) uploaded successfully:`);
+        setError('File(s) uploaded successfully:');
       }
       catch (error) {
         if (error.response) {
@@ -163,6 +124,21 @@ const FormImport = () => {
     }
   };
 
+    // handles each form input states
+    const handleFormInput = (event, setFormInputState) => {
+      console.log(event.target.value);
+      setFormInputState(event.target.value);
+      console.log(event.target.value);
+    };
+  
+    // handles how each file is added
+    const handleFileAdded = (setDetectionState) => (fileItems) => {
+      if (fileItems.length > 0) {
+        const allFiles = fileItems.map(item => item.file);
+        setDetectionState(allFiles);
+      }
+    };
+
   // handle tab index to change tabs
   const [tabIndex, setTabIndex] = useState(0);
   const handleTabChange = (event, newTabIndex) => {
@@ -170,38 +146,34 @@ const FormImport = () => {
   };
 
   return (
-    <Container component="main" maxWidth="s">
+    <Container component="main">
       <Typography variant="p" sx={{ display: "flex", alignItems: "center", marginBottom: "1rem" }}>
         <span style={{ fontWeight: "bold", marginRight: "0.5rem" }}>Dealership</span>
         <Tooltip disableFocusListener title="The information of the dealership being submitted">
           <HelpIcon sx={{ fontSize: "small" }} />
         </Tooltip>
       </Typography>
+      
       <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, alignItems: "center" }}>
-        <TextField fullWidth required label="Dealership Name" variant="outlined" onChange={(event) => handleFormInput(event, setName)}
-          sx={{ margin: "0.1rem" }}
-        />
-        <FormControl required fullWidth sx={{ margin: "0.1rem" }}>
-          <InputLabel>Brand</InputLabel>
-          <Select
-            value={dealership}
-            label="Brand"
-            onChange={(event) => handleFormInput(event, setDealership)}
-          >
-            <MenuItem value={"Audi"}>Audi</MenuItem>
-            <MenuItem value={"BMW"}>BMW</MenuItem>
-            <MenuItem value={"Cadillac"}>Cadillac</MenuItem>
-            <MenuItem value={"Chevrolet"}>Chevrolet</MenuItem>
-            <MenuItem value={"Ford"}>Ford</MenuItem>
-            <MenuItem value={"Honda"}>Honda</MenuItem>
-            <MenuItem value={"Kia"}>Kia</MenuItem>
-            <MenuItem value={"Nissan"}>Nissan</MenuItem>
-            <MenuItem value={"Subaru"}>Subaru</MenuItem>
-            <MenuItem value={"Toyota"}>Toyota</MenuItem>
-            <MenuItem value={"Volkswagen"}>Volkswagen</MenuItem>
-          </Select>
-        </FormControl>
-        <FormControl required fullWidth sx={{ margin: "0.1rem" }}>
+      <FormControl required fullWidth sx={{ margin: "0.1rem" }}>
+        <InputLabel>Dealership</InputLabel>
+        <Select
+        // name
+          value={dealerships}
+          label="Dealerships"
+          // setName
+          onChange={(event) => handleFormInput(event, setDealerships)}
+        >
+          {dealershipsList.map((dealership, index) => (
+            <MenuItem key={index} value={dealership}>
+              {dealership['UID']} {dealership['Dealership Name']}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      </Box>
+      <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, alignItems: "center" }}>
+      <FormControl required fullWidth sx={{ margin: "0.1rem" }}>
           <InputLabel>Department</InputLabel>
           <Select
             value={department}
@@ -214,27 +186,21 @@ const FormImport = () => {
             <MenuItem value={"Body and Paint"}>Body & Paint</MenuItem>
           </Select>
         </FormControl>
-        <FormControl required fullWidth sx={{ margin: "0.1rem" }}>
-          <InputLabel>Country</InputLabel>
-          <Select
-            value={country}
-            label="Country"
-            onChange={(event) => handleFormInput(event, setCountry)}
-          >
-            <MenuItem value={"USA"}>USA</MenuItem>
-            <MenuItem value={"Canada"}>Canada</MenuItem>
-          </Select>
-        </FormControl>
-      </Box>
+        </Box>
 
+      {/* detection header */}
       <Typography variant="p" sx={{ display: "flex", alignItems: "center", marginBottom: "1rem", marginTop: "1rem" }}>
         <span style={{ fontWeight: "bold", marginRight: "0.5rem" }}>Detection</span>
         <Tooltip disableFocusListener title="Upload files in the categories that you'd like to detect">
           <HelpIcon sx={{ fontSize: "small" }} />
         </Tooltip>
       </Typography>
+
+      {/* handle the tab change  */}
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} indicatorColor="primary">
         <Tabs value={tabIndex} onChange={handleTabChange} sx={{ fontSize: '0.75rem' }}
+          variant="scrollable"
+          scrollButtons="auto"
           TabIndicatorProps={{
             style: {
               backgroundColor: "#74b42c",
@@ -250,62 +216,71 @@ const FormImport = () => {
       </Box>
 
       <Box>
-
+        {/* logo files input  */}
         <div style={{ display: tabIndex === 0 ? 'block' : 'none' }}>
           <Box sx={{ marginTop: '1rem' }}>
             <FilePond
               allowMultiple={true}
-              onupdatefiles={handleLogoAdded}
+              onupdatefiles={handleFileAdded(setLogo)}
               stylePanelLayout={'compact'}
             />
           </Box>
         </div>
 
+        {/* count cars files input  */}
         <div style={{ display: tabIndex === 1 ? 'block' : 'none' }}>
           <Box sx={{ marginTop: '1rem' }}>
             <FilePond
               allowMultiple={true}
-              onupdatefiles={handleCarsAdded}
+              onupdatefiles={handleFileAdded(setCars)}
               stylePanelLayout={'compact'}
             />
           </Box>
         </div>
 
+        {/* count parking files input  */}
         <div style={{ display: tabIndex === 2 ? 'block' : 'none' }}>
           <Box sx={{ marginTop: '1rem' }}>
             <FilePond
               allowMultiple={true}
-              onupdatefiles={handleParkingAdded}
+              onupdatefiles={handleFileAdded(setParking)}
               stylePanelLayout={'compact'}
             />
           </Box>
         </div>
 
+        {/* hospitality files input  */}
         <div style={{ display: tabIndex === 3 ? 'block' : 'none' }}>
           <Box sx={{ marginTop: '1rem' }}>
             <FilePond
               allowMultiple={true}
-              onupdatefiles={handleHospitalityAdded}
+              onupdatefiles={handleFileAdded(setHospitality)}
               stylePanelLayout={'compact'}
             />
           </Box>
         </div>
 
+        {/* spatial files input  */}
         <div style={{ display: tabIndex === 4 ? 'block' : 'none' }}>
           <Box sx={{ marginTop: '1rem' }}>
             <FilePond
               allowMultiple={true}
               maxFiles={3}
-              onupdatefiles={handleSpatialAdded}
+              onupdatefiles={handleFileAdded(setSpatial)}
               stylePanelLayout={'compact'}
             />
           </Box>
         </div>
       </Box>
 
+      {/* submission button and display error  */}
       <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "0.1rem" }}>
+      {error ? (
+        <Alert severity={error === 'File(s) uploaded successfully:' ? 'success' : 'error'}>
+          {error}
+        </Alert>
+      ) : null}
         <MaterialUI.CustomButton type="submit" onClick={handleUpload}>Analyze</MaterialUI.CustomButton>
-        {error && <p id="error">{error}</p>}
       </Box>
     </Container>
   );

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 // navbar/sidebar
-import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, useMediaQuery, useTheme} from '@mui/material';
 import Button from '@mui/material/Button';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -25,6 +25,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import AddBusinessIcon from '@mui/icons-material/AddBusiness';
 // authentication
 import { auth } from '../components/Authentication';
+import { getAuth,updatePassword,reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import { useAdmin } from './Admin';
 
@@ -99,7 +100,7 @@ export const NavBar = (props) => {
                     AUDITBUDDY
                 </Typography>
                 <Typography sx={{flexGrow: 1}}></Typography>
-                <NavButton><NavLink to="/">Home</NavLink></NavButton>
+                {!user && <NavButton><NavLink to="/">Home</NavLink></NavButton>}
                 {user ? (
                 <React.Fragment>
                     <NavButton><NavLink to="/audit">Audit</NavLink></NavButton>
@@ -111,7 +112,16 @@ export const NavBar = (props) => {
     );
 };
 
-export const SideBar = () => {
+export const SideBar = (props) => {
+
+    // for mobile responsiveness
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const toggleSidebar = () => {
+        setSidebarOpen(!sidebarOpen);
+    };
+
     const location = useLocation();
     const path = location.pathname;
     const colorSelected = {
@@ -137,7 +147,25 @@ export const SideBar = () => {
     const { admin } = useAdmin();
 
     return (
-        <Drawer variant='permanent' anchor='left' sx={{width: 100}}>
+        <React.Fragment>
+        {isMobile && (
+            // fixed button at the button to toggle
+            <CustomButton
+                sx={{
+                    position: 'fixed',
+                    bottom: theme.spacing(2),
+                    right: theme.spacing(2),
+                    zIndex: (theme) => theme.zIndex.drawer + 1,
+                }}
+                onClick={toggleSidebar}
+            >
+                Menu
+            </CustomButton>
+        )}
+        <Drawer variant= { isMobile ? 'temporary' : 'permanent' } anchor='left' sx={{width: 100}}
+            open={isMobile ? sidebarOpen : null}
+            onClose={toggleSidebar}
+        >
             <Toolbar sx={{ marginTop: 7.5, width: 145 }}>
                 <List>
                     <Typography sx={{ fontSize: '0.9rem', marginLeft: -1 }} disablePadding><strong>Welcome,</strong> {user.email}</Typography>
@@ -209,6 +237,7 @@ export const SideBar = () => {
                 </List>
             </Toolbar>
         </Drawer >
+        </React.Fragment>
     );
 };
 
@@ -262,51 +291,66 @@ export const Settings = ({darkMode, toggleDarkMode}) => {
         toggleDarkMode();
     };
     const [open, setOpen] = useState(false);
-    const [oldPassword, setOldPassword] = useState(''); 
-    const [newPassword, setNewPassword] = useState(''); 
-    const [confirmPassword, setConfirmPassword] = useState(''); 
-    const [error, setError] = useState(''); 
+    const [oldPassword, setOldPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
     const handleOpen = () => {
         setOpen(true);
       };
-    
+   
       const handleClose = () => {
+        setSuccess(null);
         setOpen(false);
       };
       const handleSubmit = () => {
         if (newPassword !== confirmPassword) {
-            setError('Passwords do not match.'); 
+            setError('Passwords do not match.');
             console.log("ERROR")
             return;
         }
-
-        const requestBody = {
-            current_password: oldPassword,
-            new_password: newPassword
-        };
-
-        const requestOptions = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestBody)
-        };
-        fetch('/change-password', requestOptions)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to change password.');
-            }
-
-
-            handleClose(); 
-        })
-        .catch(error => {
-            console.error('Error changing password:', error); 
-
-        });
-
-        handleClose();
+ 
+ 
+        const auth = getAuth();
+        const user = auth.currentUser;
+ 
+ 
+        const credential = EmailAuthProvider.credential(user.email, oldPassword);
+ 
+ 
+ 
+ 
+        reauthenticateWithCredential(user, credential)
+            .then(() => {
+                if (newPassword.length < 6) {
+                    setError('Password should be at least 6 characters long.');
+                } else {
+                    updatePassword(user, newPassword)
+                        .then(() => {
+                            setSuccess("Password changed successfully");
+                            setError(null);
+                        })
+                        .catch((error) => {
+                            console.error("Error updating password, please log out and log in again to reset.", error);
+ 
+ 
+                        });
+                }
+            })
+           
+            .catch((error) => {
+                console.error("Old password is not correct:", error);
+                setError('Old password is not correct.');
+ 
+ 
+            });
+ 
+ 
+ 
+ 
+ 
+ 
       };
     return (
       <Box
@@ -317,8 +361,6 @@ export const Settings = ({darkMode, toggleDarkMode}) => {
           borderColor: 'divider',
           borderRadius: 'borderRadius',
           marginBottom: '200px'
- 
- 
         }}
       >
         <Typography variant="h5">Settings</Typography>
@@ -337,8 +379,8 @@ export const Settings = ({darkMode, toggleDarkMode}) => {
                 },
                 "& .Mui-checked": {
                     color: "#454545"
-            
-            
+           
+           
                 },
                 "& .MuiSwitch-track": {
                     backgroundColor: "#000 !important"
@@ -347,7 +389,8 @@ export const Settings = ({darkMode, toggleDarkMode}) => {
                 color="primary"
             />
           </Box>
-
+ 
+ 
           <Typography variant="subtitle1">Account</Typography>
           <Divider />
             <Box sx={{ mb: 4, mt: 2 }}>
@@ -363,8 +406,8 @@ export const Settings = ({darkMode, toggleDarkMode}) => {
                             margin="dense"
                             fullWidth
                             label="Old Password"
-                            value={oldPassword} 
-                            onChange={(e) => setOldPassword(e.target.value)} 
+                            value={oldPassword}
+                            onChange={(e) => setOldPassword(e.target.value)}
                             required
                             />
                             <TextField
@@ -372,8 +415,8 @@ export const Settings = ({darkMode, toggleDarkMode}) => {
                             margin="dense"
                             fullWidth
                             label="New Password"
-                            value={newPassword} 
-                            onChange={(e) => setNewPassword(e.target.value)} 
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
                             required
                             />
                             <TextField
@@ -381,15 +424,19 @@ export const Settings = ({darkMode, toggleDarkMode}) => {
                             margin="dense"
                             fullWidth
                             label="Confirm New Password"
-                            value={confirmPassword} 
+                            value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             required
                             />
                         </form>
+                        <span style={{ color: 'red' }}>{error}</span>
+                        <span style={{ color: 'green' }}>{success}</span>
+ 
+ 
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={handleClose} color="primary">
-                            Cancel
+                            Close
                         </Button>
                         <Button onClick={handleSubmit} color="primary">
                             Reset
@@ -397,11 +444,13 @@ export const Settings = ({darkMode, toggleDarkMode}) => {
                     </DialogActions>
                 </Dialog>
             </Box>
-
+ 
+ 
         </Box>
       </Box>
     );
   };
+ 
  
 
 

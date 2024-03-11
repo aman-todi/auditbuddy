@@ -4,6 +4,7 @@ import firebase_admin
 from firebase_admin import storage
 from PIL import Image, ImageDraw
 import os
+from io import BytesIO
 import cv2
 import time
 import numpy as np
@@ -28,15 +29,29 @@ class LogoDetector:
         with open(image_path, "rb") as image_file:
             content = image_file.read()
 
-        image = vision.Image(content=content)
+        # Create an Image object from the byte string
+        image = Image.open(BytesIO(content))
+        print("We are past converting bytes to image")
+        
+        # Convert the image to grayscale
+        gray_image = image.convert("L")
+        print("The image is gray")
 
+        # Convert the grayscale image back to a byte string
+        buffered = BytesIO()
+        gray_image.save(buffered, format="PNG")
+        gray_image_bytes = buffered.getvalue()
+
+        image = vision.Image(content=gray_image_bytes)     
+        print("Logo detection working???")
+        
         response = client.logo_detection(image=image)
         self.logos = response.logo_annotations
         print("Logos:")
 
         for logo in self.logos:
-            # print(logo.description)
-            # print(logo.score)
+            print(logo.description)
+            print(logo.score)
             annotated_image = self.create_annotated_image(image_path, logo)
             self.save_annotated_image_to_firebase(annotated_image)
             print(logo.description)

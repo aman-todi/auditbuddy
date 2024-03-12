@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import '../App.css';
 // filepond
 import { FilePond, registerPlugin } from 'react-filepond';
@@ -8,6 +8,8 @@ import * as MaterialUI from './MaterialUI';
 import HelpIcon from '@mui/icons-material/Help';
 import { InputLabel, FormControl, MenuItem, Select, Container, Box, Tab, Tabs, Tooltip, Typography, Alert } from '@mui/material/';
 import CircularProgress from '@mui/material/CircularProgress';
+import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
+import VideocamIcon from '@mui/icons-material/Videocam';
 
 // for notifications
 import { toast } from 'react-toastify';
@@ -170,10 +172,6 @@ const FormImport = () => {
     setTabIndex(newTabIndex);
   };
 
-
-
-
-  
   return (
     <Container component="main">
       <Typography variant="p" sx={{ display: "flex", alignItems: "center", marginBottom: "1rem" }}>
@@ -182,7 +180,6 @@ const FormImport = () => {
           <HelpIcon sx={{ fontSize: "small" }} />
         </Tooltip>
       </Typography>
-      
       <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, alignItems: "center" }}>
       <FormControl required fullWidth sx={{ margin: "0.1rem" }}>
         <InputLabel>Dealership</InputLabel>
@@ -236,11 +233,11 @@ const FormImport = () => {
             }
           }}
         >
-          <Tab label={<span>LOGOS</span>} />
-          <Tab label={<span>DISPLAY CARS</span>} />
-          <Tab label={<span>PARKING SPACES</span>} />
-          <Tab label={<span>HOSPITALITY</span>} />
-          <Tab label={<span>SPATIAL</span>} />
+          <Tab label={ <span style={{ display: 'flex', alignItems: 'center' }}>LOGOS<PhotoCameraIcon/></span>} />
+          <Tab label={ <span style={{ display: 'flex', alignItems: 'center' }}>DISPLAY CARS<PhotoCameraIcon/><VideocamIcon/></span>} />
+          <Tab label={ <span style={{ display: 'flex', alignItems: 'center' }}>PARKING SPACES<PhotoCameraIcon/><VideocamIcon/></span>} />
+          <Tab label={ <span style={{ display: 'flex', alignItems: 'center' }}>HOSPITALITY<PhotoCameraIcon/><VideocamIcon/></span>} />
+          <Tab label={ <span style={{ display: 'flex', alignItems: 'center' }}>SPATIAL<PhotoCameraIcon/></span>} />
         </Tabs>
       </Box>
 
@@ -248,8 +245,8 @@ const FormImport = () => {
         {/* logo files input  */}
         <div style={{ display: tabIndex === 0 ? 'block' : 'none' }}>
           <Box sx={{ marginTop: '1rem' }}>
-          <Alert severity="warning">Supports images only</Alert>
             <FilePond
+              id="logo"
               allowMultiple={true}
               acceptedFileTypes={['image/*']}
               onupdatefiles={handleFileAdded(setLogo)}
@@ -262,6 +259,7 @@ const FormImport = () => {
         <div style={{ display: tabIndex === 1 ? 'block' : 'none' }}>
           <Box sx={{ marginTop: '1rem' }}>
             <FilePond
+              id="cars"
               allowMultiple={true}
               onupdatefiles={handleFileAdded(setCars)}
               stylePanelLayout={'compact'}
@@ -273,6 +271,7 @@ const FormImport = () => {
         <div style={{ display: tabIndex === 2 ? 'block' : 'none' }}>
           <Box sx={{ marginTop: '1rem' }}>
             <FilePond
+              id="parking"
               allowMultiple={true}
               onupdatefiles={handleFileAdded(setParking)}
               stylePanelLayout={'compact'}
@@ -284,6 +283,7 @@ const FormImport = () => {
         <div style={{ display: tabIndex === 3 ? 'block' : 'none' }}>
           <Box sx={{ marginTop: '1rem' }}>
             <FilePond
+              id="hospitality"
               allowMultiple={true}
               onupdatefiles={handleFileAdded(setHospitality)}
               stylePanelLayout={'compact'}
@@ -294,8 +294,8 @@ const FormImport = () => {
         {/* spatial files input  */}
         <div style={{ display: tabIndex === 4 ? 'block' : 'none' }}>
           <Box sx={{ marginTop: '1rem' }}>
-          <Alert severity="warning">Supports images only</Alert>
             <FilePond
+              id="spatial"
               allowMultiple={true}
               maxFiles={3}
               acceptedFileTypes={['image/*']}

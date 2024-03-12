@@ -283,9 +283,9 @@ export const ContactForm = () => {
                         <TextField name="user_name" label="Name" variant="outlined" fullWidth required sx={{ marginBottom: 2 }} />
                         <TextField name="user_email" type="email" label="Email" variant="outlined" fullWidth required sx={{ marginBottom: 2 }} />
                         <TextField name="message" label="Message" multiline rows={4} variant="outlined" fullWidth required sx={{ marginBottom: 2 }} />
-                        <Button type="submit" variant="contained" fullWidth color="primary">
+                        <CustomButton type="submit" variant="contained" fullWidth color="primary">
                             Send
-                        </Button>
+                        </CustomButton>
                     </form>
                     <Box sx={{ marginTop: 1 }}><span style={{ color: 'green' }}>{success}</span></Box>
               </CardContent>

@@ -19,7 +19,8 @@ from firebase_admin import credentials, storage, firestore
 from datetime import datetime
 import time
 from dateutil import parser
-    
+import concurrent.futures
+
 ANNOTATED_IMAGES_FOLDER = os.path.join(app.root_path, 'static', 'main', 'annotated_images')
 
 bucket = storage.bucket()
@@ -456,20 +457,21 @@ def add_dealership():
 @app.route('/generate-results', methods=['POST'])
 def generate_results():
     try:
-
         # Access the 'results' collection
         collection_ref = db.collection('results')
 
-        # Dictionary to hold results
+        # Fetch all dealership documents explicitly
+        dealership_docs = list(collection_ref.list_documents())
+
+        # List to hold results
         results = []
 
-        # Fetch dealership documents explicitly
-        dealership_docs = collection_ref.list_documents()
-        for dealership_doc_ref in dealership_docs:
-            # Get the dealership name from the document reference
-
-            # Fetch all subcollections within the current dealership
+        # fetch submissions for a dealership
+        def fetch_submission_data(dealership_doc_ref):
+            # access the subcollection submissions
             subcollections = dealership_doc_ref.collections()
+
+            # loop through each subcollection
             for subcollection_ref in subcollections:
                 # Fetch submission documents within each subcollection
                 submission_docs = subcollection_ref.stream()
@@ -477,6 +479,15 @@ def generate_results():
                     submission_data = submission_doc.to_dict()  # Get submission data
                     results.append(submission_data)
 
+            return results
+
+        # use concurrent.futures.ThreadPoolExecutor to fetch submission data concurrently
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            # call function fetch_submission_data for each dealership
+            {executor.submit(fetch_submission_data, dealership_doc_ref): dealership_doc_ref for dealership_doc_ref in dealership_docs}
+        
+        # sort results by uid
+        results = sorted(results, key=lambda x: x.get('UID', ''))
         # Return results
         return jsonify(results), 200
 

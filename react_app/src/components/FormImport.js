@@ -233,11 +233,11 @@ const FormImport = () => {
             }
           }}
         >
-          <Tab label={ <span style={{ display: 'flex', alignItems: 'center' }}>LOGOS<PhotoCameraIcon/></span>} />
-          <Tab label={ <span style={{ display: 'flex', alignItems: 'center' }}>DISPLAY CARS<PhotoCameraIcon/><VideocamIcon/></span>} />
-          <Tab label={ <span style={{ display: 'flex', alignItems: 'center' }}>PARKING SPACES<PhotoCameraIcon/><VideocamIcon/></span>} />
-          <Tab label={ <span style={{ display: 'flex', alignItems: 'center' }}>HOSPITALITY<PhotoCameraIcon/><VideocamIcon/></span>} />
-          <Tab label={ <span style={{ display: 'flex', alignItems: 'center' }}>SPATIAL<PhotoCameraIcon/></span>} />
+          <Tab label={ <span style={{ display: 'flex', alignItems: 'center' }}>LOGOS<PhotoCameraIcon sx={{ fontSize: '1rem' }}/></span>} />
+          <Tab label={ <span style={{ display: 'flex', alignItems: 'center' }}>DISPLAY CARS<PhotoCameraIcon sx={{ fontSize: '1rem' }}/><VideocamIcon sx={{ fontSize: '1rem' }}/></span>} />
+          <Tab label={ <span style={{ display: 'flex', alignItems: 'center' }}>PARKING SPACES<PhotoCameraIcon sx={{ fontSize: '1rem' }}/><VideocamIcon sx={{ fontSize: '1rem' }}/></span>} />
+          <Tab label={ <span style={{ display: 'flex', alignItems: 'center' }}>HOSPITALITY<PhotoCameraIcon sx={{ fontSize: '1rem' }}/><VideocamIcon sx={{ fontSize: '1rem' }}/></span>} />
+          <Tab label={ <span style={{ display: 'flex', alignItems: 'center' }}>SPATIAL<PhotoCameraIcon sx={{ fontSize: '1rem' }}/></span>} />
         </Tabs>
       </Box>
 

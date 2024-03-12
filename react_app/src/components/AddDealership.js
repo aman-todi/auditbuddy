@@ -133,6 +133,7 @@ const AddDealershipImport = ({refresh}) => {
             <MenuItem value={"Nissan"}>Nissan</MenuItem>
             <MenuItem value={"Subaru"}>Subaru</MenuItem>
             <MenuItem value={"Toyota"}>Toyota</MenuItem>
+            <MenuItem value={"Porsche"}>Porsche</MenuItem>
             <MenuItem value={"Volkswagen"}>Volkswagen</MenuItem>
           </Select>
         </FormControl>

@@ -13,6 +13,12 @@ function ResultsPage() {
   // navigate to another page
   const navigate = useNavigate();
 
+  // hold the submissions count for each brand
+  const [dealershipCount, setDealershipCount] = useState(new Map());
+
+  // order to display the keys of database results
+  const brand_names = ['Audi', 'BMW', 'Cadillac', 'Chevrolet', 'Ford', 'Honda','Kia', 'Porsche', 'Mercedes', 'Toyota', 'Volkswagen']
+
   // page authentication
   const [user, setUser] = useState(auth.currentUser);
   useEffect(() => {
@@ -25,6 +31,24 @@ function ResultsPage() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
+  // filter dealterships by uid
+  function filterUniqueDealerships(submissions) {
+    // Track unique dealership names
+    const uniqueDealerships = new Set();
+
+    // Filter items using UID
+    const uniqueFilteredDealerships = submissions.filter(item => {
+        if (!uniqueDealerships.has(item['UID'])) {
+            uniqueDealerships.add(item['UID']);
+            return true;
+        }
+        return false;
+    });
+
+    return uniqueFilteredDealerships;
+  }
+
+
   // fetch data from the database
   const fetchResults = async () => {
     try {
@@ -32,21 +56,30 @@ function ResultsPage() {
       const response = await axios.post('/generate-results');
       // set state of items to the data
       setItems(response.data);
-      // show that the items are finished loading
-      setLoading(false);
+
+      // filter dealerships and remove duplicates
+      const uniqueFilteredDealerships = filterUniqueDealerships(response.data);
+
+      // get the count of how many dealerships are avaliable for each brand
+      const newDealershipCount = new Map();
+          uniqueFilteredDealerships.forEach(submission => {
+        const brandName = submission['Brand'];
+        newDealershipCount.set(brandName, (newDealershipCount.get(brandName) || 0) + 1);
+    });
+
+      setDealershipCount(newDealershipCount);
 
     } catch (error) {
       // errors
       console.error("Error fetching results:", error);
     }
+    // show that the items are finished loading
+    setLoading(false);
   }
   // fetch results when the user goes on the page
   useEffect(() => {
     fetchResults();
   }, []);
-
-  // order to display the keys of database results
-  const brand_names = ['Audi', 'BMW', 'Chevrolet', 'Ford', 'Honda','Lincoln', 'Mercedes', 'Volkswagen']
 
   // items in the database
   const [items, setItems] = useState([]);
@@ -107,17 +140,8 @@ function ResultsPage() {
     // Filter items based on the selected brand
     const dealerships = items.filter(item => item['Brand'] === brandName);
 
-    // Track unique dealership names
-    const uniqueDealerships = new Set();
-
-    // Filter items using UID
-    const uniqueFilteredDealerships = dealerships.filter(item => {
-      if (!uniqueDealerships.has(item['UID'])) {
-        uniqueDealerships.add(item['UID']);
-        return true;
-      }
-      return false;
-    });
+    // filter dealerships by removing duplicates
+    const uniqueFilteredDealerships = filterUniqueDealerships(dealerships);
 
     // Set the popup content with unique filtered dealerships
     setPopupContent({ type: 'Dealership Name', data: uniqueFilteredDealerships, name: brandName });
@@ -173,9 +197,6 @@ function ResultsPage() {
                   ) : (
                     <>
                     <div>
-                      <Typography>
-                        {clickedBrandName ? "" : "Select a brand to view"}
-                      </Typography>
                       <div style={{ display: 'flex', flexDirection: 'row' }}>
                         {brand_names.map((brandName, index) => (
                       <div 
@@ -189,11 +210,14 @@ function ResultsPage() {
                           textAlign: 'center'
                         }}
                       >
-                        {brandName}
+                        {brandName} {dealershipCount.get(brandName) || 0}
+                      </div>
+                    ))}
+                    </div>
+                    <Typography sx={{ marginTop: clickedBrandName ? '0' : '5rem' }}>
+                      {clickedBrandName ? "" : "Select a brand to view"}
+                    </Typography>
                   </div>
-                ))}
-                </div>
-              </div>
               </>
               )}
             </div>

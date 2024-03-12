@@ -7,6 +7,12 @@ import 'filepond/dist/filepond.min.css';
 import * as MaterialUI from './MaterialUI';
 import HelpIcon from '@mui/icons-material/Help';
 import { InputLabel, FormControl, MenuItem, Select, Container, Box, Tab, Tabs, Tooltip, Typography, Alert } from '@mui/material/';
+import CircularProgress from '@mui/material/CircularProgress';
+
+// for notifications
+import { toast } from 'react-toastify';
+
+
 // axios
 import axios from 'axios';
 
@@ -83,7 +89,7 @@ const FormImport = () => {
       setError('Please select a file in atleast one category')
     }
     else {
-
+      setError('')
       // append files to form data
       function appendFilesToFormData(files, formData, key) {
         if (files && files.length > 0) {
@@ -104,13 +110,31 @@ const FormImport = () => {
       const time = new Date().toISOString();
       formData.append('submission', time)
 
+      // notification that the files have been submitted
+      const currentlyAnalyzing = toast(
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          Analyzing {dealerships['UID']} {dealerships['Dealership Name']} {department}
+        <CircularProgress color="success" style={{ marginLeft: '10px' }} />
+        </div>,
+        { autoClose: false, closeButton: false}
+      );
+
       try {
         const response = await axios.post('http://localhost:8080/upload-video', formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
         });
-        setError('File(s) uploaded successfully:');
+
+        // remove the first toast when the second one populates
+        toast.dismiss(currentlyAnalyzing);
+        // notification that the files have been analyzed
+        toast.success(
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+             Completed {dealerships['UID']} {dealerships['Dealership Name']} {department}
+          </div>
+        , { autoClose: false , closeButton: true});
+
       }
       catch (error) {
         if (error.response) {
@@ -120,10 +144,6 @@ const FormImport = () => {
         } else if (error.request) {
           // The request was made but no response was received
           setError('Error uploading file: No response from server');
-        } else {
-          // Something happened in setting up the request that triggered an Error
-          console.error('Error message:', error.message);
-          setError('Error uploading file');
         }
       }
     }
@@ -150,6 +170,10 @@ const FormImport = () => {
     setTabIndex(newTabIndex);
   };
 
+
+
+
+  
   return (
     <Container component="main">
       <Typography variant="p" sx={{ display: "flex", alignItems: "center", marginBottom: "1rem" }}>
@@ -285,7 +309,7 @@ const FormImport = () => {
       {/* submission button and display error  */}
       <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "0.1rem" }}>
       {error ? (
-        <Alert severity={error === 'File(s) uploaded successfully:' ? 'success' : 'error'}>
+        <Alert severity='error'>
           {error}
         </Alert>
       ) : null}

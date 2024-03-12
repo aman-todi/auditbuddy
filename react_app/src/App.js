@@ -3,6 +3,7 @@ import * as MaterialUI from './components/MaterialUI';
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import HomePage from './pages/home';
 import LoginPage from './pages/login';
+
 // audit and subpages
 import SettingsPage from './pages/settings';
 import ContactPage from './pages/contact';
@@ -12,9 +13,17 @@ import ResultsPage from './pages/audit-results';
 import AdvancedResultsPage from './pages/audit-results-advanced';
 import AdminPage from './pages/admin-console';
 import DealershipsPage from './pages/audit-dealerships';
+
+// for checking admin users
 import { AdminCheck } from './components/Admin';
+
+// for light/dark mode
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "../node_modules/@mui/material/CssBaseline";
+
+// for notifications
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 function App() {
@@ -49,6 +58,9 @@ function App() {
    <ThemeProvider theme={darkT}>
      <CssBaseline />
    <React.Fragment>
+    <div>
+    <ToastContainer position="bottom-right"/>
+
      <AdminCheck>
      <BrowserRouter>
        <MaterialUI.NavBar></MaterialUI.NavBar>
@@ -68,6 +80,7 @@ function App() {
        </Routes>
      </BrowserRouter>
      </AdminCheck>
+     </div>
    </React.Fragment>
    </ThemeProvider>
  );

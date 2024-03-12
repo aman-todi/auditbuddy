@@ -10,6 +10,7 @@ import { InputLabel, FormControl, MenuItem, Select, Container, Box, Tab, Tabs, T
 import CircularProgress from '@mui/material/CircularProgress';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import VideocamIcon from '@mui/icons-material/Videocam';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 // for notifications
 import { toast } from 'react-toastify';
@@ -24,6 +25,9 @@ import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
 registerPlugin(FilePondPluginFileValidateType);
 
 const FormImport = () => {
+
+  // navigation
+  const navigate = useNavigate();
 
   // states to keep track of each file drop box
   const [logo, setLogo] = useState(null);
@@ -132,8 +136,11 @@ const FormImport = () => {
         toast.dismiss(currentlyAnalyzing);
         // notification that the files have been analyzed
         toast.success(
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-             Completed {dealerships['UID']} {dealerships['Dealership Name']} {department}
+          <div>
+            Completed {dealerships['UID']} {dealerships['Dealership Name']} {department}
+            <div>
+              <MaterialUI.CustomButton onClick={() => navigate(`/audit/results/${encodeURIComponent(dealerships['Brand'])}/${encodeURIComponent(dealerships['Dealership Name'])}/${encodeURIComponent(department)}/${encodeURIComponent(time)}`)}>View</MaterialUI.CustomButton>
+            </div>
           </div>
         , { autoClose: false , closeButton: true});
 

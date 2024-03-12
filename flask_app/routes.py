@@ -428,10 +428,18 @@ def add_dealership():
     #three first letters of the brand
     abbreviation = brand[:3].upper()
 
-    #get the next number
-    collection_ref = db.collection("dealerships")
-    docs = list(collection_ref.stream())
-    next_id = int(docs[-1].id) + 1
+    # find the next number
+    def get_next_number(brand_abbr):
+        # get all the documents in dealership
+        brand_docs = collection_ref.stream()
+        # find all the documents that start with the abbreviated brand
+        brand_numbers = [int(doc.id[len(brand_abbr):]) for doc in brand_docs if doc.id.startswith(brand_abbr)]
+
+        return max(brand_numbers, default=0) + 1
+
+    # next number
+    next_id = get_next_number(abbreviation)
+    # new uid to push
     new_uid = abbreviation + str(next_id)
 
     # set up json for user data
@@ -448,7 +456,7 @@ def add_dealership():
             }
             
     # go to the collection, create a new document (user id), and append the user email
-    db.collection("dealerships").document(str(next_id)).set(data)
+    db.collection("dealerships").document(str(new_uid)).set(data)
 
 
     return jsonify("Dealership added successfully"), 200

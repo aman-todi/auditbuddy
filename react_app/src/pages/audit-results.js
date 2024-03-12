@@ -222,7 +222,7 @@ function ResultsPage() {
               )}
             </div>
             {/* handle pop up content accordingly */}
-            <div style={{ marginLeft: 15, display: 'flex', flexDirection: 'column' }}>
+            <div style={{ marginLeft: 15, display: 'flex', flexDirection: 'column'}}>
               {/* handle the dealership list for each brand */}
               {popupContent && popupContent.type === 'Dealership Name' ? (
             <div>
@@ -231,7 +231,7 @@ function ResultsPage() {
             </div>
             <div>
             <Typography variant="h6" align="center">File Listing</Typography>
-            <Box sx={{ maxHeight: 400, overflowY: 'auto' }}>
+            <Box sx={{ maxHeight: '10%', overflowY: 'auto'}}>
               {popupContent.data.map((item, index) => (
                 <Button
                   key={index}

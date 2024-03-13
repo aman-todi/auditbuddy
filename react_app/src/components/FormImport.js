@@ -10,7 +10,7 @@ import { InputLabel, FormControl, MenuItem, Select, Container, Box, Tab, Tabs, T
 import CircularProgress from '@mui/material/CircularProgress';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import VideocamIcon from '@mui/icons-material/Videocam';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 // for notifications
 import { toast } from 'react-toastify';
@@ -92,7 +92,7 @@ const FormImport = () => {
       setError('Please select a department')
     }
     else if (!logo && !cars && !parking && !spatial && !hospitality) {
-      setError('Please select a file in atleast one category')
+      setError('Please add a file in atleast one category')
     }
     else {
       setError('')

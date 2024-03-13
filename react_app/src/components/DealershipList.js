@@ -28,6 +28,7 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, TextField} from '@mu
 export const DealershipListImport = ({refresh}) => {
   // store user dealerships list
   const [dealerships, setDealerships] = useState([]);
+
   // check loading
   const [loading, setLoading] = useState(true);
 
@@ -121,6 +122,35 @@ export const DealershipListImport = ({refresh}) => {
     fetchUserDealerships(setDealerships, setLoading);
   }, [refresh]);
 
+  // handle search
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // handle search
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
+  // filter the dealership off of typed search
+  const filteredDealerships = dealerships.filter((dealership) => {
+
+    // all dealership fields
+    const searchFields = [
+      'UID',
+      'Dealership Name',
+      'Brand',
+      'City',
+      'State',
+      'Country',
+      'UIO',
+      'Sales',
+      'Updated'
+    ];
+    // if some of the fields are included, we include those results
+    return searchFields.some((field) =>
+      String(dealership[field]).toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  });
+
   return (
     <Container component="main">
       <Typography variant="p" sx={{ display: "flex", alignItems: "center", marginBottom: "1rem" }}>
@@ -129,6 +159,16 @@ export const DealershipListImport = ({refresh}) => {
           <HelpIcon sx={{ fontSize: "small" }} />
         </Tooltip>
       </Typography>
+
+      {/* search bar */}
+      <TextField
+        label="Search"
+        variant="outlined"
+        value={searchQuery}
+        onChange={handleSearchChange}
+        fullWidth
+      />
+
       <TableContainer component={Paper} sx={{ maxHeight: "15rem" }}>
         <Table stickyHeader>
           <TableHead>
@@ -150,7 +190,7 @@ export const DealershipListImport = ({refresh}) => {
             <TableCell colSpan={8} align="center"><CircularProgress color="success" /></TableCell>
             </TableRow>
             ) : (
-                dealerships.map((dealership, index) => (
+                filteredDealerships.map((dealership, index) => (
                 <TableRow key={index} sx={{cursor: 'pointer'}} onClick={() => handleClickedDealership(dealership)}>
                   <TableCell>{dealership['UID']}</TableCell>
                   <TableCell>{dealership['Dealership Name']}</TableCell>

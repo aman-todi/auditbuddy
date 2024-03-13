@@ -38,11 +38,6 @@ def root():
 def index(path):
     return render_template('index.html')
 
-@app.route('/test')
-def test():
-	return jsonify(test = "test ajax call")
-
-
 @app.route('/get-graph-results/<brandName>/<dealershipName>/<department>/<submission>')
 def get_annotated_images_graph(brandName,dealershipName,department,submission):
     try:
@@ -333,7 +328,9 @@ def create_user():
     except Exception as e:
         return jsonify({'error': str(e)}), 400  # error
 
-# push results from the database
+#
+# push form submission to the results database
+#
 def add_to_database(database_info):
 
     # append the new data in the correct format for firebase

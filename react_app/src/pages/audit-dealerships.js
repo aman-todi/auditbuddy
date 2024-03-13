@@ -5,7 +5,7 @@ import {auth} from '../components/Authentication';
 import AddDealershipImport from '../components/AddDealership';
 import {DealershipListImport} from '../components/DealershipList';
 import { useTheme, useMediaQuery } from '@mui/material';
-
+import MinRequirements from '../components/AddMinRequirements';
 function DealershipsPage () {
 
   // page authentication
@@ -39,6 +39,7 @@ function DealershipsPage () {
           <div className="File">
             
               <AddDealershipImport refresh={handleRefresh}/>
+              <MinRequirements></MinRequirements>
               <DealershipListImport refresh={refresh}/>
 
           </div>

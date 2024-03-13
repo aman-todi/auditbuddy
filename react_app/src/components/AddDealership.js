@@ -70,7 +70,12 @@ const AddDealershipImport = ({refresh}) => {
       // country
       formData.append('country', country);
       // date
-      const currentDate = new Date();
+      const options = {
+        timeZone: 'America/New_York',
+      };
+
+      const currentDate = new Date().toLocaleString('en-US', options) + " (EST)";
+
       formData.append('updated', currentDate);
 
       try {

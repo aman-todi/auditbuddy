@@ -461,6 +461,35 @@ def add_dealership():
 
     return jsonify("Dealership added successfully"), 200
 
+#
+# edit dealership uio/sales
+#
+@app.route('/dealership-update-values', methods=['POST'])
+def dealership_update_values():
+    # get form inputs
+    uid = request.form['uid']
+    new_sales = request.form['new_sales']
+    new_uio = request.form['new_uio']
+    updated = request.form['updated']
+
+    try:
+        # go to dealerships table
+        # search the table for the document with uid
+        reference = db.collection("dealerships").document(str(uid))
+    
+        # update the 'UIO' and 'Sales' to the new values
+        reference.update({
+            'UIO': new_uio,
+            'Sales': new_sales,
+            'Updated': updated
+        })
+
+        return jsonify("Dealership uio and sales updated successfully"), 200
+    
+    except Exception as e:
+        print("Error:", e)
+        return jsonify({"error": str(e)}), 500
+
 # pull results from the database
 @app.route('/generate-results', methods=['POST'])
 def generate_results():

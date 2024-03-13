@@ -168,16 +168,14 @@ def upload_video():
     print("country", country)
     submission = request.form['submission']
     print("submission",submission)
-
-    # uid, sales, and uio
+    uid = request.form['uid']
     print("uid", request.form['uid'])
+    sales = request.form['sales']
     print("sales", request.form['sales'])
+    uio = request.form['uio']
     print("uio", request.form['uio'])
 
-    dealership_info = (brandName, dealershipName, department, country, submission)
-
-    # we should save the folders from each dealership somewhere in here
-    database_info = [request.form['submission'],request.form['name'], request.form['dealership'], request.form['department'], request.form['country'], request.form['uid'], request.form['sales'], request.form['uio']]
+    dealership_info = (brandName, dealershipName, department, country, submission, uid, sales, uio)
 
     # Computer Vision Tasks
     
@@ -254,9 +252,6 @@ def upload_video():
     cv_results = (logo_result, num_cars, num_parking, num_seating, sq_ft_result)
     build_audit_results(cv_results, dealership_info)
                   
-    # add the form info to the database
-    add_to_database(database_info)
-
     print("Logo detected:", logo_result)
     print("Number of cars:", num_cars)
     print("Number of parking spaces:", num_parking)
@@ -327,26 +322,6 @@ def create_user():
         return jsonify({'email': user.email}), 201  # user email upon success
     except Exception as e:
         return jsonify({'error': str(e)}), 400  # error
-
-#
-# push form submission to the results database
-#
-def add_to_database(database_info):
-
-    # append the new data in the correct format for firebase
-    data = {
-        # add the submission date here
-        "Submitted": database_info[0],
-        "Dealership Name": database_info[1],
-        "Brand": database_info[2],
-        "Department": database_info[3],
-        "Country": database_info[4],
-        "UID": database_info[5]
-    }
-
-    # go to the collection, create a new document (dealership name), create a new collection with (department)
-    db.collection("results").document(database_info[1]).collection(database_info[3]).document(database_info[0]).set(data)
-
 
 #
 # populate dealerships table

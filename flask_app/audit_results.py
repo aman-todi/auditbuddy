@@ -23,6 +23,33 @@ sq_footage_min = 500
 
 bucket = storage.bucket()
 
+# firestore for saving to results
+from firebase_admin import credentials, storage, firestore
+db = firestore.client()
+
+# add the form submission and grades to the database
+def add_to_database(database_info, categories, scores, total_scores):
+    # append the new data in the correct format for firebase
+    data = {
+        # add the submission date here
+        "Submitted": database_info[4],
+        "Dealership Name": database_info[1],
+        "Brand": database_info[0],
+        "Department": database_info[2],
+        "Country": database_info[3],
+        "UID": database_info[5],
+        "Category Eval": {
+            "Categories": categories,
+            "Scores": scores
+        },
+        "Overall Eval" : {
+            "Scores": total_scores
+        },
+    }
+
+    # go to the collection, create a new document (dealership name), create a new collection with (department)
+    db.collection("results").document(database_info[1]).collection(database_info[2]).document(database_info[4]).set(data)
+
 def upload_to_firebase(file_bytes, file_name):
     # Upload bytes to Firebase Storage
     blob = bucket.blob(file_name)
@@ -52,6 +79,8 @@ def visualize_category_eval(dealership_info, categories, scores):
     upload_to_firebase(image_bytes, file_path)
 
     plt.close(fig)
+
+
 
 def visualize_overall_score(dealership_info, total_score, max_score=16):
     # Create a pie chart to visualize overall performance
@@ -191,3 +220,4 @@ def build_audit_results(cv_results, dealership_info, past_sales=150, uio=300):
 
     visualize_category_eval(dealership_info, categories, scores)
     visualize_overall_score(dealership_info, total_score)
+    add_to_database(dealership_info, categories, scores, total_score)

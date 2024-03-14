@@ -109,6 +109,27 @@ def build_audit_results(cv_results, dealership_info, past_sales=150, uio=300):
 
     detected_logo, num_cars, num_parking, num_seating, sq_footage = cv_results
 
+    brand_compliance_limits = {}
+
+    brand_limits_ref = db.collection('Brand compliance limits')
+
+    for brand_doc in brand_limits_ref.stream():
+        brand_data = brand_doc.to_dict()
+
+        brand_name = brand_doc.id
+
+        min_cars = brand_data.get('minCars')
+        min_parking = brand_data.get('minParking')
+        min_seating = brand_data.get('minSeating')
+        min_sqft = brand_data.get('minSqFt')
+        brand_compliance_limits[brand_name] = {'Min Cars': min_cars, "Min Parking": min_parking, "Min Seating": min_seating, "MinSqFt": min_sqft}
+    brandName = dealership_info[0]
+    cars_min = int(brand_compliance_limits[brandName]['Min Cars'])
+    parking_min = int(brand_compliance_limits[brandName]['Min Parking'])
+    seating_min = int(brand_compliance_limits[brandName]['Min Seating'])
+    sq_footage_min = int(brand_compliance_limits[brandName]['MinSqFt'])
+    print(cars_min, parking_min, seating_min, sq_footage_min)
+    print("hello")
     def calculate_evaluation_grades():
         # Grade the evaluation results using past sales and UIO information
 

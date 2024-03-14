@@ -39,7 +39,9 @@ function DealershipsPage () {
           <div className="File">
             
               <AddDealershipImport refresh={handleRefresh}/>
+              <div style={{ margin: '20px' }}></div>
               <MinRequirements></MinRequirements>
+              <div style={{ margin: '20px' }}></div>
               <DealershipListImport refresh={refresh}/>
 
           </div>

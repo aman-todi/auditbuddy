@@ -129,7 +129,7 @@ def build_audit_results(cv_results, dealership_info, past_sales=150, uio=300):
     seating_min = int(brand_compliance_limits[brandName]['Min Seating'])
     sq_footage_min = int(brand_compliance_limits[brandName]['MinSqFt'])
     print(cars_min, parking_min, seating_min, sq_footage_min)
-    print("hello")
+
     def calculate_evaluation_grades():
         # Grade the evaluation results using past sales and UIO information
 

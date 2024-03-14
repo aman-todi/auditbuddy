@@ -573,5 +573,22 @@ def search_results():
 
 
 
+@app.route('/submit-min-requirements', methods=['POST'])
+def submit_min_requirements():
+    data = request.json   
+    brand = data['selectedBrand']
+    minCars = data['minCars']
+    minParking = data['minParking']
+    minSeating = data['minSeating']
+    minSqFt = data['minSqFt'] 
 
+    minRef = db.collection('Brand compliance limits').document(brand)
+
+    minRef.update({
+        'minCars': minCars,
+        'minParking': minParking,
+        'minSeating': minSeating,
+        'minSqFt': minSqFt
+    })
+    return jsonify({'message': 'Success'})
 

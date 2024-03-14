@@ -178,6 +178,13 @@ def upload_video():
     dealership_info = (brandName, dealershipName, department, country, submission, uid, sales, uio)
 
     # Computer Vision Tasks
+
+    # emotion files in list
+    index = 0
+    while f'emotion[{index}]' in request.files:
+        file = request.files[f'emotion[{index}]']
+        print("file: ", file)
+        index += 1
     
     # spatial files in list
     spatial_files = []

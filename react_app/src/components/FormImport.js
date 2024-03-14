@@ -35,6 +35,7 @@ const FormImport = () => {
   const [cars, setCars] = useState(null);
   const [hospitality, setHospitality] = useState(null);
   const [spatial, setSpatial] = useState(null);
+  const [emotion, setEmotion] = useState(null);
   const [error, setError] = useState("")
 
   // state to keep track department
@@ -91,8 +92,25 @@ const FormImport = () => {
     {
       setError('Please select a department')
     }
-    else if (!logo && !cars && !parking && !spatial && !hospitality) {
-      setError('Please add a file in atleast one category')
+    else if (!logo)
+    {
+      setError('Please upload logo files')
+    }
+    else if (!cars)
+    {
+      setError('Please upload cars files')
+    }
+    else if (!parking)
+    {
+      setError('Please upload parking files')
+    }
+    else if (!spatial)
+    {
+      setError('Please upload spatial files')
+    }
+    else if (!hospitality)
+    {
+      setError('Please upload hospitality files')
     }
     else {
       setError('')
@@ -111,6 +129,8 @@ const FormImport = () => {
       appendFilesToFormData(parking, formData, 'parking');
       appendFilesToFormData(spatial, formData, 'spatial');
       appendFilesToFormData(cars, formData, 'cars');
+
+      appendFilesToFormData(emotion, formData, 'emotion');
 
       // Get the current timestamp
       const time = new Date().toISOString();
@@ -245,6 +265,7 @@ const FormImport = () => {
           <Tab label={ <span style={{ display: 'flex', alignItems: 'center' }}>PARKING SPACES<PhotoCameraIcon sx={{ fontSize: '1rem' }}/><VideocamIcon sx={{ fontSize: '1rem' }}/></span>} />
           <Tab label={ <span style={{ display: 'flex', alignItems: 'center' }}>HOSPITALITY<PhotoCameraIcon sx={{ fontSize: '1rem' }}/><VideocamIcon sx={{ fontSize: '1rem' }}/></span>} />
           <Tab label={ <span style={{ display: 'flex', alignItems: 'center' }}>SPATIAL<PhotoCameraIcon sx={{ fontSize: '1rem' }}/></span>} />
+          <Tab label={ <span style={{ display: 'flex', alignItems: 'center' }}>EMOTION<PhotoCameraIcon sx={{ fontSize: '1rem' }}/><VideocamIcon sx={{ fontSize: '1rem' }}/></span>} />
         </Tabs>
       </Box>
 
@@ -307,6 +328,18 @@ const FormImport = () => {
               maxFiles={3}
               acceptedFileTypes={['image/*']}
               onupdatefiles={handleFileAdded(setSpatial)}
+              stylePanelLayout={'compact'}
+            />
+          </Box>
+        </div>
+
+         {/* emotion files input  */}
+         <div style={{ display: tabIndex === 5 ? 'block' : 'none' }}>
+          <Box sx={{ marginTop: '1rem' }}>
+            <FilePond
+              id="emotion"
+              allowMultiple={true}
+              onupdatefiles={handleFileAdded(setEmotion)}
               stylePanelLayout={'compact'}
             />
           </Box>

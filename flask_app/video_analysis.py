@@ -87,12 +87,12 @@ def assess_hospitality(files_list,dealership_info):
 
         # Initialize hospitality finder and seating tracker
         hospitality_finder = HospitalityFinder()
-        seating_tracker = Yolov3_Tracker(distance_threshold=125)
+        seating_tracker = Yolov5_Tracker(distance_threshold=40)
 
         # Load and segment video
         cap = cv2.VideoCapture(video)
 
-        display_frequency = 90  # Set the frequency of frames to save
+        display_frequency = 60  # Set the frequency of frames to save
 
         while True:
             ret, frame = cap.read()
@@ -128,18 +128,18 @@ def assess_hospitality(files_list,dealership_info):
 def count_parking_spaces(files_list,dealership_info):
     # Count the number of parking spaces for customers
     total_parking_spaces = 0
-    frame_counter = 0
+    frame_counter = -1
 
     for video in files_list:
 
         # Initialize parking detector and tracker
         parking_detector = ParkingDetector()
-        parking_tracker = Yolov5_Tracker(distance_threshold=110)
+        parking_tracker = Yolov5_Tracker()
 
         # Load and segment video
         cap = cv2.VideoCapture(video)
 
-        display_frequency = 90  # Set the frequency of frames to save
+        display_frequency = 120  # Set the frequency of frames to save
 
         while True:
             ret, frame = cap.read()
@@ -148,6 +148,9 @@ def count_parking_spaces(files_list,dealership_info):
 
             # Increment the frame counter
             frame_counter += 1
+
+            if frame_counter % 2 == 1: # Process only even frames
+                continue
 
             # Detect and track parking spaces
             parking_class_ids, parking_confidences, parking_boxes = parking_detector.detect_parking(frame)

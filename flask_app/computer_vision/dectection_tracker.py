@@ -43,13 +43,14 @@ class Yolov3_Tracker:
 
 class Yolov5_Tracker:
     # allow user to customize the distance threshold depending on the object size
-    def __init__(self, distance_threshold=170):
+    def __init__(self):
         self.next_id = 0
         self.objects = {}  # Stores object ID and its centroid
-        self.distance_threshold = distance_threshold  # Threshold for considering object as matched
+        self.box_life = 30 # Mitigates temporary detection failures (30, 31 are good)
 
     def update(self, boxes):
         # Update the tracked detections
+        updated_objects = {}
 
         for box in boxes:
             # Calculate the centroid of the new detection
@@ -57,10 +58,11 @@ class Yolov5_Tracker:
             centroid = (int(x + w / 2), int(y + h / 2))
 
             avg_side = (w+h)/2
+            distance_threshold = avg_side/2
 
             # If there are no objects currently tracked, add this as a new object
             if not self.objects: 
-                self.objects[self.next_id] = [centroid, 8]
+                updated_objects[self.next_id] = [centroid, self.box_life]
                 self.next_id += 1
                 continue
 
@@ -71,21 +73,23 @@ class Yolov5_Tracker:
             closest_obj_id, closest_distance = min(distances.items(), key=lambda x: x[1])
 
             # Check if the new detection matches any existing tracked object
-            if closest_distance < self.distance_threshold * (avg_side/25):
-                self.objects[closest_obj_id] = [centroid, 8]
-
+            if closest_distance < distance_threshold:
+                updated_objects[closest_obj_id] = [centroid, self.box_life]
+                del self.objects[closest_obj_id]
 
             # If the object does not match existing objects, consider it a new distinct object
             else:
-                self.objects[self.next_id] = [centroid, 8]
+                updated_objects[self.next_id] = [centroid, self.box_life]
                 self.next_id += 1
 
-        updated_objects = {}
-
+        # Transfer remaining detections which still have some life left
         for key in self.objects:
-            self.objects[key][1] -= 1
-            if self.objects[key][1] > 0:
+            if self.objects[key][1] > 1:
                 updated_objects[key] = self.objects[key]
+
+        # Delete the boxes which have expired
+        for key in updated_objects:
+            updated_objects[key][1] -= 1
         
         self.objects = updated_objects
         

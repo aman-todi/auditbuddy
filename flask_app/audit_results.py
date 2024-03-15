@@ -134,7 +134,10 @@ def build_audit_results(cv_results, dealership_info, past_sales=150, uio=300):
         # Grade the evaluation results using past sales and UIO information
 
         eval_factor = (past_sales + uio)//2
-
+        minParkingFactor = num_parking/min_parking + 1
+        minCarFactor = num_cars/min_cars+1
+        minSeatingFactor = num_seating/min_seating +1
+        minSqFactor = sq_footage/min_sqft +1
         grades = {}
 
         # Logo detection results
@@ -149,13 +152,13 @@ def build_audit_results(cv_results, dealership_info, past_sales=150, uio=300):
         if num_cars < cars_min:
             cars_result = ('Poor', 1, num_cars)
 
-        elif num_cars < eval_factor*cars_ratio:
+        elif num_cars < eval_factor*cars_ratio*minCarFactor:
             cars_result = ('Unsatisfactory', 2, num_cars)
 
-        elif num_cars == eval_factor*cars_ratio or num_cars < eval_factor*cars_ratio + 5:
+        elif num_cars == eval_factor*cars_ratio*minCarFactor or num_cars < eval_factor*cars_ratio + 5*minCarFactor:
             cars_result = ('Good', 3, num_cars)
 
-        elif num_cars >= eval_factor*cars_ratio + 5:
+        elif num_cars >= eval_factor*cars_ratio*minCarFactor + 5:
             cars_result = ('Great', 4, num_cars)
 
         grades['Cars'] = cars_result
@@ -164,13 +167,13 @@ def build_audit_results(cv_results, dealership_info, past_sales=150, uio=300):
         if num_parking < parking_min:
             parking_result = ('Poor', 1, num_parking)
 
-        elif num_parking < eval_factor*parking_ratio:
+        elif num_parking < eval_factor*parking_ratio*minParkingFactor:
             parking_result = ('Unsatisfactory', 2, num_parking)
 
-        elif num_parking == eval_factor*parking_ratio or num_parking < eval_factor*parking_ratio + 10:
+        elif num_parking == eval_factor*parking_ratio*minParkingFactor or num_parking < eval_factor*parking_ratio*minParkingFactor + 10:
             parking_result = ('Good', 3, num_parking)
 
-        elif num_parking >= eval_factor*parking_ratio + 10:
+        elif num_parking >= eval_factor*parking_ratio*minParkingFactor + 10:
             parking_result = ('Great', 4, num_parking)
 
         grades['Parking'] = parking_result
@@ -179,13 +182,13 @@ def build_audit_results(cv_results, dealership_info, past_sales=150, uio=300):
         if num_seating < seating_min:
             seating_result = ('Poor', 1, num_seating)
 
-        elif num_seating < eval_factor*seating_ratio:
+        elif num_seating < eval_factor*seating_ratio*minSeatingFactor:
             seating_result = ('Unsatisfactory', 2, num_seating)
 
-        elif num_seating == eval_factor*seating_ratio or num_seating < eval_factor*seating_ratio + 6:
+        elif num_seating == eval_factor*seating_ratio*minSeatingFactor or num_seating < eval_factor*seating_ratio*minSeatingFactor + 6:
             seating_result = ('Good', 3, num_seating)
 
-        elif num_seating >= eval_factor*seating_ratio + 6:
+        elif num_seating >= eval_factor*seating_ratio*minSeatingFactor + 6:
             seating_result = ('Great', 4, num_seating)
 
         grades['Hospitality'] = seating_result
@@ -194,13 +197,13 @@ def build_audit_results(cv_results, dealership_info, past_sales=150, uio=300):
         if sq_footage < sq_footage_min:
             sq_footage_result = ('Poor', 1, sq_footage)
 
-        elif sq_footage < eval_factor*sq_footage_ratio:
+        elif sq_footage < eval_factor*sq_footage_ratio* minSqFactor:
             sq_footage_result = ('Unsatisfactory', 2, sq_footage)
 
-        elif sq_footage == eval_factor*sq_footage_ratio or sq_footage < eval_factor*sq_footage_ratio + 6:
+        elif sq_footage == eval_factor*sq_footage_ratio* minSqFactor or sq_footage < eval_factor*sq_footage_ratio* minSqFactor + 6:
             sq_footage_result = ('Good', 3, sq_footage)
 
-        elif sq_footage >= eval_factor*sq_footage + 6:
+        elif sq_footage >= eval_factor*sq_footage* minSqFactor + 6:
             sq_footage_result = ('Great', 4, sq_footage)
 
         grades['Square Ft'] = sq_footage_result

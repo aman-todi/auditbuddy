@@ -599,3 +599,15 @@ def submit_min_requirements():
     })
     return jsonify({'message': 'Success'})
 
+@app.route('/get_brand_compliance_limits', methods=['GET'])
+def get_brand_compliance_limits():
+    try:
+        brand_limits = []
+        docs = db.collection('Brand compliance limits').get()
+        for doc in docs:
+            data = doc.to_dict()
+            brand_limits.append(data)
+        return jsonify(brand_limits)
+    except Exception as e:
+        return jsonify({'error': str(e)})
+

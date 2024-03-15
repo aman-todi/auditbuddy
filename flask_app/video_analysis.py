@@ -87,7 +87,7 @@ def assess_hospitality(files_list,dealership_info):
 
         # Initialize hospitality finder and seating tracker
         hospitality_finder = HospitalityFinder()
-        seating_tracker = Yolov5_Tracker(distance_threshold=40)
+        seating_tracker = Yolov5_Tracker()
 
         # Load and segment video
         cap = cv2.VideoCapture(video)
@@ -101,6 +101,9 @@ def assess_hospitality(files_list,dealership_info):
 
             # Increment the frame counter
             frame_counter += 1
+            
+            if frame_counter % 2 == 1: # Process only even frames
+                continue
 
             # Find and track hospitality indicators
             _, _, seating_boxes = hospitality_finder.detect_indicators(frame)

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import * as MaterialUI from '../components/MaterialUI';
-import { Container, Grid, Paper, Typography, Button, Dialog, DialogActions, DialogContent, DialogTitle, Card, CardContent, FormControl, Box, useTheme, useMediaQuery } from '@mui/material';
+import { Container, Typography, Button, Paper, useTheme, useMediaQuery } from '@mui/material';
 import ResponsiveAppBar from '../components/ResponsiveAppBar';
 import AdvancedResultsTabContent from '../components/AdvancedResultsTabContent';
 
@@ -12,77 +12,58 @@ const AdvancedResultsPage = () => {
   const decodedDepartment = decodeURIComponent(department);
   const decodedSubmission = decodeURIComponent(submission);
 
-  const [graphResults, setGraphResults] = useState([]);
   const [selectedTab, setSelectedTab] = useState(0);
-
-  useEffect(() => {
-    fetchGraphResults();
-  }, []);
-
-  const fetchGraphResults = () => {
-    fetch(`/get-graph-results/${encodeURIComponent(decodedBrandName)}/${encodeURIComponent(decodedDealershipName)}/${encodeURIComponent(decodedDepartment)}/${encodeURIComponent(decodedSubmission)}`)
-      .then(response => response.json())
-      .then(data => {
-        setGraphResults(data.images);
-      })
-      .catch(error => console.error('Error fetching graph results:', error));
-  };
 
   const handleTabChange = (newValue) => {
     setSelectedTab(newValue);
   };
 
+  const { search } = useLocation();
+  const navigate = useNavigate();
 
-  const brandStandards = ['Logo Results', 'Car Detection', 'Parking Space', 'Hospitality', 'Spatial'];
+  // Parse the query parameter to extract the previous URL
+  const queryParams = new URLSearchParams(search);
+  const prevUrl = queryParams.get('prev');
 
-  // for mobile responsiveness
+  const handleGoBack = () => {
+    // Navigate back to the previous URL
+    navigate(prevUrl);
+  };
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  // marginLeft: isMobile ? 0 : 125 
 
   return (
     <Container maxWidth="lg" style={{ marginRight: '3rem', paddingTop: '5rem' }}>
       <MaterialUI.SideBar />
-      <Typography variant="h4" gutterBottom align="center" style={{ marginBottom: '2rem', marginTop: '3rem' }}>
-        AuditBuddy Results for {decodedSubmission} at {decodedDealershipName}
+      <Typography variant="h4" gutterBottom align="center" style={{ marginBottom: '2rem', marginTop: '3rem', position: 'relative' }}>
+        {/* Position the "Back" button next to the title */}
+        <Button
+          variant="contained"
+          onClick={handleGoBack}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            backgroundColor: '#74b42c'
+          }}
+        >
+          Back
+        </Button>
+        AuditBuddy Results for {decodedDealershipName}
       </Typography>
       <Paper elevation={3} style={{ marginBottom: '2rem', marginTop: '3rem', padding: '1rem', marginRight: '4rem' }}>
         <ResponsiveAppBar handleTabChange={handleTabChange} />
-        {selectedTab === 0 ? (
-          <Grid container spacing={3} style={{ marginTop: "1rem" }}>
-            {/* Display graphs horizontally */}
-            <Grid item xs={12}>
-              <Typography variant="h6" gutterBottom align="center">Graphs</Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Grid container spacing={3}>
-                {/* Render each graph with description */}
-                {graphResults.map((item, index) => (
-                  <Grid item xs={2} key={index}>
-                    <Paper>
-                      <img src={item} alt={`Graph ${index}`} style={{ width: '100%' }} />
-                      <Typography variant="body2" align="center">Description for Graph {item}</Typography>
-                    </Paper>
-                  </Grid>
-                ))}
-              </Grid>
-            </Grid>
-          </Grid>
-        ) : (
-          <AdvancedResultsTabContent
-            selectedTab={selectedTab}
-            decodedBrandName={decodedBrandName}
-            decodedDealershipName={decodedDealershipName}
-            decodedDepartment={decodedDepartment}
-            decodedSubmission={decodedSubmission}
-          />
-        )}
+        <AdvancedResultsTabContent
+          selectedTab={selectedTab}
+          decodedBrandName={decodedBrandName}
+          decodedDealershipName={decodedDealershipName}
+          decodedDepartment={decodedDepartment}
+          decodedSubmission={decodedSubmission}
+        />
       </Paper >
     </Container>
-
   );
 };
 
 export default AdvancedResultsPage;
-
-

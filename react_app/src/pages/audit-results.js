@@ -46,7 +46,7 @@ function ResultsPage() {
   }, []);
 
   // order to display the keys of database results
-  const brand_names = ['Audi', 'BMW', 'Chevrolet', 'Ford', 'Honda','Lincoln', 'Mercedes', 'Volkswagen']
+  const brand_names = ['Audi', 'BMW', 'Chevrolet', 'Ford', 'Honda', 'Lincoln', 'Mercedes', 'Volkswagen']
 
   // items in the database
   const [items, setItems] = useState([]);
@@ -90,7 +90,7 @@ function ResultsPage() {
 
       const results = response.data;
       // Set the popup content to display the search results
-      openPopup({ type: 'Submitted', other: 'Search', data: results });
+      openPopup({ type: 'Upload Name', other: 'Search', data: results });
       console.log("Popup set!");
     } catch (error) {
       console.error("Error fetching search results:", error);
@@ -101,8 +101,8 @@ function ResultsPage() {
   // clicking of brand cards
   const handleBrandClick = (brandName) => {
 
-     // set clicked brand name
-     setClickedBrandName(brandName);
+    // set clicked brand name
+    setClickedBrandName(brandName);
 
     // Filter items based on the selected brand
     const dealerships = items.filter(item => item['Brand'] === brandName);
@@ -146,12 +146,18 @@ function ResultsPage() {
   // handle click on department
   const handleDepartmentClick = (param) => {
     const submissions = items.filter(item => item['Department'] === param['Department'] && item['Dealership Name'] === param['Dealership Name'] && item['Brand'] === param['Brand'] && param['UID'] === item["UID"]);
-    openPopup({ type: 'Submitted', data: submissions, name: param["Department"] });
+    openPopup({ type: 'Upload Name', data: submissions, name: param["Department"] });
   }
 
   const handleSubmissionClick = (param) => {
-    navigate(`/audit/results/${encodeURIComponent(param['Brand'])}/${encodeURIComponent(param['Dealership Name'])}/${encodeURIComponent(param['Department'])}/${encodeURIComponent(param["Submitted"])}`);
+    // Get the current URL
+    const currentUrl = window.location.href;
+    // Get the previous path without query parameters
+    const previousPath = window.location.pathname;
+    // Navigate to the AdvancedResultsPage with the previous path as a query parameter
+    navigate(`/audit/results/${encodeURIComponent(param['Brand'])}/${encodeURIComponent(param['Dealership Name'])}/${encodeURIComponent(param['Department'])}/${encodeURIComponent(param["Submitted"])}?prev=${encodeURIComponent(previousPath)}`);
   };
+
 
   return (
     <React.Fragment>
@@ -167,95 +173,93 @@ function ResultsPage() {
                   <SearchBar onSearch={handleSearch} />
                   <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', marginTop: '10vh' }}>
 
-                  {/* Display brand name cards */}
-                  {loading ? (
-                    <CircularProgress color="success" />
-                  ) : (
-                    <>
-                    <div>
-                      <Typography>
-                        {clickedBrandName ? "" : "Select a brand to view"}
-                      </Typography>
-                      <div style={{ display: 'flex', flexDirection: 'row' }}>
-                        {brand_names.map((brandName, index) => (
-                      <div 
-                        key={index} 
-                        onClick={() => handleBrandClick(brandName)} 
-                        style={{ 
-                          border: brandName === clickedBrandName ? '0.1em solid green' : '0.1em solid black',
-                          padding: '0.5em',
-                          margin: '0.1em',
-                          cursor: 'pointer',
-                          textAlign: 'center'
-                        }}
-                      >
-                        {brandName}
+                    {/* Display brand name cards */}
+                    {loading ? (
+                      <CircularProgress color="success" />
+                    ) : (
+                      <>
+                        <div>
+                          <Typography>
+                            {clickedBrandName ? "" : "Select a brand to view"}
+                          </Typography>
+                          <div style={{ display: 'flex', flexDirection: 'row' }}>
+                            {brand_names.map((brandName, index) => (
+                              <div
+                                key={index}
+                                onClick={() => handleBrandClick(brandName)}
+                                style={{
+                                  border: brandName === clickedBrandName ? '0.1em solid green' : '0.1em solid black',
+                                  padding: '0.5em',
+                                  margin: '0.1em',
+                                  cursor: 'pointer',
+                                  textAlign: 'center'
+                                }}
+                              >
+                                {brandName}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
-                ))}
-                </div>
-              </div>
-              </>
-              )}
-            </div>
-            {/* handle pop up content accordingly */}
-            <div style={{ marginLeft: 15, display: 'flex', flexDirection: 'column' }}>
-              {/* handle the dealership list for each brand */}
-              {popupContent && popupContent.type === 'Dealership Name' ? (
-            <div>
-            <div>
-            <Typography variant="h6">{popupContent.name}</Typography>
-            </div>
-            <div>
-            <Typography variant="h6" align="center">File Listing</Typography>
-            <Box sx={{ maxHeight: 400, overflowY: 'auto' }}>
-              {popupContent.data.map((item, index) => (
-                <Button
-                  key={index}
-                  variant="outlined"
-                  style={{ color: '#000000', borderColor: '#bae38c', marginBottom: '0.5rem' }}
-                  fullWidth
-                  onClick={() => handleDealershipClick(item)}
-                >
-                  {`${item['UID']} - ${item['Dealership Name']}`}
-                </Button>
-              ))}
-            </Box>
-          </div>
-        </div>
-      ) : (
-        // handle the other pop ups like department and submission
-        popupContent && (
-          <Dialog fullWidth open={isPopupOpen} onClose={closePopup} sx={{ marginLeft: 15, display: 'flex', flexDirection: 'column' }}>
-            <DialogTitle>{popupContent.name}</DialogTitle>
-            <DialogContent>
-              <Typography variant="h6" align="center">File Listing</Typography>
-              <Box sx={{ maxHeight: 400, overflowY: 'auto' }}>
-                {popupContent.data.map((item, index) => (
-                  <Button
-                    key={index}
-                    variant="outlined"
-                    style={{ color: '#000000', borderColor: '#bae38c', marginBottom: '0.5rem' }}
-                    fullWidth
-                    onClick={() => {
-                      if (popupContent.type === 'Department') {
-                        handleDepartmentClick(item);
-                      } else {
-                        handleSubmissionClick(item);
-                      }
-                    }}
-                  >
-                    {item[popupContent.type]}
-                  </Button>
-                ))}
-              </Box>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={closePopup}>Close</Button>
-            </DialogActions>
-          </Dialog>
-        )
-      )}
-    </div>
+                  {/* handle pop up content accordingly */}
+                  <div style={{ marginLeft: 15, display: 'flex', flexDirection: 'column' }}>
+                    {/* handle the dealership list for each brand */}
+                    {popupContent && popupContent.type === 'Dealership Name' ? (
+                      <div>
+                        <div>
+                          <Typography variant="h6">{popupContent.name}</Typography>
+                        </div>
+                        <div>
+                          <Box sx={{ maxHeight: 400, overflowY: 'auto' }}>
+                            {popupContent.data.map((item, index) => (
+                              <Button
+                                key={index}
+                                variant="outlined"
+                                style={{ color: '#000000', borderColor: '#bae38c', marginBottom: '0.5rem' }}
+                                fullWidth
+                                onClick={() => handleDealershipClick(item)}
+                              >
+                                {`${item['UID']} - ${item['Dealership Name']}`}
+                              </Button>
+                            ))}
+                          </Box>
+                        </div>
+                      </div>
+                    ) : (
+                      // handle the other pop ups like department and submission
+                      popupContent && (
+                        <Dialog fullWidth open={isPopupOpen} onClose={closePopup} sx={{ marginLeft: 15, display: 'flex', flexDirection: 'column' }}>
+                          <DialogTitle>{popupContent.name}</DialogTitle>
+                          <DialogContent>
+                            <Box sx={{ maxHeight: 400, overflowY: 'auto' }}>
+                              {popupContent.data.map((item, index) => (
+                                <Button
+                                  key={index}
+                                  variant="outlined"
+                                  style={{ color: '#000000', borderColor: '#bae38c', marginBottom: '0.5rem' }}
+                                  fullWidth
+                                  onClick={() => {
+                                    if (popupContent.type === 'Department') {
+                                      handleDepartmentClick(item);
+                                    } else {
+                                      handleSubmissionClick(item);
+                                    }
+                                  }}
+                                >
+                                  {item[popupContent.type]}
+                                </Button>
+                              ))}
+                            </Box>
+                          </DialogContent>
+                          <DialogActions>
+                            <Button onClick={closePopup}>Close</Button>
+                          </DialogActions>
+                        </Dialog>
+                      )
+                    )}
+                  </div>
                 </div>
               </Container>
             </div>

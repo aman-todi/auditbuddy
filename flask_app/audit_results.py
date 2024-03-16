@@ -5,7 +5,8 @@ import numpy as np
 import os
 from flask import current_app as app
 import firebase_admin
-from firebase_admin import storage
+from firebase_admin import credentials, storage, firestore
+
 import io
 import cv2
 
@@ -23,57 +24,34 @@ sq_footage_min = 500
 
 bucket = storage.bucket()
 
-def upload_to_firebase(file_bytes, file_name):
-    # Upload bytes to Firebase Storage
-    blob = bucket.blob(file_name)
-    blob.upload_from_string(file_bytes.getvalue(), content_type='image/png')
-    print(f'Saved annotated image to Firebase Storage: {blob.public_url}')
+db = firestore.client()
 
-def visualize_category_eval(dealership_info, categories, scores):
-    # Create a bar plot to visualize performance by category
-    fig, ax = plt.subplots(figsize=(10, 6))
-    y_pos = np.arange(len(categories))
-    ax.bar(y_pos, scores, align='center', alpha=0.5, color='b')
-    ax.set_xticks(y_pos)
-    ax.set_xticklabels(categories)
-    ax.set_xlabel('Categories')
-    ax.set_ylabel('Scores')
-    ax.set_yticks(np.arange(0, 5))
-    ax.set_yticklabels(['0', 'Poor', 'Unsatisfactory', 'Good', 'Great'])
-    ax.set_title('Evaluation Grades by Category')
+# push results from the database
+def add_to_database(database_info,categories, scores,total_scores,detection):
 
-    # Generate a temporary file to save the plot
-    file_path = f"{dealership_info[0]}/{dealership_info[1]}/{dealership_info[2]}/{dealership_info[4]}/GraphResults/visualization_bar.png"
-    image_bytes = io.BytesIO()
-    plt.savefig(image_bytes, format='png')
-    image_bytes.seek(0)
+    # append the new data in the correct format for firebase
+    data = {
+        # add the submission date here
+        "Submitted": database_info[4],
+        "Dealership Name": database_info[1],
+        "Brand": database_info[0],
+        "Department": database_info[2],
+        "Country": database_info[3],
+        "UID": database_info[5],
+        "Category Eval": {
+             "Categories": categories,
+             "Scores": scores
+         },
+         "Overall Eval" : {
+             "Scores": total_scores
+         },
+         "Detection" : detection,
+         "Upload Name" : database_info[-1]
+    }
 
-    # Upload the bytes to Firebase Storage
-    upload_to_firebase(image_bytes, file_path)
-
-    plt.close(fig)
-
-def visualize_overall_score(dealership_info, total_score, max_score=16):
-    # Create a pie chart to visualize overall performance
-    fig, ax = plt.subplots(figsize=(6, 6))
-    labels = [f'Score {total_score}', f'Remaining {max_score - total_score}']
-    sizes = [total_score, max_score - total_score]
-    colors = ['#467be3', '#e9edf7']
-    ax.pie(sizes, labels=labels, colors=colors, startangle=90, autopct='%1.1f%%')
-    ax.set_title('Overall Score')
-
-    file_path = f"{dealership_info[0]}/{dealership_info[1]}/{dealership_info[2]}/{dealership_info[4]}/GraphResults/visualization_pie.png"
-    image_bytes = io.BytesIO()
-    plt.savefig(image_bytes, format='png')
-    image_bytes.seek(0)
-
-    # Upload the bytes to Firebase Storage
-    upload_to_firebase(image_bytes, file_path)
-
-    plt.close(fig)
-
-
-
+    # go to the collection, create a new document (dealership name), create a new collection with (department)
+    db.collection("results").document(database_info[1]).collection(database_info[2]).document(database_info[4]).set(data)
+    
 
 def build_audit_results(cv_results, dealership_info, past_sales=150, uio=300):
     # Extract results from various evaluations to build results
@@ -153,7 +131,7 @@ def build_audit_results(cv_results, dealership_info, past_sales=150, uio=300):
         elif sq_footage >= eval_factor*sq_footage + 6:
             sq_footage_result = ('Great', 4, sq_footage)
 
-        grades['Square Ft'] = sq_footage_result
+        grades['Spatial'] = sq_footage_result
 
         return grades   
     
@@ -179,15 +157,13 @@ def build_audit_results(cv_results, dealership_info, past_sales=150, uio=300):
     print("Overall grade: ", final_grade)
 
     # Extract categories and their scores
-    categories = ['Logo', 'Cars', 'Parking', 'Hospitality', 'Square Ft']
+    categories = ['Logo', 'Cars', 'Parking', 'Hospitality', 'Spatial']
     scores = [grades[category][1] for category in categories]
+    detection = [grades[category][2] for category in categories]
 
     grades = calculate_evaluation_grades()
     print("Grades by category: ", grades)
 
-    # Extract categories and their scores
-    categories = ['Logo', 'Cars', 'Parking', 'Hospitality', 'Square Ft']
-    scores = [grades[category][1] for category in categories]
 
-    visualize_category_eval(dealership_info, categories, scores)
-    visualize_overall_score(dealership_info, total_score)
+
+    add_to_database(dealership_info,categories,scores,total_score,detection)

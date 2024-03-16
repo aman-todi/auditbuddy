@@ -14,11 +14,12 @@ export const SearchBar = ({ onSearch }) => {
   console.log("Contents of onSearch", onSearch);
 
   const [searchCriteria, setSearchCriteria] = useState({
+    uploadName: '',
     dealership: '',
     brand: '',
     department: '',
     country: '',
-    date: dayjs().toISOString()
+    date: ''
   });
 
 
@@ -57,10 +58,10 @@ export const SearchBar = ({ onSearch }) => {
 
   // states to keep track of form
   const [department, setDepartment] = useState('');
-  const [ID, setID] = useState('');
+  const [uploadName, setUploadName] = useState('');
   const [country, setCountry] = useState('');
   const [brandName, setBrand] = useState('');
-  const [date, setDate] = useState(dayjs());
+  const [date, setDate] = useState(null);
   const [dealershipName, setDealershipName] = useState('');
 
   return (
@@ -74,13 +75,13 @@ export const SearchBar = ({ onSearch }) => {
         </Typography>
       </Box>
       <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, alignItems: "center" }}>
-        <TextField label="ID" variant="outlined"
-          sx={{ margin: "0.1rem", width: "25vw" }}
+        <TextField label="Upload Name" variant="outlined" onChange={(event) => handleFormInput(event, setUploadName, 'uploadName')}
+          sx={{ margin: "0.1rem", width: "75vw" }}
         />
         <TextField label="Dealership Name" variant="outlined" onChange={(event) => handleFormInput(event, setDealershipName, 'dealership')}
           sx={{ margin: "0.1rem", width: "75vw" }}
         />
-        <FormControl sx={{ margin: "0.1rem", width: "35vw" }}>
+        <FormControl sx={{ margin: "0.1rem", width: "40vw" }}>
           <InputLabel>Brand</InputLabel>
           <Select
             value={brandName}
@@ -96,12 +97,14 @@ export const SearchBar = ({ onSearch }) => {
             <MenuItem value={"honda"}>Honda</MenuItem>
             <MenuItem value={"kia"}>Kia</MenuItem>
             <MenuItem value={"nissan"}>Nissan</MenuItem>
+            <MenuItem value={"porsche"}>Porsche</MenuItem>
             <MenuItem value={"subaru"}>Subaru</MenuItem>
             <MenuItem value={"toyota"}>Toyota</MenuItem>
             <MenuItem value={"volkswagen"}>Volkswagen</MenuItem>
+
           </Select>
         </FormControl>
-        <FormControl sx={{ margin: "0.1rem", width: "40vw" }}>
+        <FormControl sx={{ margin: "0.1rem", width: "45vw" }}>
           <InputLabel>Department</InputLabel>
           <Select
             value={department}
@@ -115,7 +118,7 @@ export const SearchBar = ({ onSearch }) => {
             <MenuItem value={"bodyandpaint"}>Body & Paint</MenuItem>
           </Select>
         </FormControl>
-        <FormControl sx={{ margin: "0.1rem", width: "30vw" }}>
+        <FormControl sx={{ margin: "0.1rem", width: "35vw" }}>
           <InputLabel>Country</InputLabel>
           <Select
             value={country}

@@ -3,11 +3,11 @@ import '../App.css';
 // material ui
 import * as MaterialUI from './MaterialUI';
 import HelpIcon from '@mui/icons-material/Help';
-import { InputLabel, FormControl, MenuItem, Select, TextField, Container, Box, Tooltip, Typography, Alert} from '@mui/material/';
+import { InputLabel, FormControl, MenuItem, Select, TextField, Container, Box, Tooltip, Typography, Alert } from '@mui/material/';
 // axios
 import axios from 'axios';
 
-const AddDealershipImport = ({refresh}) => {
+const AddDealershipImport = ({ refresh }) => {
 
   // error message
   const [error, setError] = useState('')
@@ -41,8 +41,7 @@ const AddDealershipImport = ({refresh}) => {
     else if (state === '') {
       setError('Please input a state/province')
     }
-    else if (country === '')
-    {
+    else if (country === '') {
       setError('Please input a country')
     }
     else if (uio === '') {
@@ -102,7 +101,7 @@ const AddDealershipImport = ({refresh}) => {
   };
 
   return (
-    <Container component= "main" maxWidth="s">
+    <Container component="main" maxWidth="s">
       {/* add dealership header */}
       <Typography variant="p" sx={{ display: "flex", alignItems: "center", marginBottom: "1rem" }}>
         <span style={{ fontWeight: "bold", marginRight: "0.5rem" }}>Add Dealership</span>
@@ -113,10 +112,10 @@ const AddDealershipImport = ({refresh}) => {
       <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, alignItems: "center", justifyContent: 'center' }}>
         {/* dealership name */}
         <TextField required fullWidth label="Dealership Name" variant="outlined" onChange={(event) => handleFormInput(event, setName)}
-          sx={{ margin: "0.1rem"}}
+          sx={{ margin: "0.1rem" }}
         />
         {/* select brand */}
-         <FormControl required fullWidth sx={{ margin: "0.1rem"}}>
+        <FormControl required fullWidth sx={{ margin: "0.1rem" }}>
           <InputLabel>Brand</InputLabel>
           <Select
             value={brand}
@@ -131,30 +130,31 @@ const AddDealershipImport = ({refresh}) => {
             <MenuItem value={"Honda"}>Honda</MenuItem>
             <MenuItem value={"Kia"}>Kia</MenuItem>
             <MenuItem value={"Nissan"}>Nissan</MenuItem>
+            <MenuItem value={"Porsche"}>Porsche</MenuItem>
             <MenuItem value={"Subaru"}>Subaru</MenuItem>
             <MenuItem value={"Toyota"}>Toyota</MenuItem>
             <MenuItem value={"Volkswagen"}>Volkswagen</MenuItem>
           </Select>
         </FormControl>
-         {/* set uio */}
-         <TextField required fullWidth label="UIO" variant="outlined" onChange={(event) => handleFormInput(event, setUIO)}
-          sx={{ margin: "0.1rem"}}
+        {/* set uio */}
+        <TextField required fullWidth label="UIO" variant="outlined" onChange={(event) => handleFormInput(event, setUIO)}
+          sx={{ margin: "0.1rem" }}
         />
         {/* set sales */}
         <TextField required fullWidth label="# of Sales" variant="outlined" onChange={(event) => handleFormInput(event, setSales)}
-          sx={{ margin: "0.1rem"}}
+          sx={{ margin: "0.1rem" }}
         />
-        </Box>
-        <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, alignItems: "center", justifyContent: 'center' }}>
+      </Box>
+      <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, alignItems: "center", justifyContent: 'center' }}>
         {/* select city */}
         <TextField required fullWidth label="City" variant="outlined" onChange={(event) => handleFormInput(event, setCity)}
-          sx={{ margin: "0.1rem"}}/>
+          sx={{ margin: "0.1rem" }} />
         {/* select state/province */}
         <TextField required fullWidth label="State/Province" variant="outlined" inputProps={{ maxLength: 2 }} onChange={(event) => handleFormInput(event, setState)}
-          sx={{ margin: "0.1rem"}}
+          sx={{ margin: "0.1rem" }}
         />
         {/* set country */}
-         <FormControl required fullWidth sx={{ margin: "0.1rem" }}>
+        <FormControl required fullWidth sx={{ margin: "0.1rem" }}>
           <InputLabel>Country</InputLabel>
           <Select
             value={country}
@@ -165,14 +165,14 @@ const AddDealershipImport = ({refresh}) => {
             <MenuItem value={"Canada"}>Canada</MenuItem>
           </Select>
         </FormControl>
-        </Box>
+      </Box>
       {/* add dealership button and error */}
       <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "0.1rem" }}>
-      {error ? (
-        <Alert severity={error === 'Dealership added successfully' ? 'success' : 'error'}>
-          {error}
-        </Alert>
-      ) : null}
+        {error ? (
+          <Alert severity={error === 'Dealership added successfully' ? 'success' : 'error'}>
+            {error}
+          </Alert>
+        ) : null}
         <MaterialUI.CustomButton type="submit" onClick={handleUpload}>Add Dealership</MaterialUI.CustomButton>
       </Box>
     </Container>

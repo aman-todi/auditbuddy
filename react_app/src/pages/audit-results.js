@@ -81,9 +81,6 @@ function ResultsPage() {
     fetchResults();
   }, []);
 
-  // order to display the keys of database results
-  const brand_names = ['Audi', 'BMW', 'Chevrolet', 'Ford', 'Honda', 'Lincoln', 'Mercedes', 'Volkswagen']
-
   // items in the database
   const [items, setItems] = useState([]);
   // loading indicator of the results

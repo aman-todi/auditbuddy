@@ -5,6 +5,7 @@ import {auth} from '../components/Authentication';
 import AddDealershipImport from '../components/AddDealership';
 import {DealershipListImport} from '../components/DealershipList';
 import { useTheme, useMediaQuery } from '@mui/material';
+import MinRequirements from '../components/AddMinRequirements';
 
 function DealershipsPage () {
 

@@ -1,16 +1,33 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import '../App.css';
 // filepond
-import { FilePond } from 'react-filepond';
+import { FilePond, registerPlugin } from 'react-filepond';
 import 'filepond/dist/filepond.min.css';
 // material ui
 import * as MaterialUI from './MaterialUI';
 import HelpIcon from '@mui/icons-material/Help';
 import { InputLabel, FormControl, TextField, MenuItem, Select, Container, Box, Tab, Tabs, Tooltip, Typography, Alert } from '@mui/material/';
+import CircularProgress from '@mui/material/CircularProgress';
+import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
+import VideocamIcon from '@mui/icons-material/Videocam';
+import { useNavigate } from 'react-router-dom';
+
+// for notifications
+import { toast } from 'react-toastify';
+
+
 // axios
 import axios from 'axios';
 
+// for the file validation
+import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
+
+registerPlugin(FilePondPluginFileValidateType);
+
 const FormImport = () => {
+
+  // navigation
+  const navigate = useNavigate();
 
   // states to keep track of each file drop box
   const [logo, setLogo] = useState(null);
@@ -18,6 +35,7 @@ const FormImport = () => {
   const [cars, setCars] = useState(null);
   const [hospitality, setHospitality] = useState(null);
   const [spatial, setSpatial] = useState(null);
+  const [emotion, setEmotion] = useState(null);
   const [error, setError] = useState("")
 
   // state to keep track department
@@ -81,8 +99,23 @@ const FormImport = () => {
     else if (!logo && !cars && !parking && !spatial && !hospitality) {
       setError('Please select a file in at least one category')
     }
+    else if (!logo) {
+      setError('Please upload logo files')
+    }
+    else if (!cars) {
+      setError('Please upload cars files')
+    }
+    else if (!parking) {
+      setError('Please upload parking files')
+    }
+    else if (!spatial) {
+      setError('Please upload spatial files')
+    }
+    else if (!hospitality) {
+      setError('Please upload hospitality files')
+    }
     else {
-
+      setError('')
       // append files to form data
       function appendFilesToFormData(files, formData, key) {
         if (files && files.length > 0) {
@@ -99,9 +132,20 @@ const FormImport = () => {
       appendFilesToFormData(spatial, formData, 'spatial');
       appendFilesToFormData(cars, formData, 'cars');
 
+      appendFilesToFormData(emotion, formData, 'emotion');
+
       // Get the current timestamp
       const time = new Date().toISOString();
       formData.append('submission', time)
+
+      // notification that the files have been submitted
+      const currentlyAnalyzing = toast(
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          Analyzing {dealerships['UID']} {dealerships['Dealership Name']} {department}
+          <CircularProgress color="success" style={{ marginLeft: '10px' }} />
+        </div>,
+        { autoClose: false, closeButton: false }
+      );
 
       // Append the name of the submission
       formData.append('uploadName', name)
@@ -112,7 +156,19 @@ const FormImport = () => {
             'Content-Type': 'multipart/form-data'
           }
         });
-        setError('File(s) uploaded successfully:');
+
+        // remove the first toast when the second one populates
+        toast.dismiss(currentlyAnalyzing);
+        // notification that the files have been analyzed
+        toast.success(
+          <div>
+            Completed {dealerships['UID']} {dealerships['Dealership Name']} {department}
+            <div>
+              <MaterialUI.CustomButton onClick={() => navigate(`/audit/results/${encodeURIComponent(dealerships['Brand'])}/${encodeURIComponent(dealerships['Dealership Name'])}/${encodeURIComponent(department)}/${encodeURIComponent(time)}`)}>View</MaterialUI.CustomButton>
+            </div>
+          </div>
+          , { autoClose: false, closeButton: true });
+
       }
       catch (error) {
         if (error.response) {
@@ -122,10 +178,6 @@ const FormImport = () => {
         } else if (error.request) {
           // The request was made but no response was received
           setError('Error uploading file: No response from server');
-        } else {
-          // Something happened in setting up the request that triggered an Error
-          console.error('Error message:', error.message);
-          setError('Error uploading file');
         }
       }
     }
@@ -220,11 +272,12 @@ const FormImport = () => {
             }
           }}
         >
-          <Tab label={<span>LOGOS</span>} />
-          <Tab label={<span>DISPLAY CARS</span>} />
-          <Tab label={<span>PARKING SPACES</span>} />
-          <Tab label={<span>HOSPITALITY</span>} />
-          <Tab label={<span>SPATIAL</span>} />
+          <Tab label={<span style={{ display: 'flex', alignItems: 'center' }}>LOGOS<PhotoCameraIcon sx={{ fontSize: '1rem' }} /></span>} />
+          <Tab label={<span style={{ display: 'flex', alignItems: 'center' }}>DISPLAY CARS<PhotoCameraIcon sx={{ fontSize: '1rem' }} /><VideocamIcon sx={{ fontSize: '1rem' }} /></span>} />
+          <Tab label={<span style={{ display: 'flex', alignItems: 'center' }}>PARKING SPACES<PhotoCameraIcon sx={{ fontSize: '1rem' }} /><VideocamIcon sx={{ fontSize: '1rem' }} /></span>} />
+          <Tab label={<span style={{ display: 'flex', alignItems: 'center' }}>HOSPITALITY<PhotoCameraIcon sx={{ fontSize: '1rem' }} /><VideocamIcon sx={{ fontSize: '1rem' }} /></span>} />
+          <Tab label={<span style={{ display: 'flex', alignItems: 'center' }}>SPATIAL<PhotoCameraIcon sx={{ fontSize: '1rem' }} /></span>} />
+          <Tab label={<span style={{ display: 'flex', alignItems: 'center' }}>EMOTION<PhotoCameraIcon sx={{ fontSize: '1rem' }} /><VideocamIcon sx={{ fontSize: '1rem' }} /></span>} />
         </Tabs>
       </Box>
 
@@ -233,7 +286,9 @@ const FormImport = () => {
         <div style={{ display: tabIndex === 0 ? 'block' : 'none' }}>
           <Box sx={{ marginTop: '1rem' }}>
             <FilePond
+              id="logo"
               allowMultiple={true}
+              acceptedFileTypes={['image/*']}
               onupdatefiles={handleFileAdded(setLogo)}
               stylePanelLayout={'compact'}
             />
@@ -244,6 +299,7 @@ const FormImport = () => {
         <div style={{ display: tabIndex === 1 ? 'block' : 'none' }}>
           <Box sx={{ marginTop: '1rem' }}>
             <FilePond
+              id="cars"
               allowMultiple={true}
               onupdatefiles={handleFileAdded(setCars)}
               stylePanelLayout={'compact'}
@@ -255,6 +311,7 @@ const FormImport = () => {
         <div style={{ display: tabIndex === 2 ? 'block' : 'none' }}>
           <Box sx={{ marginTop: '1rem' }}>
             <FilePond
+              id="parking"
               allowMultiple={true}
               onupdatefiles={handleFileAdded(setParking)}
               stylePanelLayout={'compact'}
@@ -266,6 +323,7 @@ const FormImport = () => {
         <div style={{ display: tabIndex === 3 ? 'block' : 'none' }}>
           <Box sx={{ marginTop: '1rem' }}>
             <FilePond
+              id="hospitality"
               allowMultiple={true}
               onupdatefiles={handleFileAdded(setHospitality)}
               stylePanelLayout={'compact'}
@@ -277,9 +335,23 @@ const FormImport = () => {
         <div style={{ display: tabIndex === 4 ? 'block' : 'none' }}>
           <Box sx={{ marginTop: '1rem' }}>
             <FilePond
+              id="spatial"
               allowMultiple={true}
               maxFiles={3}
+              acceptedFileTypes={['image/*']}
               onupdatefiles={handleFileAdded(setSpatial)}
+              stylePanelLayout={'compact'}
+            />
+          </Box>
+        </div>
+
+        {/* emotion files input  */}
+        <div style={{ display: tabIndex === 5 ? 'block' : 'none' }}>
+          <Box sx={{ marginTop: '1rem' }}>
+            <FilePond
+              id="emotion"
+              allowMultiple={true}
+              onupdatefiles={handleFileAdded(setEmotion)}
               stylePanelLayout={'compact'}
             />
           </Box>
@@ -290,6 +362,11 @@ const FormImport = () => {
       <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "0.1rem" }}>
         {error ? (
           <Alert severity={error === 'File(s) uploaded successfully:' ? 'success' : 'error'}>
+            {error}
+          </Alert>
+        ) : null}
+        {error ? (
+          <Alert severity='error'>
             {error}
           </Alert>
         ) : null}

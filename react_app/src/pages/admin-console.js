@@ -7,7 +7,7 @@ import { auth } from '../components/Authentication';
 import axios from 'axios';
 import { useAdmin } from '../components/Admin';
 import {UserListImport, fetchData} from '../components/UserList';
-
+import MinRequirements from '../components/AddMinRequirements';
 function AdminPage () {
 
   // page authentication
@@ -127,6 +127,9 @@ function AdminPage () {
               {error && <p id="error">{error}</p>}
               </Box>
         </Container>
+        <div style={{ margin: '20px' }}></div>
+              <MinRequirements></MinRequirements>
+          <div style={{ margin: '20px' }}></div>
         <UserListImport refresh={refresh}></UserListImport>
           </div>
           </header>

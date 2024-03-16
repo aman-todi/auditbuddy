@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 // navbar/sidebar
 import { Dialog, DialogTitle, DialogContent, DialogActions, useMediaQuery, useTheme} from '@mui/material';
 import Button from '@mui/material/Button';
@@ -28,6 +28,7 @@ import { auth } from '../components/Authentication';
 import { getAuth,updatePassword,reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import { useAdmin } from './Admin';
+import emailjs from '@emailjs/browser'
 
 // custom button
 export const CustomButton = (props) => {
@@ -168,7 +169,7 @@ export const SideBar = (props) => {
         >
             <Toolbar sx={{ marginTop: 7.5, width: 145 }}>
                 <List>
-                    <Typography sx={{ fontSize: '0.9rem', marginLeft: -1 }} disablePadding><strong>Welcome,</strong> {user.email}</Typography>
+                    <Typography sx={{ fontSize: '0.9rem', marginLeft: -1 }} disablePadding><strong>Welcome,</strong> {user && user.email}</Typography>
                     <ListItem disablePadding>
                         <ListItemButton sx={{ ...colorSelected }} selected={path === '/audit'} component={Link} to="/audit">
                             <ListItemIcon sx={{minWidth: 40}}><AlignHorizontalLeftIcon></AlignHorizontalLeftIcon></ListItemIcon>
@@ -242,7 +243,30 @@ export const SideBar = (props) => {
 };
 
 export const ContactForm = () => {
+    const formRef = useRef();
 
+
+    const [success, setSuccess] = useState('');
+
+    const sendEmail = (e) => {
+        e.preventDefault();
+
+
+        emailjs
+        .sendForm('service_y59uwxw', 'template_3bqp34o', formRef.current, {
+            publicKey: 'lGFFLVyIiAj0uD6mY',
+        })
+        .then(
+            () => {
+            setSuccess("We have received your message")
+            console.log('SUCCESS!');
+            },
+            (error) => {
+            console.log('FAILED...', error.text);
+            },
+        );
+    };
+    
     return (
 
         <Grid container justifyContent="center">
@@ -255,27 +279,15 @@ export const ContactForm = () => {
                 <Typography variant="body2" color="textSecondary" component="p" gutterBottom>
                   Questions or concerns? Fill out the form to get in touch with us.
                 </Typography>
-                <form>
-                  <Grid container spacing={1}>
-                    <Grid item xs={12} sm={6}>
-                      <TextField placeholder="Enter first name" label="First Name" variant="outlined" fullWidth required />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <TextField placeholder="Enter last name" label="Last Name" variant="outlined" fullWidth required />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <TextField type="email" placeholder="Enter email" label="Email" variant="outlined" fullWidth required />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <TextField label="Message" multiline rows={4} placeholder="Type your message here" variant="outlined" fullWidth required />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Button type="submit" variant="contained" fullWidth sx={{ backgroundColor: '#74b42d', color: 'white', '&:hover': {
-          backgroundColor: '#74b42d', 
-        },}}>Submit</Button>
-                    </Grid>
-                  </Grid>
-                </form>
+                    <form ref={formRef} onSubmit={sendEmail}>
+                        <TextField name="user_name" label="Name" variant="outlined" fullWidth required sx={{ marginBottom: 2 }} />
+                        <TextField name="user_email" type="email" label="Email" variant="outlined" fullWidth required sx={{ marginBottom: 2 }} />
+                        <TextField name="message" label="Message" multiline rows={4} variant="outlined" fullWidth required sx={{ marginBottom: 2 }} />
+                        <CustomButton type="submit" variant="contained" fullWidth color="primary">
+                            Send
+                        </CustomButton>
+                    </form>
+                    <Box sx={{ marginTop: 1 }}><span style={{ color: 'green' }}>{success}</span></Box>
               </CardContent>
             </Card>
           </Grid>
@@ -325,15 +337,17 @@ export const Settings = ({darkMode, toggleDarkMode}) => {
             .then(() => {
                 if (newPassword.length < 6) {
                     setError('Password should be at least 6 characters long.');
+                    setSuccess(null)
                 } else {
                     updatePassword(user, newPassword)
                         .then(() => {
                             setSuccess("Password changed successfully");
                             setError(null);
+
                         })
                         .catch((error) => {
                             console.error("Error updating password, please log out and log in again to reset.", error);
- 
+                            setSuccess(null)
  
                         });
                 }
@@ -342,6 +356,7 @@ export const Settings = ({darkMode, toggleDarkMode}) => {
             .catch((error) => {
                 console.error("Old password is not correct:", error);
                 setError('Old password is not correct.');
+                setSuccess(null)
  
  
             });

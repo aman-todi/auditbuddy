@@ -69,7 +69,12 @@ const AddDealershipImport = ({ refresh }) => {
       // country
       formData.append('country', country);
       // date
-      const currentDate = new Date();
+      const options = {
+        timeZone: 'America/New_York',
+      };
+
+      const currentDate = new Date().toLocaleString('en-US', options) + " (EST)";
+
       formData.append('updated', currentDate);
 
       try {
@@ -133,6 +138,7 @@ const AddDealershipImport = ({ refresh }) => {
             <MenuItem value={"Porsche"}>Porsche</MenuItem>
             <MenuItem value={"Subaru"}>Subaru</MenuItem>
             <MenuItem value={"Toyota"}>Toyota</MenuItem>
+            <MenuItem value={"Porsche"}>Porsche</MenuItem>
             <MenuItem value={"Volkswagen"}>Volkswagen</MenuItem>
           </Select>
         </FormControl>

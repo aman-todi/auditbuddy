@@ -19,7 +19,8 @@ from firebase_admin import credentials, storage, firestore
 from datetime import datetime
 import time
 from dateutil import parser
-    
+import concurrent.futures
+
 ANNOTATED_IMAGES_FOLDER = os.path.join(app.root_path, 'static', 'main', 'annotated_images')
 
 bucket = storage.bucket()
@@ -36,11 +37,6 @@ def root():
 @app.route('/<path:path>')
 def index(path):
     return render_template('index.html')
-
-@app.route('/test')
-def test():
-	return jsonify(test = "test ajax call")
-
 
 @app.route('/get-graph-results/<brandName>/<dealershipName>/<department>/<submission>')
 def get_annotated_images_graph(brandName,dealershipName,department,submission):
@@ -188,6 +184,13 @@ def upload_video():
     database_info = [request.form['submission'],request.form['name'], request.form['dealership'], request.form['department'], request.form['country'], request.form['uid'], request.form['sales'], request.form['uio'],request.form['uploadName']]
 
     # Computer Vision Tasks
+
+    # emotion files in list
+    index = 0
+    while f'emotion[{index}]' in request.files:
+        file = request.files[f'emotion[{index}]']
+        print("file: ", file)
+        index += 1
     
     # spatial files in list
     spatial_files = []
@@ -416,10 +419,18 @@ def add_dealership():
     #three first letters of the brand
     abbreviation = brand[:3].upper()
 
-    #get the next number
-    collection_ref = db.collection("dealerships")
-    docs = list(collection_ref.stream())
-    next_id = int(docs[-1].id) + 1
+    # find the next number
+    def get_next_number(brand_abbr):
+        # get all the documents in dealership
+        brand_docs = collection_ref.stream()
+        # find all the documents that start with the abbreviated brand
+        brand_numbers = [int(doc.id[len(brand_abbr):]) for doc in brand_docs if doc.id.startswith(brand_abbr)]
+
+        return max(brand_numbers, default=0) + 1
+
+    # next number
+    next_id = get_next_number(abbreviation)
+    # new uid to push
     new_uid = abbreviation + str(next_id)
 
     # set up json for user data
@@ -436,29 +447,59 @@ def add_dealership():
             }
             
     # go to the collection, create a new document (user id), and append the user email
-    db.collection("dealerships").document(str(next_id)).set(data)
+    db.collection("dealerships").document(str(new_uid)).set(data)
 
 
     return jsonify("Dealership added successfully"), 200
+
+#
+# edit dealership uio/sales
+#
+@app.route('/dealership-update-values', methods=['POST'])
+def dealership_update_values():
+    # get form inputs
+    uid = request.form['uid']
+    new_sales = request.form['new_sales']
+    new_uio = request.form['new_uio']
+    updated = request.form['updated']
+
+    try:
+        # go to dealerships table
+        # search the table for the document with uid
+        reference = db.collection("dealerships").document(str(uid))
+    
+        # update the 'UIO' and 'Sales' to the new values
+        reference.update({
+            'UIO': new_uio,
+            'Sales': new_sales,
+            'Updated': updated
+        })
+
+        return jsonify("Dealership uio and sales updated successfully"), 200
+    
+    except Exception as e:
+        print("Error:", e)
+        return jsonify({"error": str(e)}), 500
 
 # pull results from the database
 @app.route('/generate-results', methods=['POST'])
 def generate_results():
     try:
-
         # Access the 'results' collection
         collection_ref = db.collection('results')
 
-        # Dictionary to hold results
+        # Fetch all dealership documents explicitly
+        dealership_docs = list(collection_ref.list_documents())
+
+        # List to hold results
         results = []
 
-        # Fetch dealership documents explicitly
-        dealership_docs = collection_ref.list_documents()
-        for dealership_doc_ref in dealership_docs:
-            # Get the dealership name from the document reference
-
-            # Fetch all subcollections within the current dealership
+        # fetch submissions for a dealership
+        def fetch_submission_data(dealership_doc_ref):
+            # access the subcollection submissions
             subcollections = dealership_doc_ref.collections()
+
+            # loop through each subcollection
             for subcollection_ref in subcollections:
                 # Fetch submission documents within each subcollection
                 submission_docs = subcollection_ref.stream()
@@ -466,6 +507,15 @@ def generate_results():
                     submission_data = submission_doc.to_dict()  # Get submission data
                     results.append(submission_data)
 
+            return results
+
+        # use concurrent.futures.ThreadPoolExecutor to fetch submission data concurrently
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            # call function fetch_submission_data for each dealership
+            {executor.submit(fetch_submission_data, dealership_doc_ref): dealership_doc_ref for dealership_doc_ref in dealership_docs}
+        
+        # sort results by uid
+        results = sorted(results, key=lambda x: x.get('UID', ''))
         # Return results
         return jsonify(results), 200
 
@@ -583,5 +633,34 @@ def get_category_eval():
     else:
         return jsonify({"error": "Submission not found"}), 404
 
+@app.route('/submit-min-requirements', methods=['POST'])
+def submit_min_requirements():
+    data = request.json   
+    brand = data['selectedBrand']
+    minCars = data['minCars']
+    minParking = data['minParking']
+    minSeating = data['minSeating']
+    minSqFt = data['minSqFt'] 
 
+    minRef = db.collection('Brand compliance limits').document(brand)
+
+    minRef.update({
+        'minCars': minCars,
+        'minParking': minParking,
+        'minSeating': minSeating,
+        'minSqFt': minSqFt
+    })
+    return jsonify({'message': 'Success'})
+
+@app.route('/get_brand_compliance_limits', methods=['GET'])
+def get_brand_compliance_limits():
+    try:
+        brand_limits = []
+        docs = db.collection('Brand compliance limits').get()
+        for doc in docs:
+            data = doc.to_dict()
+            brand_limits.append(data)
+        return jsonify(brand_limits)
+    except Exception as e:
+        return jsonify({'error': str(e)})
 

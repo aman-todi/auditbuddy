@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 
 class ParkingDetector:
-    def __init__(self, confidence_threshold=0.1, nms_threshold=0.4):
+    def __init__(self, confidence_threshold=0.6, nms_threshold=0.4):
         # Load YOLO model with ONNX weights
         self.net = cv2.dnn.readNet("flask_app/computer_vision/parking_weights.onnx")
         self.score_threshold = 0.2

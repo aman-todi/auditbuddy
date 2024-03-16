@@ -2,7 +2,7 @@
 
 import os
 import cv2
-from flask_app.computer_vision.tracker import Tracker
+from flask_app.computer_vision.dectection_tracker import Tracker
 from flask_app.computer_vision.car_detection import CarDetector
 from flask_app.computer_vision.hospitality_assessment import HospitalityFinder
 from flask_app.computer_vision.parking_detection import ParkingDetector
@@ -38,6 +38,7 @@ def save_frame_to_firebase(frame,frame_number,output_folder,dealership_info):
 def count_cars_in_footage(files_list,dealership_info):
     # Compute the number of distinct cars from multiple videos
     total_cars = 0
+    frame_counter = 0
 
     for video in files_list:
         # Load and segment video
@@ -45,10 +46,9 @@ def count_cars_in_footage(files_list,dealership_info):
 
         # Initialize car detector and tracker
         car_detector = CarDetector()
-        car_tracker = Tracker(distance_threshold=70)
+        car_tracker = Tracker(box_life = 31)
 
-        frame_counter = 0
-        display_frequency = 100  # Set the frequency of frames to save
+        display_frequency = 90  # Set the frequency of frames to save
 
         while True:
             ret, frame = cap.read()
@@ -57,6 +57,9 @@ def count_cars_in_footage(files_list,dealership_info):
 
             # Increment the frame counter
             frame_counter += 1
+
+            if frame_counter % 2 == 1: # Process only even frames
+                continue
 
             # Detect and track cars
             car_boxes = car_detector.detect_cars(frame)
@@ -70,8 +73,10 @@ def count_cars_in_footage(files_list,dealership_info):
                 annotated_frame = cv2.cvtColor(np.array(frame), cv2.COLOR_RGB2BGR)
                 save_frame_to_firebase(annotated_frame, frame_counter, 'CarResults',dealership_info)
 
-        print("Count of cars found: ", car_tracker.get_total_count())
-        total_cars += car_tracker.get_total_count()
+        # Adjust for error
+        cars_count = int(car_tracker.get_total_count() * 0.7)
+        print("Count of cars found: ", cars_count)
+        total_cars += cars_count
             
         cap.release()
 
@@ -81,18 +86,18 @@ def count_cars_in_footage(files_list,dealership_info):
 def assess_hospitality(files_list,dealership_info):
     # Build a list of hospitality indicators from videos
     total_seating = 0
+    frame_counter = 0
 
     for video in files_list:
 
         # Initialize hospitality finder and seating tracker
         hospitality_finder = HospitalityFinder()
-        seating_tracker = Tracker(distance_threshold=45)
+        seating_tracker = Tracker(box_life=29)
 
         # Load and segment video
         cap = cv2.VideoCapture(video)
 
-        frame_counter = 0
-        display_frequency = 80  # Set the frequency of frames to save
+        display_frequency = 60  # Set the frequency of frames to save
 
         while True:
             ret, frame = cap.read()
@@ -101,6 +106,9 @@ def assess_hospitality(files_list,dealership_info):
 
             # Increment the frame counter
             frame_counter += 1
+
+            if frame_counter % 2 == 1: # Process only even frames
+                continue
 
             # Find and track hospitality indicators
             _, _, seating_boxes = hospitality_finder.detect_indicators(frame)
@@ -128,18 +136,18 @@ def assess_hospitality(files_list,dealership_info):
 def count_parking_spaces(files_list,dealership_info):
     # Count the number of parking spaces for customers
     total_parking_spaces = 0
+    frame_counter = -1
 
     for video in files_list:
 
         # Initialize parking detector and tracker
         parking_detector = ParkingDetector()
-        parking_tracker = Tracker(distance_threshold=200)
+        parking_tracker = Tracker(box_life=30)
 
         # Load and segment video
         cap = cv2.VideoCapture(video)
 
-        frame_counter = 0
-        display_frequency = 100  # Set the frequency of frames to save
+        display_frequency = 120  # Set the frequency of frames to save
 
         while True:
             ret, frame = cap.read()
@@ -148,6 +156,9 @@ def count_parking_spaces(files_list,dealership_info):
 
             # Increment the frame counter
             frame_counter += 1
+
+            if frame_counter % 2 == 1: # Process only even frames
+                continue
 
             # Detect and track parking spaces
             parking_class_ids, parking_confidences, parking_boxes = parking_detector.detect_parking(frame)

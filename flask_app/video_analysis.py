@@ -2,7 +2,7 @@
 
 import os
 import cv2
-from flask_app.computer_vision.dectection_tracker import Yolov3_Tracker, Yolov5_Tracker
+from flask_app.computer_vision.dectection_tracker import Tracker
 from flask_app.computer_vision.car_detection import CarDetector
 from flask_app.computer_vision.hospitality_assessment import HospitalityFinder
 from flask_app.computer_vision.parking_detection import ParkingDetector
@@ -46,7 +46,7 @@ def count_cars_in_footage(files_list,dealership_info):
 
         # Initialize car detector and tracker
         car_detector = CarDetector()
-        car_tracker = Yolov3_Tracker(distance_threshold=140)
+        car_tracker = Tracker(box_life = 31)
 
         display_frequency = 90  # Set the frequency of frames to save
 
@@ -57,6 +57,9 @@ def count_cars_in_footage(files_list,dealership_info):
 
             # Increment the frame counter
             frame_counter += 1
+
+            if frame_counter % 2 == 1: # Process only even frames
+                continue
 
             # Detect and track cars
             car_boxes = car_detector.detect_cars(frame)
@@ -70,8 +73,10 @@ def count_cars_in_footage(files_list,dealership_info):
                 annotated_frame = cv2.cvtColor(np.array(frame), cv2.COLOR_RGB2BGR)
                 save_frame_to_firebase(annotated_frame, frame_counter, 'CarResults',dealership_info)
 
-        print("Count of cars found: ", car_tracker.get_total_count())
-        total_cars += car_tracker.get_total_count()
+        # Adjust for error
+        cars_count = int(car_tracker.get_total_count() * 0.7)
+        print("Count of cars found: ", cars_count)
+        total_cars += cars_count
             
         cap.release()
 
@@ -87,7 +92,7 @@ def assess_hospitality(files_list,dealership_info):
 
         # Initialize hospitality finder and seating tracker
         hospitality_finder = HospitalityFinder()
-        seating_tracker = Yolov5_Tracker()
+        seating_tracker = Tracker(box_life=29)
 
         # Load and segment video
         cap = cv2.VideoCapture(video)
@@ -101,7 +106,7 @@ def assess_hospitality(files_list,dealership_info):
 
             # Increment the frame counter
             frame_counter += 1
-            
+
             if frame_counter % 2 == 1: # Process only even frames
                 continue
 
@@ -137,7 +142,7 @@ def count_parking_spaces(files_list,dealership_info):
 
         # Initialize parking detector and tracker
         parking_detector = ParkingDetector()
-        parking_tracker = Yolov5_Tracker()
+        parking_tracker = Tracker(box_life=30)
 
         # Load and segment video
         cap = cv2.VideoCapture(video)

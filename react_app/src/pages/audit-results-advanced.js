@@ -6,11 +6,34 @@ import ResponsiveAppBar from '../components/ResponsiveAppBar';
 import AdvancedResultsTabContent from '../components/AdvancedResultsTabContent';
 
 const AdvancedResultsPage = () => {
-  const { brandName, dealershipName, department, submission } = useParams();
-  const decodedDealershipName = decodeURIComponent(dealershipName);
-  const decodedBrandName = decodeURIComponent(brandName);
-  const decodedDepartment = decodeURIComponent(department);
-  const decodedSubmission = decodeURIComponent(submission);
+
+  const [brandName, setBrandName] = useState('');
+  const [dealershipName, setDealershipName] = useState('');
+  const [department, setDepartment] = useState('');
+  const [submission, setSubmission] = useState('');
+
+  useEffect(() => {
+    // Retrieve parameters from session storage
+    const params = JSON.parse(sessionStorage.getItem('advancedResultsParams'));
+    console.log("PARAMS", params);
+    if (!params) {
+      // Handle case when parameters are not available
+      // For example, redirect to the results page
+      navigate('/audit/results');
+    }
+
+    // Handle your logic with the parameters here
+
+    setBrandName(params["Brand"]);
+    setDealershipName(params["Dealership Name"]);
+    setDepartment(params["Department"]);
+    setSubmission(params["Submitted"]);
+
+    return () => {
+      // Clear session storage when the component unmounts
+      sessionStorage.removeItem('advancedResultsParams');
+    };
+  }, []);
 
   const [selectedTab, setSelectedTab] = useState(0);
 
@@ -27,11 +50,13 @@ const AdvancedResultsPage = () => {
 
   const handleGoBack = () => {
     // Navigate back to the previous URL
-    navigate(prevUrl);
+    navigate('/audit/results');
   };
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  console.log("Checking Values", brandName, dealershipName, department, submission);
 
   return (
     <Container maxWidth="lg" style={{ marginRight: '3rem', paddingTop: '5rem' }}>
@@ -50,16 +75,16 @@ const AdvancedResultsPage = () => {
         >
           Back
         </Button>
-        AuditBuddy Results for {decodedDealershipName}
+        AuditBuddy Results for {dealershipName}
       </Typography>
       <Paper elevation={3} style={{ marginBottom: '2rem', marginTop: '3rem', padding: '1rem', marginRight: '4rem' }}>
         <ResponsiveAppBar handleTabChange={handleTabChange} />
         <AdvancedResultsTabContent
           selectedTab={selectedTab}
-          decodedBrandName={decodedBrandName}
-          decodedDealershipName={decodedDealershipName}
-          decodedDepartment={decodedDepartment}
-          decodedSubmission={decodedSubmission}
+          brandName={brandName}
+          dealershipName={dealershipName}
+          department={department}
+          submission={submission}
         />
       </Paper >
     </Container>

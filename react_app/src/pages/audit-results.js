@@ -174,12 +174,10 @@ function ResultsPage() {
   }
 
   const handleSubmissionClick = (param) => {
-    // Get the current URL
-    const currentUrl = window.location.href;
-    // Get the previous path without query parameters
-    const previousPath = window.location.pathname;
-    // Navigate to the AdvancedResultsPage with the previous path as a query parameter
-    navigate(`/audit/results/${encodeURIComponent(param['Brand'])}/${encodeURIComponent(param['Dealership Name'])}/${encodeURIComponent(param['Department'])}/${encodeURIComponent(param["Submitted"])}?prev=${encodeURIComponent(previousPath)}`);
+    // Store parameters in session storage
+    sessionStorage.setItem('advancedResultsParams', JSON.stringify(param));
+    // Navigate to the advanced results page
+    navigate('/audit/results/advanced-results');
   };
 
 

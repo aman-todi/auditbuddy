@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import * as MaterialUI from './components/MaterialUI';
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import HomePage from './pages/home';
@@ -9,6 +9,7 @@ import SettingsPage from './pages/settings';
 import ContactPage from './pages/contact';
 import AuditPage from './pages/audit';
 import UploadPage from './pages/audit-upload';
+import ProfilePage from './pages/profile';
 import ResultsPage from './pages/audit-results';
 import AdvancedResultsPage from './pages/audit-results-advanced';
 import AdminPage from './pages/admin-console';
@@ -29,61 +30,62 @@ import 'react-toastify/dist/ReactToastify.css';
 function App() {
 
 
- const savedDarkMode = JSON.parse(localStorage.getItem('darkMode')) || false;
+  const savedDarkMode = JSON.parse(localStorage.getItem('darkMode')) || false;
   const [darkMode, setDarkMode] = useState(savedDarkMode);
 
 
- const toggleDarkMode = () => {
-   const newDarkMode = !darkMode;
-   setDarkMode(newDarkMode);
-   // Store the dark mode preference in localStorage
-   localStorage.setItem('darkMode', JSON.stringify(newDarkMode));
- };
+  const toggleDarkMode = () => {
+    const newDarkMode = !darkMode;
+    setDarkMode(newDarkMode);
+    // Store the dark mode preference in localStorage
+    localStorage.setItem('darkMode', JSON.stringify(newDarkMode));
+  };
 
 
- useEffect(() => {
-   console.log("Dark mode:", darkMode);
- }, [darkMode]);
+  useEffect(() => {
+    console.log("Dark mode:", darkMode);
+  }, [darkMode]);
 
 
- const darkT = createTheme({
-   palette: {
-     mode: darkMode ? 'dark' : 'light',
-   },
- });
+  const darkT = createTheme({
+    palette: {
+      mode: darkMode ? 'dark' : 'light',
+    },
+  });
 
- return (
+  return (
 
 
-   <ThemeProvider theme={darkT}>
-     <CssBaseline />
-   <React.Fragment>
-    <div>
-    <ToastContainer position="bottom-right"/>
+    <ThemeProvider theme={darkT}>
+      <CssBaseline />
+      <React.Fragment>
+        <div>
+          <ToastContainer position="bottom-right" />
 
-     <AdminCheck>
-     <BrowserRouter>
-       <MaterialUI.NavBar></MaterialUI.NavBar>
-       <Routes>
-         <Route exact path="/" element={<HomePage />}></Route>
-         <Route exact path="/login" element={<LoginPage />}></Route>
-         <Route exact path="/audit" element={<AuditPage />}></Route>
-         <Route path="/audit/upload" element={<UploadPage />}></Route>
-         <Route path="/audit/results" element={<ResultsPage />}></Route>
-         <Route path="/audit/dealerships" element={<DealershipsPage />}></Route>
-         <Route path="/audit/upload" element={<UploadPage />}></Route>
-         <Route path="/audit/results" element={<ResultsPage />}></Route>
-         <Route path="/audit/contact" element={<ContactPage />}></Route>
-         <Route path="/audit/settings" element={<SettingsPage darkMode={darkMode} toggleDarkMode={toggleDarkMode} />} />
-         <Route path="/audit/admin-console" element={<AdminPage />}></Route>
-         <Route path="/audit/results/:brandName/:dealershipName/:department/:submission" element={<AdvancedResultsPage />} />
-       </Routes>
-     </BrowserRouter>
-     </AdminCheck>
-     </div>
-   </React.Fragment>
-   </ThemeProvider>
- );
+          <AdminCheck>
+            <BrowserRouter>
+              <MaterialUI.NavBar></MaterialUI.NavBar>
+              <Routes>
+                <Route exact path="/" element={<HomePage />}></Route>
+                <Route exact path="/login" element={<LoginPage />}></Route>
+                <Route exact path="/audit" element={<AuditPage />}></Route>
+                <Route path="/audit/upload" element={<UploadPage />}></Route>
+                <Route path="/audit/results" element={<ResultsPage />}></Route>
+                <Route path="/audit/dealerships" element={<DealershipsPage />}></Route>
+                <Route path="/audit/upload" element={<UploadPage />}></Route>
+                <Route path="/audit/results" element={<ResultsPage />}></Route>
+                <Route path="/audit/profile" element={<ProfilePage />} />
+                <Route path="/audit/contact" element={<ContactPage />}></Route>
+                <Route path="/audit/settings" element={<SettingsPage darkMode={darkMode} toggleDarkMode={toggleDarkMode} />} />
+                <Route path="/audit/admin-console" element={<AdminPage />}></Route>
+                <Route path="/audit/results/advanced-results" element={<AdvancedResultsPage />} />
+              </Routes>
+            </BrowserRouter>
+          </AdminCheck>
+        </div>
+      </React.Fragment>
+    </ThemeProvider>
+  );
 }
 
 

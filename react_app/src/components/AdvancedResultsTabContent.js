@@ -1,18 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Typography, Box, Divider, CircularProgress, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import { Typography, Box, Divider, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Chart from 'chart.js/auto'; // Import Chart.js library
 import axios from 'axios';
 
-const AdvancedResultsTabContent = ({ selectedTab, decodedBrandName, decodedDealershipName, decodedDepartment, decodedSubmission }) => {
+const AdvancedResultsTabContent = ({ selectedTab, brandName, dealershipName, department, submission }) => {
   const [categoryResults, setCategoryResults] = useState(null);
   const [gradeResults, setGradeResults] = useState([]);
   const [categories, setCategories] = useState([]);
   const [categoryScores, setCategoryScores] = useState([]);
   const [totalScore, setTotalScore] = useState('');
   const [detection, setDetection] = useState([]);
-  const [loading, setLoading] = useState(true);
-
 
   const tab = selectedTab ?? 0;
   console.log("Tab Selected", tab)
@@ -24,43 +22,65 @@ const AdvancedResultsTabContent = ({ selectedTab, decodedBrandName, decodedDeale
     setGradeResults(data);
   };
 
-  // function to get the category eval
-  const fetchGradeResults = async (decodedSubmission, decodedDealershipName, decodedDepartment) => {
-    try {
-      // append to a form the dealership submission, name, department
-      // create a form and append this file
-      const formData = new FormData();
-
-      // extract information from dealership
-      formData.append('submission', decodedSubmission);
-      formData.append('name', decodedDealershipName);
-      formData.append('department', decodedDepartment);
-
-      const response = await axios.post('http://localhost:8080/get-category-eval', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-
-      handleSetGradeResults(response.data);
-      console.log(response.data);
-
-      setCategories(response.data["Category Eval"]["Categories"]);
-      setCategoryScores(response.data["Category Eval"]["Scores"]);
-      setTotalScore(response.data["Overall Eval"]["Scores"]);
-      setDetection(response.data["Detection"])
-
-      renderCategoryGraphs(response.data["Category Eval"]["Categories"], response.data["Category Eval"]["Scores"]);
-      renderOverallScorePieChart(response.data["Overall Eval"]["Scores"]);
-    } catch (error) {
-      console.error('Error fetching the category eval', error);
-    }
-  };
-
   useEffect(() => {
-    fetchCategoryResults();
-    fetchGradeResults(decodedSubmission, decodedDealershipName, decodedDepartment);
-  }, [tab]);
+    const fetchData = async (submission, dealershipName, department) => {
+      try {
+        // Fetch grade results
+        const formData = new FormData();
+        formData.append('submission', submission);
+        formData.append('name', dealershipName);
+        formData.append('department', department);
+
+        const gradeResponse = await axios.post('http://localhost:8080/get-category-eval', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+
+        // Set grade results
+        handleSetGradeResults(gradeResponse.data);
+        setCategories(gradeResponse.data["Category Eval"]["Categories"]);
+        setCategoryScores(gradeResponse.data["Category Eval"]["Scores"]);
+        setTotalScore(gradeResponse.data["Overall Eval"]["Scores"]);
+        setDetection(gradeResponse.data["Detection"]);
+        renderCategoryGraphs(gradeResponse.data["Category Eval"]["Categories"], gradeResponse.data["Category Eval"]["Scores"]);
+        renderOverallScorePieChart(gradeResponse.data["Overall Eval"]["Scores"]);
+
+        // Fetch category results
+        let categoryEndpoint = '';
+
+        switch (tab) {
+          case 1:
+            categoryEndpoint = `/get-logo-results/${encodeURIComponent(brandName)}/${encodeURIComponent(dealershipName)}/${encodeURIComponent(department)}/${encodeURIComponent(submission)}`;
+            break;
+          case 2:
+            categoryEndpoint = `/get-car-results/${encodeURIComponent(brandName)}/${encodeURIComponent(dealershipName)}/${encodeURIComponent(department)}/${encodeURIComponent(submission)}`;
+            break;
+          case 3:
+            categoryEndpoint = `/get-parking-results/${encodeURIComponent(brandName)}/${encodeURIComponent(dealershipName)}/${encodeURIComponent(department)}/${encodeURIComponent(submission)}`;
+            break;
+          case 4:
+            categoryEndpoint = `/get-hospitality-results/${encodeURIComponent(brandName)}/${encodeURIComponent(dealershipName)}/${encodeURIComponent(department)}/${encodeURIComponent(submission)}`;
+            break;
+          case 5:
+            categoryEndpoint = `/get-spatial-results/${encodeURIComponent(brandName)}/${encodeURIComponent(dealershipName)}/${encodeURIComponent(department)}/${encodeURIComponent(submission)}`;
+            break;
+          default:
+            break;
+        }
+
+        if (categoryEndpoint) {
+          const categoryResponse = await fetch(categoryEndpoint);
+          const categoryData = await categoryResponse.json();
+          setCategoryResults(categoryData.images);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData(submission, dealershipName, department);
+  }, [tab, submission, dealershipName, department]); // Fetch data whenever the tab changes
 
   const renderCategoryGraphs = (categories, scores) => {
     console.log("scores in graph", scores);
@@ -176,104 +196,57 @@ const AdvancedResultsTabContent = ({ selectedTab, decodedBrandName, decodedDeale
     }
   };
 
-
-  const fetchCategoryResults = () => {
-    let categoryEndpoint = '';
-
-    switch (tab) {
-      case 1:
-        categoryEndpoint = `/get-logo-results/${encodeURIComponent(decodedBrandName)}/${encodeURIComponent(decodedDealershipName)}/${encodeURIComponent(decodedDepartment)}/${encodeURIComponent(decodedSubmission)}`;
-        break;
-      case 2:
-        categoryEndpoint = `/get-car-results/${encodeURIComponent(decodedBrandName)}/${encodeURIComponent(decodedDealershipName)}/${encodeURIComponent(decodedDepartment)}/${encodeURIComponent(decodedSubmission)}`;
-        break;
-      case 3:
-        categoryEndpoint = `/get-parking-results/${encodeURIComponent(decodedBrandName)}/${encodeURIComponent(decodedDealershipName)}/${encodeURIComponent(decodedDepartment)}/${encodeURIComponent(decodedSubmission)}`;
-        break;
-      case 4:
-        categoryEndpoint = `/get-hospitality-results/${encodeURIComponent(decodedBrandName)}/${encodeURIComponent(decodedDealershipName)}/${encodeURIComponent(decodedDepartment)}/${encodeURIComponent(decodedSubmission)}`;
-        break;
-      case 5:
-        categoryEndpoint = `/get-spatial-results/${encodeURIComponent(decodedBrandName)}/${encodeURIComponent(decodedDealershipName)}/${encodeURIComponent(decodedDepartment)}/${encodeURIComponent(decodedSubmission)}`;
-        break;
-      default:
-        setLoading(false);
-        break;
-    }
-
-    if (categoryEndpoint) {
-      setLoading(true); // Set loading to true before fetching data
-      fetch(categoryEndpoint)
-        .then(response => response.json())
-        .then(data => {
-          setCategoryResults(data.images);
-        })
-        .catch(error => console.error(`Error fetching ${categoryEndpoint} results:`, error))
-        .finally(() => {
-          setLoading(false); // Set loading to false when data fetching completes
-          console.log("What it set Endpoint", loading);
-        });
-    }
-
-  };
-
-  console.log("Category Results", categoryResults);
-  console.log("Loading Value", loading);
   return (
     <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center' }}>
-      {loading ? (
-        <CircularProgress color="success" />
-      ) : (
-        <>
-          {tab !== 0 && gradeResults && (
-            <div style={{ flex: 1 }}>
-              <Typography variant="h6" align="center">Content</Typography>
-              <Box>
-                <Typography variant="body1" align="center">
-                  Category Score: {categoryScores[tab - 1]}
-                </Typography>
-                <Typography variant="body1" align="center">
-                  Detected Value: {detection[tab - 1]}
-                </Typography>
-              </Box>
-            </div>
-          )}
-          {tab !== 0 ? (
-            <div style={{ flex: 1 }}>
-              <Typography variant="h6" align="center">Images</Typography>
-              {categoryResults && categoryResults.map((image, index) => (
-                <Accordion key={index}>
-                  <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls={`panel${index}-content`} id={`panel${index}-header`}>
-                    {`Image ${index + 1}`}
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <img src={image} alt={`Image ${index}`} style={{ maxWidth: '100%' }} />
-                  </AccordionDetails>
-                </Accordion>
-              ))}
-            </div>
-          ) : (
-            <>
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', marginBottom: '2rem' }}>
-                <Typography variant="h6" align="center">Evaluation Graphs</Typography>
-                <Typography variant="body1" align="center">
-                  Overall Score: {totalScore}
-                </Typography>
-                <div style={{ display: 'flex', flexDirection: 'row', flex: 1 }}>
-                  <div style={{ flex: 1 }}>
-                    <canvas id="categoryChart" width="300" height="300"></canvas>
-                  </div>
-                  <Divider orientation="vertical" flexItem />
-                  <div style={{ flex: 1 }}>
-                    <canvas id="overallScoreChart" width="300" height="300"></canvas>
-                  </div>
+
+      <>
+        {tab !== 0 && gradeResults && (
+          <div style={{ flex: 1 }}>
+            <Typography variant="h6" align="center">Content</Typography>
+            <Box>
+              <Typography variant="body1" align="center">
+                Category Score: {categoryScores[tab - 1]} / 4
+              </Typography>
+              <Typography variant="body1" align="center">
+                Detected Value: {detection[tab - 1]}
+              </Typography>
+            </Box>
+          </div>
+        )}
+        {tab !== 0 ? (
+          <div style={{ flex: 1 }}>
+            <Typography variant="h6" align="center">Images</Typography>
+            {categoryResults && categoryResults.map((image, index) => (
+              <Accordion key={index}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls={`panel${index}-content`} id={`panel${index}-header`}>
+                  {`Image ${index + 1}`}
+                </AccordionSummary>
+                <AccordionDetails>
+                  <img src={image} alt={`Image ${index}`} style={{ maxWidth: '100%' }} />
+                </AccordionDetails>
+              </Accordion>
+            ))}
+          </div>
+        ) : (
+          <>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', marginBottom: '2rem' }}>
+              <Typography variant="h6" align="center">Evaluation Graphs</Typography>
+              <Typography variant="body1" align="center">
+                Overall Score: {totalScore} / 20
+              </Typography>
+              <div style={{ display: 'flex', flexDirection: 'row', flex: 1 }}>
+                <div style={{ flex: 1 }}>
+                  <canvas id="categoryChart" width="300" height="300"></canvas>
+                </div>
+                <Divider orientation="vertical" flexItem />
+                <div style={{ flex: 1 }}>
+                  <canvas id="overallScoreChart" width="300" height="300"></canvas>
                 </div>
               </div>
-            </>
-          )}
-        </>
-      )
-      }
+            </div>
+          </>
+        )}
+      </>
     </div >
   );
 

@@ -25,7 +25,7 @@ function LoginPage() {
             setInterval(() => {
               if (countdown === 0) 
               {
-                navigate('/audit');
+                navigate('/audit/dashboard');
               }
               else
               {

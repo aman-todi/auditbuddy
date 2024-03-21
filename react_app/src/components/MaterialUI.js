@@ -13,15 +13,12 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import { makeStyles } from '@mui/material/styles';
 import { Card, CardContent, Grid, TextField } from '@mui/material';
 import { Box, Switch } from '@mui/material';
 // icons
 import AlignHorizontalLeftIcon from '@mui/icons-material/AlignHorizontalLeft';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import BallotIcon from '@mui/icons-material/Ballot';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import SettingsIcon from '@mui/icons-material/Settings';
 import AddBusinessIcon from '@mui/icons-material/AddBusiness';
 // authentication
 import { auth } from '../components/Authentication';
@@ -34,7 +31,6 @@ import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Avatar from '@mui/material/Avatar';
-
 
 // custom button
 export const CustomButton = (props) => {
@@ -114,14 +110,14 @@ export const NavBar = (props) => {
     return (
         <AppBar position='fixed' style={style} sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
             <Toolbar>
-                <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                <Typography variant="h7" component="div" sx={{ flexGrow: 1 }}>
                     AUDITBUDDY
                 </Typography>
 
                 {!user && <NavButton><NavLink to="/">Home</NavLink></NavButton>}
                 {user ? (
                     <React.Fragment>
-                        <NavButton><NavLink to="/audit">Audit</NavLink></NavButton>
+                        <NavButton><NavLink to="/audit/dashboard">Audit</NavLink></NavButton>
 
                         {/* Profile Icon and Menu */}
                         <IconButton
@@ -219,7 +215,7 @@ export const SideBar = (props) => {
                     <List>
                         <Typography sx={{ fontSize: '0.9rem', marginLeft: -1 }} disablePadding><strong>Welcome,</strong> {user && user.email}</Typography>
                         <ListItem disablePadding>
-                            <ListItemButton sx={{ ...colorSelected }} selected={path === '/audit'} component={Link} to="/audit">
+                            <ListItemButton sx={{ ...colorSelected }} selected={path === '/audit/dashboard'} component={Link} to="/audit/dashboard">
                                 <ListItemIcon sx={{ minWidth: 40 }}><AlignHorizontalLeftIcon></AlignHorizontalLeftIcon></ListItemIcon>
                                 <ListItemText
                                     primary={<Typography sx={{ fontSize: '0.9rem' }}>Dashboard</Typography>}
@@ -247,26 +243,28 @@ export const SideBar = (props) => {
                         {admin ? (
                             <React.Fragment>
                                 <Divider sx={{ ...colorSelected }}></Divider>
+                                <Typography sx={{ fontSize: '0.9rem', marginLeft: -1 }}><b>Admin Console</b></Typography>
                                 <ListItem disablePadding>
-                                    <ListItemButton sx={{ ...colorSelected }} selected={path === '/audit/admin-console'} component={Link} to="/audit/admin-console">
+                                    <ListItemButton sx={{ ...colorSelected }} selected={path === '/audit/users'} component={Link} to="/audit/users">
                                         <ListItemIcon sx={{ minWidth: 40 }}><AdminPanelSettingsIcon /></ListItemIcon>
                                         <ListItemText
-                                            primary={<Typography sx={{ fontSize: '0.9rem' }}>Console</Typography>}
+                                            primary={<Typography sx={{ fontSize: '0.9rem' }}>Users</Typography>}
                                         />
                                     </ListItemButton>
                                 </ListItem>
-                            </React.Fragment>
-                        ) : null}
-
-                        <Divider sx={{ ...colorSelected }}></Divider>
-                        <ListItem disablePadding>
+                                <ListItem disablePadding>
                             <ListItemButton sx={{ ...colorSelected }} selected={path === '/audit/dealerships'} component={Link} to="/audit/dealerships">
                                 <ListItemIcon sx={{ minWidth: 40 }}><AddBusinessIcon></AddBusinessIcon></ListItemIcon>
                                 <ListItemText
                                     primary={<Typography sx={{ fontSize: '0.9rem' }}>Dealerships</Typography>}
                                 />
                             </ListItemButton>
-                        </ListItem>
+                            </ListItem>
+                            </React.Fragment>
+                        ) : null}
+
+                        <Divider sx={{ ...colorSelected }}></Divider>
+                       
 
                     </List>
                 </Toolbar>

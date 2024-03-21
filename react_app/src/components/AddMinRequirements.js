@@ -69,9 +69,9 @@ const MinRequirements = () => {
   const brands = Object.keys(minRequirements || {});
 
   return (
-    <Container component="main" maxWidth="s">
+    <Container component="main">
       <Typography variant="p" sx={{ display: "flex", alignItems: "center", marginBottom: "1rem" }}>
-        <span style={{ fontWeight: "bold", marginRight: "0.5rem" }}>Add Minimum Compliance Standards</span>
+        <span style={{ fontWeight: "bold", marginRight: "0.5rem" }}>Brand Standards</span>
         <Tooltip disableFocusListener title="Add in minimum compliance standards for different brands">
           <HelpIcon sx={{ fontSize: "small" }} />
         </Tooltip>

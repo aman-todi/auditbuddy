@@ -3,6 +3,7 @@ import axios from 'axios';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Tooltip from '@mui/material/Tooltip';
+import AddDealershipImport from '../components/AddDealership';
 import HelpIcon from '@mui/icons-material/Help';
 import * as MaterialUI from './MaterialUI';
 // for dealership table
@@ -25,7 +26,15 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, TextField} from '@mu
   }
 };
 
-export const DealershipListImport = ({refresh}) => {
+export const DealershipListImport = () => {
+
+    // handle user table refresh
+    const [refresh, setRefresh] = useState(false);
+
+    const handleRefresh = () => {
+      setRefresh(!refresh);
+    };
+
   // store user dealerships list
   const [dealerships, setDealerships] = useState([]);
 
@@ -151,13 +160,22 @@ export const DealershipListImport = ({refresh}) => {
     );
   });
 
+    // control the pop up for add dealerships
+    const [popupDealership, setPopupDealership] = useState(false);
+    const handlePopupDealership = () => {
+      setPopupDealership(!popupDealership);
+    };
+
   return (
     <Container component="main">
       <Typography variant="p" sx={{ display: "flex", alignItems: "center", marginBottom: "1rem" }}>
-        <span style={{ fontWeight: "bold", marginRight: "0.5rem" }}>Dealership List</span>
+        <span style={{ fontWeight: "bold", marginRight: "0.5rem" }}>Dealerships</span>
         <Tooltip disableFocusListener title="List of all dealerships">
           <HelpIcon sx={{ fontSize: "small" }} />
         </Tooltip>
+        <span style={{marginLeft: 'auto'}}>
+          <MaterialUI.CustomButton onClick={handlePopupDealership}>Add Dealership</MaterialUI.CustomButton>
+        </span>
       </Typography>
 
       {/* search bar */}
@@ -168,6 +186,19 @@ export const DealershipListImport = ({refresh}) => {
         onChange={handleSearchChange}
         fullWidth
       />
+
+       {/* dialog for add dealerships */}
+       <Dialog open={popupDealership} onClose={handlePopupDealership} fullWidth maxWidth="lg">
+          <DialogTitle>Add Dealership</DialogTitle>
+          <DialogContent>
+            <AddDealershipImport refresh={handleRefresh}/>
+          </DialogContent>
+          <DialogActions>
+            <MaterialUI.CustomButton onClick={handlePopupDealership} color="primary">
+              Close
+            </MaterialUI.CustomButton>
+          </DialogActions>
+        </Dialog>
 
       <TableContainer component={Paper} sx={{ maxHeight: "15rem" }}>
         <Table stickyHeader>

@@ -8,7 +8,7 @@ import os
 db = database()
 from werkzeug.utils import secure_filename
 # computer vision
-from flask_app.video_analysis import count_cars_in_footage, assess_hospitality, count_parking_spaces
+from flask_app.media_analysis import count_cars_in_footage, assess_hospitality, count_parking_spaces
 from flask_app.brand_detection.logo import LogoDetector
 from flask_app.computer_vision.square_footage_detector import compute_square_footage
 from flask_app.audit_results import build_audit_results
@@ -218,6 +218,7 @@ def upload_video():
 
     # loop the detection categories
     required_categories = ['logo', 'cars', 'parking','hospitality', 'spatial']
+    
 
     # logic for extracting file from different categories (works for multi files)
     for category in required_categories:

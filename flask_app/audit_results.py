@@ -83,10 +83,10 @@ def build_audit_results(cv_results, dealership_info, past_sales=150, uio=300):
         # Grade the evaluation results using past sales and UIO information
 
         eval_factor = (past_sales + uio)//2
-        minParkingFactor = num_parking/min_parking + 1
-        minCarFactor = num_cars/min_cars+1
-        minSeatingFactor = num_seating/min_seating +1
-        minSqFactor = sq_footage/min_sqft +1
+        minParkingFactor = num_parking/parking_min + 1
+        minCarFactor = num_cars/cars_min+1
+        minSeatingFactor = num_seating/seating_min +1
+        minSqFactor = sq_footage/sq_footage_min +1
         grades = {}
 
         # Logo detection results

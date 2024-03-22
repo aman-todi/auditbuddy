@@ -116,6 +116,7 @@ export const DealershipListImport = () => {
 
     // extract information from dealership
     formData.append('uid', clickedDealership['UID']);
+    formData.append('name', clickedDealership['Dealership Name'])
 
     const response = await axios.post('http://localhost:8080/delete-dealership', formData, {
           headers: {

@@ -323,16 +323,12 @@ def create_user():
         # for admins, add to the database
         if role == "Admin":
             user = auth.create_user(email=email, password=password)
-            # get the next id
-            collection_ref = db.collection("admins")
-            docs = list(collection_ref.stream())
-            next_id = int(docs[-1].id) + 1
-
+       
             # put the data in a json
             data = {'email': email}
             
              # go to the collection, create a new document (admin id), and append the user email
-            db.collection("admins").document(str(next_id)).set(data)
+            db.collection("admins").document(email).set(data)
         elif role == "Auditor":
             user = auth.create_user(email=email, password=password)
      
@@ -365,8 +361,8 @@ def all_users():
     # access the database of all users
     users = auth.list_users()
 
-    # iterate through each user
-    for user in users.iterate_all():
+    # fetch user data
+    def fetch_user_data(user):
 
         #jsonify the data
         user_data = {
@@ -374,24 +370,57 @@ def all_users():
             'role': "Auditor" 
         }
 
-        # check if the user is an admin
+         # check if the user is an admin
         collection_ref = db.collection("admins")
         email_list = [doc.to_dict()['email'] for doc in collection_ref.stream()]
 
         if user.email in email_list:
             user_data['role'] = "Admin"
         
+        return user_data
+
+    # execute this using concurrent.futures to iterate through users
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+       for user_data in executor.map(fetch_user_data, users.iterate_all()):
         user_list.append(user_data)
 
-
     return jsonify(user_list)
+
+
+#
+# delete a user from the list
+#
+@app.route('/delete-user', methods=['POST'])
+def delete_user():
+    # get user info
+    email = request.form['email']
+    role = request.form['role']
+
+    # delete the user from auth
+    user = auth.get_user_by_email(email)
+    auth.delete_user(user.uid)
+
+    # if the user is an admin
+    if role == "Admin":
+        # go to dealerships table in db
+        collection_ref = db.collection('admins')
+
+        # search the admins for the field uid
+        user_doc = collection_ref.document(email).get()
+
+        # if present, then we delete the user from table
+        if user_doc.exists:
+            user_doc.reference.delete()
+
+        
+    return jsonify("ok")
 
 #
 # delete a dealership from the list
 #
 @app.route('/delete-dealership', methods=['POST'])
 def delete_dealership():
-    # get dealership uid
+    # get dealership info
     uid = request.form['uid']
 
     # go to dealerships table in db
@@ -399,14 +428,13 @@ def delete_dealership():
 
     # search the dealerships for the field uid
     dealership_doc = collection_ref.document(uid).get()
+
     # if present, then we delete the dealership
     if dealership_doc.exists:
         dealership_doc.reference.delete()
 
-    # delete all the submissions from this dealership
-    collection_ref = db.collection('results')
-
-
+    # ADD DELETE SUBMISSION DATA IN RESULTS TABLE
+        
     return jsonify("ok")
 
 #
@@ -473,6 +501,41 @@ def add_dealership():
 
     return jsonify("Dealership added successfully"), 200
 
+#
+# edit user role
+#
+@app.route('/user-update-values', methods=['POST'])
+def user_update_values():
+    # get form inputs
+    email = request.form['email']
+    new_role = request.form['new_role']
+    old_role = request.form['old_role']
+
+    try:
+        # go to admins table
+        reference = db.collection("admins")
+
+        # search the table for document that contains the field email
+        admin_query = reference.where('email', '==', email).limit(1).get()
+        if admin_query:
+            for doc in admin_query:
+                # if the current role is admin, then remove from db
+                # if the user's role is being changed from admin to auditor
+                if old_role == "Admin" and new_role == "Auditor":
+                    # delete from the db
+                    doc.reference.delete()
+        else:
+            # if the current role is auditor, then add to db
+            if old_role == "Auditor" and new_role == "Admin":
+                # add to the db their email
+                reference.document(email).set({'email': email})
+
+        return jsonify("User role updated successfully"), 200
+    
+    except Exception as e:
+        print("Error:", e)
+        return jsonify({"error": str(e)}), 500
+    
 #
 # edit dealership uio/sales
 #

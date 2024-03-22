@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '../App.css';
 import * as MaterialUI from '../components/MaterialUI';
-import { Container, Grid, Paper, Typography, Button, Select, Tabs, Tab, MenuItem, CardHeader, Dialog, DialogActions, DialogContent, DialogTitle, Card, CardContent, FormControl, Box, useTheme, useMediaQuery, CircularProgress } from '@mui/material';
+import { Container, Grid, Paper, Typography, Button, Dialog, DialogActions, DialogContent, DialogTitle, Box, useTheme, useMediaQuery, CircularProgress } from '@mui/material';
 import { auth } from '../components/Authentication';
 import { SearchBar } from '../components/SearchBar';
 import { useNavigate } from 'react-router-dom';

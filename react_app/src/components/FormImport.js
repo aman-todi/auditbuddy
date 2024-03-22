@@ -160,11 +160,22 @@ const FormImport = () => {
         // remove the first toast when the second one populates
         toast.dismiss(currentlyAnalyzing);
         // notification that the files have been analyzed
+
+        // find the result
+        const navigateToResults = {
+          'Department': department,
+          'Brand': dealerships['Brand'],
+          'Dealership Name': dealerships['Dealership Name'],
+          'Submitted': time
+        };
+       
+        sessionStorage.setItem('advancedResultsParams', JSON.stringify(navigateToResults));
+
         toast.success(
           <div>
             Completed {dealerships['UID']} {dealerships['Dealership Name']} {department}
             <div>
-              <MaterialUI.CustomButton onClick={() => navigate(`/audit/results/${encodeURIComponent(dealerships['Brand'])}/${encodeURIComponent(dealerships['Dealership Name'])}/${encodeURIComponent(department)}/${encodeURIComponent(time)}`)}>View</MaterialUI.CustomButton>
+              <MaterialUI.CustomButton onClick={() => navigate(`/audit/results/advanced-results`)}>View</MaterialUI.CustomButton>
             </div>
           </div>
           , { autoClose: false, closeButton: true });

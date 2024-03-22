@@ -23,7 +23,6 @@ const AdvancedResultsPage = () => {
     }
 
     // Handle your logic with the parameters here
-
     setBrandName(params["Brand"]);
     setDealershipName(params["Dealership Name"]);
     setDepartment(params["Department"]);

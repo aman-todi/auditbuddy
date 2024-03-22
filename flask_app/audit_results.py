@@ -50,7 +50,7 @@ def add_to_database(database_info,categories, scores,total_scores,detection):
     }
 
     # go to the collection, create a new document (dealership name), create a new collection with (department)
-    db.collection("results").document(database_info[5]).collection(database_info[2]).document(database_info[4]).set(data)
+    db.collection("results").document(database_info[1]).collection(database_info[2]).document(database_info[4]).set(data)
     
 
 def build_audit_results(cv_results, dealership_info, past_sales=150, uio=300):

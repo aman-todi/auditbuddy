@@ -340,9 +340,6 @@ def create_user():
     except Exception as e:
         return jsonify({'error': str(e)}), 400  # error
 
-
-
-
 #
 # populate dealerships table
 #

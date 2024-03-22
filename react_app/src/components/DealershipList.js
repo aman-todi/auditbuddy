@@ -9,7 +9,7 @@ import * as MaterialUI from './MaterialUI';
 // for dealership table
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress } from '@mui/material';
 // for pop up
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField} from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button} from '@mui/material';
 
 
  // axios request to get dealerships
@@ -99,6 +99,40 @@ export const DealershipListImport = () => {
 
     // call to the backend with the dealership information
     updateValues(sales, uio, clickedDealership);
+  };
+
+  // handle a deletion
+  const handleDelete = () => {
+
+    // call to the backend with dealership information
+    deleteDealership(clickedDealership);
+  }
+
+  // function to delete a dealership from the list
+  const deleteDealership = async (clickedDealership) => {
+  try {
+    // append to a form the dealership uid
+    const formData = new FormData();
+
+    // extract information from dealership
+    formData.append('uid', clickedDealership['UID']);
+
+    const response = await axios.post('http://localhost:8080/delete-dealership', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+  
+      // once the backend is changed, then we need to update the table immediately
+      await fetchUserDealerships(setDealerships, setLoading);
+
+      // close the pop up
+      handlePopup();
+
+      console.log(response.data)
+    } catch (error) {
+      console.error('Error deleting dealership', error);
+    }
   };
 
   // cancel the edit
@@ -280,6 +314,7 @@ export const DealershipListImport = () => {
           <Typography>{updatedTime}</Typography>
         </DialogContent>
         <DialogActions>
+          <Button color="error" onClick={handleDelete}>Delete Dealership</Button>
           <MaterialUI.CustomButton onClick={handlePopup}>Close</MaterialUI.CustomButton>
         </DialogActions>
       </Dialog>

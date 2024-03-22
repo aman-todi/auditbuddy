@@ -389,6 +389,29 @@ def all_users():
     return jsonify(user_list)
 
 #
+# delete a dealership from the list
+#
+@app.route('/delete-dealership', methods=['POST'])
+def delete_dealership():
+    # get dealership uid
+    uid = request.form['uid']
+
+    # go to dealerships table in db
+    collection_ref = db.collection('dealerships')
+
+    # search the dealerships for the field uid
+    dealership_doc = collection_ref.document(uid).get()
+    # if present, then we delete the dealership
+    if dealership_doc.exists:
+        dealership_doc.reference.delete()
+
+    # delete all the submissions from this dealership
+    collection_ref = db.collection('results')
+
+
+    return jsonify("ok")
+
+#
 # add dealership to the database
 #
 @app.route('/add-dealership', methods=['POST'])

@@ -355,6 +355,9 @@ def user_dealerships():
 @app.route('/prepopulate-dealerships', methods=['POST'])
 def prepopulate_dealerships():
 
+    # get the time of submission
+    time = request.form['updated']
+
     # what the file is stored under
     category = "dealerships"
     index = 0
@@ -369,10 +372,28 @@ def prepopulate_dealerships():
                 # read the contents of file
                 file_content = file.stream.read().decode('utf-8')
 
+                # turn into JSON
                 json_data = json.loads(file_content)
-                print("json data", file_content)
 
-            # db.collection("dealerships").document(str(uid)).set(data)
+                # loop through each json in the list
+                for dealership in json_data:
+                    # set up json for dealership data
+                    data = {
+                        'UID': dealership['UID'],
+                        'Dealership Name': dealership['Dealership Name'],
+                        'Brand': dealership['Brand'],
+                        'City': dealership['City'],
+                        'State': dealership['State'],
+                        'UIO': dealership['UIO'],
+                        'Sales': dealership['Sales'], 
+                        'Country': dealership['Country'],
+                        'Updated': time
+                    }
+
+                    # HAVE CHECKS IF NEEDED. CURRENTLY OVERRIDES THE DATA
+
+                    # insert this data into the dealerships table
+                    db.collection("dealerships").document(dealership['UID']).set(data)
 
         except Exception as e:
             error_message = f"Error during {category} processing: {str(e)}"

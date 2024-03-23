@@ -55,6 +55,15 @@ const AddDealershipImport = ({ refresh }) => {
       // call files to append to form
       appendFilesToFormData(file, formData, 'dealerships');
 
+      // append the time
+      const options = {
+        timeZone: 'America/New_York',
+      };
+
+      const currentDate = new Date().toLocaleString('en-US', options) + " (EST)";
+
+      formData.append('updated', currentDate);
+
       // notification that the files have been submitted
       const currentlyAnalyzing = toast(
         <div style={{ display: 'flex', alignItems: 'center' }}>

@@ -263,7 +263,7 @@ def upload_video():
             
     # Build audit score
     cv_results = (logo_result, num_cars, num_parking, num_seating, sq_ft_result)
-    build_audit_results(cv_results, dealership_info)
+    build_audit_results(cv_results, dealership_info,int(sales),int(uio))
                   
     # add the form info to the database
 

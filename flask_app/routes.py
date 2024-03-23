@@ -350,6 +350,41 @@ def user_dealerships():
     return jsonify(docs)
 
 #
+# prepopulate the dealerships table with a .json
+#
+@app.route('/prepopulate-dealerships', methods=['POST'])
+def prepopulate_dealerships():
+
+    # what the file is stored under
+    category = "dealerships"
+    index = 0
+
+    # loop the the files sent (only 1 for now, but can support multiple)
+    while f'{category}[{index}]' in request.files:
+        file = request.files[f'{category}[{index}]']
+
+        try:
+            # not an empty file
+            if file.filename != '':
+                # read the contents of file
+                file_content = file.stream.read().decode('utf-8')
+
+                json_data = json.loads(file_content)
+                print("json data", file_content)
+
+            # db.collection("dealerships").document(str(uid)).set(data)
+
+        except Exception as e:
+            error_message = f"Error during {category} processing: {str(e)}"
+            print(error_message)
+            return jsonify({'error': error_message}), 500
+
+        index += 1
+
+
+    return jsonify("ok")
+
+#
 # populate user table in admin console
 #
 @app.route('/all-users', methods=['POST'])

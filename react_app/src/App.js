@@ -12,7 +12,7 @@ import UploadPage from './pages/audit-upload';
 import ProfilePage from './pages/profile';
 import ResultsPage from './pages/audit-results';
 import AdvancedResultsPage from './pages/audit-results-advanced';
-import AdminPage from './pages/admin-console';
+import AdminUserPage from './pages/admin-users';
 import DealershipsPage from './pages/audit-dealerships';
 
 // for checking admin users
@@ -68,16 +68,17 @@ function App() {
               <Routes>
                 <Route exact path="/" element={<HomePage />}></Route>
                 <Route exact path="/login" element={<LoginPage />}></Route>
-                <Route exact path="/audit" element={<AuditPage />}></Route>
+                <Route exact path="/audit/dashboard" element={<AuditPage />}></Route>
                 <Route path="/audit/upload" element={<UploadPage />}></Route>
                 <Route path="/audit/results" element={<ResultsPage />}></Route>
-                <Route path="/audit/dealerships" element={<DealershipsPage />}></Route>
                 <Route path="/audit/upload" element={<UploadPage />}></Route>
                 <Route path="/audit/results" element={<ResultsPage />}></Route>
                 <Route path="/audit/profile" element={<ProfilePage />} />
                 <Route path="/audit/contact" element={<ContactPage />}></Route>
                 <Route path="/audit/settings" element={<SettingsPage darkMode={darkMode} toggleDarkMode={toggleDarkMode} />} />
-                <Route path="/audit/admin-console" element={<AdminPage />}></Route>
+                <Route path="/audit/users" element={<AdminUserPage />}></Route>
+                <Route path="/audit/dealerships" element={<DealershipsPage />}></Route>
+
                 <Route path="/audit/results/advanced-results" element={<AdvancedResultsPage />} />
               </Routes>
             </BrowserRouter>

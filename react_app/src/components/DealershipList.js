@@ -3,12 +3,13 @@ import axios from 'axios';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Tooltip from '@mui/material/Tooltip';
+import AddDealershipImport from '../components/AddDealership';
 import HelpIcon from '@mui/icons-material/Help';
 import * as MaterialUI from './MaterialUI';
 // for dealership table
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress } from '@mui/material';
 // for pop up
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField} from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button} from '@mui/material';
 
 
  // axios request to get dealerships
@@ -25,7 +26,15 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, TextField} from '@mu
   }
 };
 
-export const DealershipListImport = ({refresh}) => {
+export const DealershipListImport = () => {
+
+    // handle user table refresh
+    const [refresh, setRefresh] = useState(false);
+
+    const handleRefresh = () => {
+      setRefresh(!refresh);
+    };
+
   // store user dealerships list
   const [dealerships, setDealerships] = useState([]);
 
@@ -92,6 +101,41 @@ export const DealershipListImport = ({refresh}) => {
     updateValues(sales, uio, clickedDealership);
   };
 
+  // handle a deletion
+  const handleDelete = () => {
+
+    // call to the backend with dealership information
+    deleteDealership(clickedDealership);
+  }
+
+  // function to delete a dealership from the list
+  const deleteDealership = async (clickedDealership) => {
+  try {
+    // append to a form the dealership uid
+    const formData = new FormData();
+
+    // extract information from dealership
+    formData.append('uid', clickedDealership['UID']);
+    formData.append('name', clickedDealership['Dealership Name'])
+
+    const response = await axios.post('http://localhost:8080/delete-dealership', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+  
+      // once the backend is changed, then we need to update the table immediately
+      await fetchUserDealerships(setDealerships, setLoading);
+
+      // close the pop up
+      handlePopup();
+
+      console.log(response.data)
+    } catch (error) {
+      console.error('Error deleting dealership', error);
+    }
+  };
+
   // cancel the edit
   const handleCancelEdit = () => {
     setUIO(originalUIO);
@@ -151,13 +195,22 @@ export const DealershipListImport = ({refresh}) => {
     );
   });
 
+    // control the pop up for add dealerships
+    const [popupDealership, setPopupDealership] = useState(false);
+    const handlePopupDealership = () => {
+      setPopupDealership(!popupDealership);
+    };
+
   return (
     <Container component="main">
       <Typography variant="p" sx={{ display: "flex", alignItems: "center", marginBottom: "1rem" }}>
-        <span style={{ fontWeight: "bold", marginRight: "0.5rem" }}>Dealership List</span>
+        <span style={{ fontWeight: "bold", marginRight: "0.5rem" }}>Dealerships</span>
         <Tooltip disableFocusListener title="List of all dealerships">
           <HelpIcon sx={{ fontSize: "small" }} />
         </Tooltip>
+        <span style={{marginLeft: 'auto'}}>
+          <MaterialUI.CustomButton onClick={handlePopupDealership}>Add Dealership</MaterialUI.CustomButton>
+        </span>
       </Typography>
 
       {/* search bar */}
@@ -168,6 +221,19 @@ export const DealershipListImport = ({refresh}) => {
         onChange={handleSearchChange}
         fullWidth
       />
+
+       {/* dialog for add dealerships */}
+       <Dialog open={popupDealership} onClose={handlePopupDealership} fullWidth maxWidth="lg">
+          <DialogTitle>Add Dealership</DialogTitle>
+          <DialogContent>
+            <AddDealershipImport refresh={handleRefresh}/>
+          </DialogContent>
+          <DialogActions>
+            <MaterialUI.CustomButton onClick={handlePopupDealership} color="primary">
+              Close
+            </MaterialUI.CustomButton>
+          </DialogActions>
+        </Dialog>
 
       <TableContainer component={Paper} sx={{ maxHeight: "15rem" }}>
         <Table stickyHeader>
@@ -249,6 +315,7 @@ export const DealershipListImport = ({refresh}) => {
           <Typography>{updatedTime}</Typography>
         </DialogContent>
         <DialogActions>
+          <Button color="error" onClick={handleDelete}>Delete Dealership</Button>
           <MaterialUI.CustomButton onClick={handlePopup}>Close</MaterialUI.CustomButton>
         </DialogActions>
       </Dialog>

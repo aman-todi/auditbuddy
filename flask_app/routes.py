@@ -8,7 +8,7 @@ import os
 db = database()
 from werkzeug.utils import secure_filename
 # computer vision
-from flask_app.video_analysis import count_cars_in_footage, assess_hospitality, count_parking_spaces
+from flask_app.media_analysis import count_cars_in_footage, assess_hospitality, count_parking_spaces
 from flask_app.brand_detection.logo import LogoDetector
 from flask_app.computer_vision.square_footage_detector import compute_square_footage
 from flask_app.audit_results import build_audit_results
@@ -176,12 +176,10 @@ def upload_video():
     print("uio", request.form['uio'])
     name = request.form['uploadName']
     print("uploadName", request.form['uploadName'])
+    email = request.form['email']
+    print("email: ", email)
 
-
-    dealership_info = (brandName, dealershipName, department, country, submission,uid,sales,uio,name)
-
-    # we should save the folders from each dealership somewhere in here
-    database_info = [request.form['submission'],request.form['name'], request.form['dealership'], request.form['department'], request.form['country'], request.form['uid'], request.form['sales'], request.form['uio'],request.form['uploadName']]
+    dealership_info = (brandName, dealershipName, department, country, submission,uid,sales,uio, email, name)
 
     # Computer Vision Tasks
 
@@ -218,6 +216,7 @@ def upload_video():
 
     # loop the detection categories
     required_categories = ['logo', 'cars', 'parking','hospitality', 'spatial']
+    
 
     # logic for extracting file from different categories (works for multi files)
     for category in required_categories:
@@ -285,25 +284,19 @@ def upload_video():
 #
 @app.route('/check-admin', methods=['POST'])
 def check_admin():
-    # get the admins database
-    admins = {}
-    collection_ref = db.collection('admins')
-    for doc in collection_ref.stream():
-    # get document name (key) and email (value)
-        doc_name = doc.id
-        email = doc.to_dict().get('email')
-    
-        # add to the dictionary
-        admins[doc_name] = email
-
     # get the user token
     token = request.json.get('userToken')
-    #decode the token
+    # decode the token
     decoded_token = auth.verify_id_token(token)
     user_email = decoded_token['email']
 
-    # check if the current user is an admin
-    if user_email in admins.values():
+    # get the admins database
+    collection_ref = db.collection('admins')
+    # find the document with the user's email
+    user_doc = collection_ref.document(user_email).get()
+
+    # if present, then the user is an admin
+    if user_doc.exists:
         return jsonify({'isAdmin': True}), 200
 
     return jsonify({'isAdmin': False}), 200
@@ -322,25 +315,18 @@ def create_user():
         # for admins, add to the database
         if role == "Admin":
             user = auth.create_user(email=email, password=password)
-            # get the next id
-            collection_ref = db.collection("admins")
-            docs = list(collection_ref.stream())
-            next_id = int(docs[-1].id) + 1
-
+       
             # put the data in a json
             data = {'email': email}
             
              # go to the collection, create a new document (admin id), and append the user email
-            db.collection("admins").document(str(next_id)).set(data)
+            db.collection("admins").document(email).set(data)
         elif role == "Auditor":
             user = auth.create_user(email=email, password=password)
      
         return jsonify({'email': user.email}), 201  # user email upon success
     except Exception as e:
         return jsonify({'error': str(e)}), 400  # error
-
-
-
 
 #
 # populate dealerships table
@@ -356,6 +342,62 @@ def user_dealerships():
     return jsonify(docs)
 
 #
+# prepopulate the dealerships table with a .json
+#
+@app.route('/prepopulate-dealerships', methods=['POST'])
+def prepopulate_dealerships():
+
+    # get the time of submission
+    time = request.form['updated']
+
+    # what the file is stored under
+    category = "dealerships"
+    index = 0
+
+    # loop the the files sent (only 1 for now, but can support multiple)
+    while f'{category}[{index}]' in request.files:
+        file = request.files[f'{category}[{index}]']
+
+        try:
+            # not an empty file
+            if file.filename != '':
+                # read the contents of file
+                file_content = file.stream.read().decode('utf-8')
+
+                # turn into JSON
+                json_data = json.loads(file_content)
+
+                # loop through each json in the list
+                for dealership in json_data:
+                    # set up json for dealership data
+                    data = {
+                        'UID': dealership['UID'],
+                        'Dealership Name': dealership['Dealership Name'],
+                        'Brand': dealership['Brand'],
+                        'City': dealership['City'],
+                        'State': dealership['State'],
+                        'UIO': dealership['UIO'],
+                        'Sales': dealership['Sales'], 
+                        'Country': dealership['Country'],
+                        'Updated': time
+                    }
+
+                    # HAVE CHECKS IF NEEDED. CURRENTLY OVERRIDES THE DATA
+
+                    # insert this data into the dealerships table
+                    db.collection("dealerships").document(dealership['UID']).set(data)
+
+        except Exception as e:
+            error_message = f"Error during {category} processing: {str(e)}"
+            print(error_message)
+            return jsonify({'error': error_message}), 500
+
+        index += 1
+
+
+    return jsonify("ok")
+
+#
 # populate user table in admin console
 #
 @app.route('/all-users', methods=['POST'])
@@ -367,8 +409,8 @@ def all_users():
     # access the database of all users
     users = auth.list_users()
 
-    # iterate through each user
-    for user in users.iterate_all():
+    # fetch user data
+    def fetch_user_data(user):
 
         #jsonify the data
         user_data = {
@@ -376,17 +418,72 @@ def all_users():
             'role': "Auditor" 
         }
 
-        # check if the user is an admin
+         # check if the user is an admin
         collection_ref = db.collection("admins")
         email_list = [doc.to_dict()['email'] for doc in collection_ref.stream()]
 
         if user.email in email_list:
             user_data['role'] = "Admin"
         
+        return user_data
+
+    # execute this using concurrent.futures to iterate through users
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+       for user_data in executor.map(fetch_user_data, users.iterate_all()):
         user_list.append(user_data)
 
-
     return jsonify(user_list)
+
+
+#
+# delete a user from the list
+#
+@app.route('/delete-user', methods=['POST'])
+def delete_user():
+    # get user info
+    email = request.form['email']
+    role = request.form['role']
+
+    # delete the user from auth
+    user = auth.get_user_by_email(email)
+    auth.delete_user(user.uid)
+
+    # if the user is an admin
+    if role == "Admin":
+        # go to dealerships table in db
+        collection_ref = db.collection('admins')
+
+        # search the admins for the field uid
+        user_doc = collection_ref.document(email).get()
+
+        # if present, then we delete the user from table
+        if user_doc.exists:
+            user_doc.reference.delete()
+
+        
+    return jsonify("ok")
+
+#
+# delete a dealership from the list
+#
+@app.route('/delete-dealership', methods=['POST'])
+def delete_dealership():
+    # get dealership info
+    uid = request.form['uid']
+
+    # go to dealerships table in db
+    collection_ref = db.collection('dealerships')
+
+    # search the dealerships for the field uid
+    dealership_doc = collection_ref.document(uid).get()
+
+    # if present, then we delete the dealership
+    if dealership_doc.exists:
+        dealership_doc.reference.delete()
+
+    # ADD DELETE SUBMISSION DATA IN RESULTS TABLE
+        
+    return jsonify("ok")
 
 #
 # add dealership to the database
@@ -453,6 +550,41 @@ def add_dealership():
     return jsonify("Dealership added successfully"), 200
 
 #
+# edit user role
+#
+@app.route('/user-update-values', methods=['POST'])
+def user_update_values():
+    # get form inputs
+    email = request.form['email']
+    new_role = request.form['new_role']
+    old_role = request.form['old_role']
+
+    try:
+        # go to admins table
+        reference = db.collection("admins")
+
+        # search the table for document that contains the field email
+        admin_query = reference.where('email', '==', email).limit(1).get()
+        if admin_query:
+            for doc in admin_query:
+                # if the current role is admin, then remove from db
+                # if the user's role is being changed from admin to auditor
+                if old_role == "Admin" and new_role == "Auditor":
+                    # delete from the db
+                    doc.reference.delete()
+        else:
+            # if the current role is auditor, then add to db
+            if old_role == "Auditor" and new_role == "Admin":
+                # add to the db their email
+                reference.document(email).set({'email': email})
+
+        return jsonify("User role updated successfully"), 200
+    
+    except Exception as e:
+        print("Error:", e)
+        return jsonify({"error": str(e)}), 500
+    
+#
 # edit dealership uio/sales
 #
 @app.route('/dealership-update-values', methods=['POST'])
@@ -484,7 +616,20 @@ def dealership_update_values():
 # pull results from the database
 @app.route('/generate-results', methods=['POST'])
 def generate_results():
+
+    # extract the current user's email
+    email = request.form['email']
+    admin = False
+
     try:
+
+         # find the document with the user's email
+        admin_doc = db.collection('admins').document(email).get()
+        
+        if admin_doc.exists:
+            # user is an admin
+            admin = True
+
         # Access the 'results' collection
         collection_ref = db.collection('results')
 
@@ -505,7 +650,14 @@ def generate_results():
                 submission_docs = subcollection_ref.stream()
                 for submission_doc in submission_docs:
                     submission_data = submission_doc.to_dict()  # Get submission data
-                    results.append(submission_data)
+
+                    if admin:
+                        # admin append the submission
+                        results.append(submission_data)
+                    else:
+                        # user append submission only if the email matches
+                        if submission_data.get('User') == email:
+                            results.append(submission_data)
 
             return results
 

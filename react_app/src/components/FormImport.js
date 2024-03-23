@@ -15,6 +15,9 @@ import { useNavigate } from 'react-router-dom';
 // for notifications
 import { toast } from 'react-toastify';
 
+// for getting the current user
+import { auth } from '../components/Authentication';
+
 
 // axios
 import axios from 'axios';
@@ -150,8 +153,17 @@ const FormImport = () => {
       // Append the name of the submission
       formData.append('uploadName', name)
 
+      // get logged in user
+      const user = auth.currentUser;
+      if (user)
+      {
+        const email = user.email;
+        // append the users email
+        formData.append('email', email);
+      } 
+
       try {
-        const response = await axios.post('http://localhost:8080/upload-video', formData, {
+        const response = await axios.post('/upload-video', formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
@@ -160,17 +172,29 @@ const FormImport = () => {
         // remove the first toast when the second one populates
         toast.dismiss(currentlyAnalyzing);
         // notification that the files have been analyzed
+
+        // find the result
+        const navigateToResults = {
+          'Department': department,
+          'Brand': dealerships['Brand'],
+          'Dealership Name': dealerships['Dealership Name'],
+          'Submitted': time
+        };
+       
+        sessionStorage.setItem('advancedResultsParams', JSON.stringify(navigateToResults));
+
         toast.success(
           <div>
             Completed {dealerships['UID']} {dealerships['Dealership Name']} {department}
             <div>
-              <MaterialUI.CustomButton onClick={() => navigate(`/audit/results/${encodeURIComponent(dealerships['Brand'])}/${encodeURIComponent(dealerships['Dealership Name'])}/${encodeURIComponent(department)}/${encodeURIComponent(time)}`)}>View</MaterialUI.CustomButton>
+              <MaterialUI.CustomButton onClick={() => navigate(`/audit/results/advanced-results`)}>View</MaterialUI.CustomButton>
             </div>
           </div>
           , { autoClose: false, closeButton: true });
 
       }
       catch (error) {
+        toast.dismiss(currentlyAnalyzing);
         if (error.response) {
           // The request was made and the server responded with a status code
           // that falls out of the range of 2xx

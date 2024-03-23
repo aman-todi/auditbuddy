@@ -13,7 +13,7 @@ class HospitalityFinder:
         self.confidence_threshold = confidence_threshold  # Set confidence threshold for detection
         self.nms_threshold = nms_threshold  # Set Non-Maximum Suppression threshold
 
-    def detect_indicators(self, frame):
+    def detect_seating(self, frame):
         # Detect indicators of hospitality in the frame
         height, width, _ = frame.shape
         # Convert frame to blob format for DNN input
@@ -21,22 +21,9 @@ class HospitalityFinder:
         self.net.setInput(blob)
         outs = self.net.forward(self.output_layers)  # Perform a forward pass and get output
 
-        # Segregate hospitality indicators by class
-        # Beverage (class 1): Bottle, Wine Glass, Cup - 39,40,41
-        # Snacks (class 2) : Banana, Apple, Sandwich, Orange, Broccoli, Carrot, Hot dog, Pizza, Donut, Cake - [45,55]
-        # Seating (class 3): Bench, Chair, Couch - 13,56,57
-
-        class_ids_1 = []
-        confidences_1 = []
-        boxes_1 = []
-
-        class_ids_2 = []
-        confidences_2 = []
-        boxes_2 = []
-
-        class_ids_3 = []
-        confidences_3 = []
-        boxes_3 = []
+        class_ids = []
+        confidences = []
+        boxes = []
 
         for out in outs:
             for detection in out:
@@ -53,32 +40,16 @@ class HospitalityFinder:
                 x = int(center_x - w / 2)
                 y = int(center_y - h / 2)
 
-                # Check for beverages (class 1)
-                if confidence > self.confidence_threshold and class_id in [39,41]:
-                    boxes_1.append([x, y, w, h])
-                    confidences_1.append(float(confidence))
-                    class_ids_1.append(class_id)
-
-                # Check for snacks (class 2)
-                elif confidence > self.confidence_threshold and (45 <= class_id <= 55):
-                    boxes_2.append([x, y, w, h])
-                    confidences_2.append(float(confidence))
-                    class_ids_2.append(class_id)
-
-                # Check for seating (class 3)
-                elif confidence > self.confidence_threshold and class_id in [13,56,57]:
-                    boxes_3.append([x, y, w, h])
-                    confidences_3.append(float(confidence))
-                    class_ids_3.append(class_id)
+                # Check for seating: Bench, Chair, Couch
+                if confidence > self.confidence_threshold and class_id in [13,56,57]:
+                    boxes.append([x, y, w, h])
+                    confidences.append(float(confidence))
+                    class_ids.append(class_id)
 
         # Apply Non-Maximum Suppression to filter overlapping boxes
-        indices_1 = cv2.dnn.NMSBoxes(boxes_1, confidences_1, self.confidence_threshold, self.nms_threshold)
-        indices_2 = cv2.dnn.NMSBoxes(boxes_2, confidences_2, self.confidence_threshold, self.nms_threshold)
-        indices_3 = cv2.dnn.NMSBoxes(boxes_3, confidences_3, self.confidence_threshold, self.nms_threshold)
+        indices = cv2.dnn.NMSBoxes(boxes, confidences, self.confidence_threshold, self.nms_threshold)
 
         # Use list comprehension to filter boxes based on class ID
-        boxes_1 = [boxes_1[i] for i in indices_1 if class_ids_1[i] in [39,41]]
-        boxes_2 = [boxes_2[i] for i in indices_2 if (45 <= class_ids_2[i] <= 55)]
-        boxes_3 = [boxes_3[i] for i in indices_3 if class_ids_3[i] in [13,56,57]]
+        seating_boxes = [boxes[i] for i in indices if class_ids[i] in [13,56,57]]
 
-        return boxes_1, boxes_2, boxes_3  # Return 3 sets of boxes for each of the classes: beverages, snacks, and seating
+        return seating_boxes  # output seating detections

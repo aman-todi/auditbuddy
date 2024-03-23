@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '../App.css';
 import * as MaterialUI from '../components/MaterialUI';
-import { Container, Grid, Paper, Typography, Button, Select, Tabs, Tab, MenuItem, CardHeader, Dialog, DialogActions, DialogContent, DialogTitle, Card, CardContent, FormControl, Box, useTheme, useMediaQuery, CircularProgress } from '@mui/material';
+import { Container, Grid, Paper, Typography, Button, Dialog, DialogActions, DialogContent, DialogTitle, Box, useTheme, useMediaQuery, CircularProgress } from '@mui/material';
 import { auth } from '../components/Authentication';
 import { SearchBar } from '../components/SearchBar';
 import { useNavigate } from 'react-router-dom';
@@ -52,8 +52,26 @@ function ResultsPage() {
   // fetch data from the database
   const fetchResults = async () => {
     try {
+
+      // create a form and append this file
+      const formData = new FormData();
+
+      // get logged in user
+      const user = auth.currentUser;
+      if (user)
+      {
+        const email = user.email;
+        // append the users email
+        formData.append('email', email);
+      } 
+
       // make request to the backend
-      const response = await axios.post('/generate-results');
+      const response = await axios.post('/generate-results', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+
       // set state of items to the data
       setItems(response.data);
 

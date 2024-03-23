@@ -44,7 +44,8 @@ def add_to_database(database_info,categories, scores,total_scores,detection,min_
          "Detection" : detection,
          "Min Vals" : min_vals,
          "Expected Logo" : expected_logo,
-         "Upload Name" : database_info[-1]
+         "Upload Name" : database_info[-1],
+         "User" : database_info[8]
 
     }
 

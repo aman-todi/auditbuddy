@@ -84,17 +84,12 @@ function AdminUserPage () {
 
     const { admin } = useAdmin();
 
-     // for mobile responsiveness
-     const theme = useTheme();
-     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
     return (
         <React.Fragment>
         {admin ? 
         (
           <React.Fragment>
-          <MaterialUI.SideBar></MaterialUI.SideBar>
-          <header className="App-header" style={{ marginLeft: isMobile ? 0 : 125 }}>
+          <header className="App-header">
           <div className="App">
               <h1>Manage Users</h1>
               <Container component= "main" maxWidth="s">

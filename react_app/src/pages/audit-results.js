@@ -27,10 +27,6 @@ function ResultsPage() {
     });
   }, []);
 
-  // for mobile responsiveness
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
   // filter dealterships by uid
   function filterUniqueDealerships(submissions) {
     // Track unique dealership names
@@ -203,8 +199,7 @@ function ResultsPage() {
     <React.Fragment>
       {user ? (
         <React.Fragment>
-          <MaterialUI.SideBar />
-          <header className="App-header" style={{ marginLeft: isMobile ? 0 : 125 }}>
+          <header className="App-header">
             <div className="App">
               <Container maxWidth="lg" style={{ marginTop: '6rem' }}>
                 <h1>Results</h1>

@@ -1,9 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import '../App.css';
-import * as MaterialUI from '../components/MaterialUI';
 import { auth } from '../components/Authentication';
-import { useTheme, useMediaQuery } from '@mui/material';
 import * as Dash from '../components/Dashboard';
+import { Typography } from '@mui/material';
 
 function AuditPage () {
 
@@ -14,26 +13,26 @@ function AuditPage () {
     auth.onAuthStateChanged((currentUser) => setUser(currentUser));
   }, []);
 
-    // for mobile responsiveness
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
     return (
         <React.Fragment>
         {user ? 
         (
           <React.Fragment>
-          <MaterialUI.SideBar></MaterialUI.SideBar>
-          <header className="Dash-header" style={{ marginLeft: isMobile ? 0 : 125 }}>
-          <div className="App">
-              <h1>Dashboard</h1>
-              </div>
-              </header>
-            <Dash.NewChanges></Dash.NewChanges>
-            <Dash.TopDealerships></Dash.TopDealerships>
+          <header className="App-header">
+    <div className="App">
+      <h1>Dashboard</h1>
+      <Typography sx={{ fontSize: '0.9rem', marginLeft: -1 }} disablePadding><strong>Welcome,</strong> {user && user.email}</Typography>
+      <div style={{ display: 'inline-flex', flexDirection: 'column' }}>
+        <Dash.NewChanges />
+        <Dash.TopDealerships />
+      </div>
+    </div>
+  </header>
             </React.Fragment>
           ) : (<p>Not Authorized</p>)
+         
         }
+        
         </React.Fragment>
     );
 }

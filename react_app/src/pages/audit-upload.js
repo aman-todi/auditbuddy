@@ -14,17 +14,12 @@ function AuditPage() {
      auth.onAuthStateChanged((currentUser) => setUser(currentUser));
    }, []);
 
-    // for mobile responsiveness
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
   return (
     <React.Fragment>
       {user ? 
       (
       <React.Fragment>
-      <MaterialUI.SideBar></MaterialUI.SideBar>
-      <header className="App-header" style={{ marginLeft: isMobile ? 0 : 125 }}>
+      <header className="App-header">
         <div className="App">
           <h1 sx={{}} >Upload Media</h1>
           <p>Complete the form below and press 'Analyze' to process the audit data</p>

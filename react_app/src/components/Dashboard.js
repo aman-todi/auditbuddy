@@ -5,12 +5,12 @@ import axios from 'axios';
 
 export function NewChanges() {
   return (
-    <Box sx={{ marginLeft: 25 }}>
+    <Box style={{marginBottom: "5rem"}}>
       <Typography variant="h4" gutterBottom>
         New Changes
       </Typography>
-      <Divider sx={{ width: 225 }} /> 
-      <Typography variant="h6" gutterBottom sx={{ marginTop: 2 }}>
+      <Divider /> 
+      <Typography variant="h6" gutterBottom>
         2 Recent Uploads <br></br> In Past 24 Hours
       </Typography>
       {/* uploads */}
@@ -20,7 +20,7 @@ export function NewChanges() {
 
 export function TopDealerships() {
     return (
-        <Box sx={{ border: '1px solid #ccc', marginLeft: 25,width: 'fit-content', marginTop: 5 }}>
+        <Box sx={{ border: '1px solid #ccc',width: 'fit-content'}}>
           <Typography variant="h4" gutterBottom>
             Top Dealerships
           </Typography>

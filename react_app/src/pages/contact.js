@@ -5,15 +5,10 @@ import { useTheme, useMediaQuery} from '@mui/material';
 
 function ContactPage() {
 
-    // for mobile responsiveness
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
   return (
 
     <React.Fragment>
-    <header className="App-header" style={{ marginLeft: isMobile ? 0 : 125 }}>
-    <div><MaterialUI.SideBar></MaterialUI.SideBar></div> 
+    <header className="App-header">
     <MaterialUI.ContactForm></MaterialUI.ContactForm>
     </header>
     </React.Fragment>

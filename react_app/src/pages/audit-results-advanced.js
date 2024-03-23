@@ -52,14 +52,10 @@ const AdvancedResultsPage = () => {
     navigate('/audit/results');
   };
 
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
   console.log("Checking Values", brandName, dealershipName, department, submission);
 
   return (
     <Container maxWidth="lg" style={{ marginRight: '3rem', paddingTop: '5rem' }}>
-      <MaterialUI.SideBar />
       <Typography variant="h4" gutterBottom align="center" style={{ marginBottom: '2rem', marginTop: '3rem', position: 'relative' }}>
         {/* Position the "Back" button next to the title */}
         <Button

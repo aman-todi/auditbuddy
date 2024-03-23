@@ -214,14 +214,14 @@ export const SideBar = (props) => {
                 <Toolbar sx={{ marginTop: 7.5, width: 145 }}>
                     <List>
                         <Typography sx={{ fontSize: '0.9rem', marginLeft: -1 }} disablePadding><strong>Welcome,</strong> {user && user.email}</Typography>
-                        <ListItem disablePadding>
-                            <ListItemButton sx={{ ...colorSelected }} selected={path === '/audit/dashboard'} component={Link} to="/audit/dashboard">
-                                <ListItemIcon sx={{ minWidth: 40 }}><AlignHorizontalLeftIcon></AlignHorizontalLeftIcon></ListItemIcon>
-                                <ListItemText
-                                    primary={<Typography sx={{ fontSize: '0.9rem' }}>Dashboard</Typography>}
-                                />
-                            </ListItemButton>
-                        </ListItem>
+                            <ListItem disablePadding>
+                                <ListItemButton sx={{ ...colorSelected }} selected={path === '/audit/dashboard'} component={Link} to="/audit/dashboard">
+                                    <ListItemIcon sx={{ minWidth: 40 }}><AlignHorizontalLeftIcon></AlignHorizontalLeftIcon></ListItemIcon>
+                                    <ListItemText
+                                        primary={<Typography sx={{ fontSize: '0.9rem' }}>Dashboard</Typography>}
+                                    />
+                                </ListItemButton>
+                            </ListItem>
                         <ListItem disablePadding>
                             <ListItemButton sx={{ ...colorSelected }} selected={path === '/audit/upload'} component={Link} to="/audit/upload">
                                 <ListItemIcon sx={{ minWidth: 40 }}><CloudUploadIcon></CloudUploadIcon></ListItemIcon>

@@ -176,12 +176,10 @@ def upload_video():
     print("uio", request.form['uio'])
     name = request.form['uploadName']
     print("uploadName", request.form['uploadName'])
+    email = request.form['email']
+    print("email: ", email)
 
-
-    dealership_info = (brandName, dealershipName, department, country, submission,uid,sales,uio,name)
-
-    # we should save the folders from each dealership somewhere in here
-    database_info = [request.form['submission'],request.form['name'], request.form['dealership'], request.form['department'], request.form['country'], request.form['uid'], request.form['sales'], request.form['uio'],request.form['uploadName']]
+    dealership_info = (brandName, dealershipName, department, country, submission,uid,sales,uio, email, name)
 
     # Computer Vision Tasks
 
@@ -286,25 +284,19 @@ def upload_video():
 #
 @app.route('/check-admin', methods=['POST'])
 def check_admin():
-    # get the admins database
-    admins = {}
-    collection_ref = db.collection('admins')
-    for doc in collection_ref.stream():
-    # get document name (key) and email (value)
-        doc_name = doc.id
-        email = doc.to_dict().get('email')
-    
-        # add to the dictionary
-        admins[doc_name] = email
-
     # get the user token
     token = request.json.get('userToken')
-    #decode the token
+    # decode the token
     decoded_token = auth.verify_id_token(token)
     user_email = decoded_token['email']
 
-    # check if the current user is an admin
-    if user_email in admins.values():
+    # get the admins database
+    collection_ref = db.collection('admins')
+    # find the document with the user's email
+    user_doc = collection_ref.document(user_email).get()
+
+    # if present, then the user is an admin
+    if user_doc.exists:
         return jsonify({'isAdmin': True}), 200
 
     return jsonify({'isAdmin': False}), 200
@@ -624,7 +616,20 @@ def dealership_update_values():
 # pull results from the database
 @app.route('/generate-results', methods=['POST'])
 def generate_results():
+
+    # extract the current user's email
+    email = request.form['email']
+    admin = False
+
     try:
+
+         # find the document with the user's email
+        admin_doc = db.collection('admins').document(email).get()
+        
+        if admin_doc.exists:
+            # user is an admin
+            admin = True
+
         # Access the 'results' collection
         collection_ref = db.collection('results')
 
@@ -645,7 +650,14 @@ def generate_results():
                 submission_docs = subcollection_ref.stream()
                 for submission_doc in submission_docs:
                     submission_data = submission_doc.to_dict()  # Get submission data
-                    results.append(submission_data)
+
+                    if admin:
+                        # admin append the submission
+                        results.append(submission_data)
+                    else:
+                        # user append submission only if the email matches
+                        if submission_data.get('User') == email:
+                            results.append(submission_data)
 
             return results
 

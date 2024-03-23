@@ -52,8 +52,26 @@ function ResultsPage() {
   // fetch data from the database
   const fetchResults = async () => {
     try {
+
+      // create a form and append this file
+      const formData = new FormData();
+
+      // get logged in user
+      const user = auth.currentUser;
+      if (user)
+      {
+        const email = user.email;
+        // append the users email
+        formData.append('email', email);
+      } 
+
       // make request to the backend
-      const response = await axios.post('/generate-results');
+      const response = await axios.post('/generate-results', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+
       // set state of items to the data
       setItems(response.data);
 

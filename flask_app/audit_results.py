@@ -46,7 +46,8 @@ def add_to_database(database_info,categories, scores,total_scores,detection):
              "Scores": total_scores
          },
          "Detection" : detection,
-         "Upload Name" : database_info[-1]
+         "Upload Name" : database_info[-1],
+         "User" : database_info[8]
     }
 
     # go to the collection, create a new document (dealership name), create a new collection with (department)

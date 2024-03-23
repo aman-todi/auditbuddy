@@ -4,6 +4,7 @@ import * as MaterialUI from '../components/MaterialUI';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../components/Authentication';
 import { signInWithEmailAndPassword, getAuth, sendPasswordResetEmail } from 'firebase/auth';
+import { useAdmin } from '../components/Admin';
 
 function LoginPage() {
     const [email, setEmail] = useState('');
@@ -13,13 +14,13 @@ function LoginPage() {
     const [open, setOpen] = useState(false);
     const [passEmail, setPassEmail] = useState('');
     const [success, setSuccess] = useState('');
+
     // sign in function
     const signIn = (e) => {
         e.preventDefault();
         signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) =>{
-            console.log(userCredential);
-    
+
             // redirect to the audit page after 1 second
             let countdown = 1;
             setInterval(() => {

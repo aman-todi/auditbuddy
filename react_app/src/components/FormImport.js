@@ -15,6 +15,9 @@ import { useNavigate } from 'react-router-dom';
 // for notifications
 import { toast } from 'react-toastify';
 
+// for getting the current user
+import { auth } from '../components/Authentication';
+
 
 // axios
 import axios from 'axios';
@@ -150,8 +153,17 @@ const FormImport = () => {
       // Append the name of the submission
       formData.append('uploadName', name)
 
+      // get logged in user
+      const user = auth.currentUser;
+      if (user)
+      {
+        const email = user.email;
+        // append the users email
+        formData.append('email', email);
+      } 
+
       try {
-        const response = await axios.post('http://localhost:8080/upload-video', formData, {
+        const response = await axios.post('/upload-video', formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }

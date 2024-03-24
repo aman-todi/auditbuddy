@@ -496,13 +496,18 @@ def delete_submission():
     brand = request.form['brand']
     time = request.form['time']
     department = request.form['department']
+    print(name)
+    print(brand)
+    print(time)
+    print(department)
 
     # path to delete
-    submission_doc = db.collection("dealerships").document(name).collection(department).document(time).get()
-
+    submission_doc = db.collection("results").document(name).collection(department).document(time).get()
+    print("not deleted")
     # if present, then we delete the submission
     if submission_doc.exists:
         submission_doc.reference.delete()
+        print("deleted")
         
     return jsonify("ok")
 

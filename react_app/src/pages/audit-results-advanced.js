@@ -5,6 +5,7 @@ import { Container, Typography, Button, Paper, useTheme, useMediaQuery } from '@
 import ResponsiveAppBar from '../components/ResponsiveAppBar';
 import AdvancedResultsTabContent from '../components/AdvancedResultsTabContent';
 import Chip from '@mui/material/Chip';
+import axios from 'axios';
 
 const AdvancedResultsPage = () => {
 
@@ -53,6 +54,41 @@ const AdvancedResultsPage = () => {
     navigate('/audit/results');
   };
 
+  // handle a deletion
+  const handleDelete = () => {
+
+    // call to the backend with submission information
+    deleteSubmission(dealershipName, submission, brandName, department);
+  }
+
+  // function to delete a dealership from the list
+  const deleteSubmission = async (dealershipName, submission, brandName, department) => {
+  try {
+
+    // append to a form the dealership information
+    const formData = new FormData();
+
+    // extract information from dealership
+    formData.append('name', dealershipName)
+    formData.append('time', submission)
+    formData.append('brand', brandName)
+    formData.append('department', department)
+
+    const response = await axios.post('http://localhost:8080/delete-submission', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+  
+      // once the submission is deleted, then we need to return the user to the results page
+      navigate('/audit/results');
+
+      console.log(response.data)
+    } catch (error) {
+      console.error('Error deleting dealership', error);
+    }
+  };
+
   console.log("Checking Values", brandName, dealershipName, department, submission);
 
   return (
@@ -62,6 +98,9 @@ const AdvancedResultsPage = () => {
       <div style={{ display: 'flex', justifyContent: 'flex-end'}}>
         <Chip label={department}  style={{ backgroundColor: '#bae38c' }}/>
         <Chip label={submission}/>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'flex-end'}}>
+      <Button color="error" onClick={handleDelete}>Delete Submission</Button>
       </div>
       <Typography variant="h4" gutterBottom align="center" style={{ marginBottom: '2rem', marginTop: '3rem', display: 'flex', alignItems: 'center'}}>
       {/* back button */}

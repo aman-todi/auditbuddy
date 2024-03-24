@@ -486,6 +486,27 @@ def delete_dealership():
     return jsonify("ok")
 
 #
+# delete a submission from the list
+#
+@app.route('/delete-submission', methods=['POST'])
+def delete_submission():
+
+    # get dealership info
+    name = request.form['name']
+    brand = request.form['brand']
+    time = request.form['time']
+    department = request.form['department']
+
+    # path to delete
+    submission_doc = db.collection("dealerships").document(name).collection(department).document(time).get
+
+    # if present, then we delete the submission
+    if submission_doc.exists:
+        submission_doc.reference.delete()
+        
+    return jsonify("ok")
+
+#
 # add dealership to the database
 #
 @app.route('/add-dealership', methods=['POST'])

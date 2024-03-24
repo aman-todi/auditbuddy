@@ -498,7 +498,7 @@ def delete_submission():
     department = request.form['department']
 
     # path to delete
-    submission_doc = db.collection("dealerships").document(name).collection(department).document(time).get()
+    submission_doc = db.collection("dealerships").document(name).collection(department).document(time).get
 
     # if present, then we delete the submission
     if submission_doc.exists:

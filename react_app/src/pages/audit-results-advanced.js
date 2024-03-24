@@ -55,24 +55,24 @@ const AdvancedResultsPage = () => {
   console.log("Checking Values", brandName, dealershipName, department, submission);
 
   return (
-    <Container maxWidth="lg" style={{ marginRight: '3rem', paddingTop: '5rem' }}>
-      <Typography variant="h4" gutterBottom align="center" style={{ marginBottom: '2rem', marginTop: '3rem', position: 'relative' }}>
-        {/* Position the "Back" button next to the title */}
-        <Button
-          variant="contained"
-          onClick={handleGoBack}
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            backgroundColor: '#74b42c'
-          }}
-        >
-          Back
-        </Button>
+    <Container maxWidth="lg" fullWidth style={{ marginRight: '3rem', paddingTop: '5rem' }}>
+     <Typography variant="h4" gutterBottom align="center" style={{ marginBottom: '2rem', marginTop: '3rem', display: 'flex', alignItems: 'center'}}>
+      {/* back button */}
+      <Button
+        variant="contained"
+        onClick={handleGoBack}
+        style={{
+          backgroundColor: '#74b42c',
+          marginRight: '10rem'
+        }}
+      >
+        Back to Results
+      </Button>
+  
+      {/* dealership name */}
         AuditBuddy Results for {dealershipName}
-      </Typography>
-      <Paper elevation={3} style={{ marginBottom: '2rem', marginTop: '3rem', padding: '1rem', marginRight: '4rem' }}>
+    </Typography>
+      <Paper elevation={3} style={{ marginBottom: '2rem', marginTop: '3rem', padding: '1rem', marginRight: '4rem' }} fullWidth>
         <ResponsiveAppBar handleTabChange={handleTabChange} />
         <AdvancedResultsTabContent
           selectedTab={selectedTab}

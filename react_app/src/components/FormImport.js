@@ -271,11 +271,11 @@ const FormImport = () => {
         </FormControl>
       </Box>
       <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, alignItems: "center" }}>
-        <TextField label="Name of Upload*" variant="outlined" onChange={(event) => handleFormInput(event, setName)}
-          sx={{ margin: "0.1rem", width: "75vw" }}
+      <FormControl required fullWidth sx={{ margin: "0.1rem" }}>
+        <TextField label="Name of Upload" variant="outlined" onChange={(event) => handleFormInput(event, setName)}
         />
+      </FormControl>
       </Box>
-
 
       {/* detection header */}
       <Typography variant="p" sx={{ display: "flex", alignItems: "center", marginBottom: "1rem", marginTop: "1rem" }}>

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import '../App.css';
 import * as MaterialUI from '../components/MaterialUI';
-import { Container, Grid, Paper, Typography, Button, Dialog, DialogActions, DialogContent, DialogTitle, Box, useTheme, useMediaQuery, CircularProgress } from '@mui/material';
+import { Container, Grid, Paper, Typography, Button, Dialog, DialogActions, DialogContent, DialogTitle, Box, useTheme, useMediaQuery, CircularProgress, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import { auth } from '../components/Authentication';
 import { SearchBar } from '../components/SearchBar';
 import { useNavigate } from 'react-router-dom';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 // axios
 import axios from 'axios';
 
@@ -194,6 +195,9 @@ function ResultsPage() {
     navigate('/audit/results/advanced-results');
   };
 
+  // for mobile responsiveness
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
     <React.Fragment>
@@ -201,47 +205,58 @@ function ResultsPage() {
         <React.Fragment>
           <header className="App-header">
             <div className="App">
-              <Container maxWidth="lg" style={{ marginTop: '6rem' }}>
+              <Container maxWidth="lg" fullWidth style={{ marginTop: '6rem', maxWidth: '90vw' }}>
                 <h1>Results</h1>
                 <div>
-                  {/* Search bar*/}
-                  <SearchBar onSearch={handleSearch} />
-                  <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', marginTop: '10vh' }}>
 
-                    {/* Display brand name cards */}
-                    {loading ? (
-                      <CircularProgress color="success" />
-                    ) : (
-                      <>
-                        <div>
-                          <Typography>
-                            {clickedBrandName ? "" : "Select a brand to view"}
-                          </Typography>
-                          <div style={{ display: 'flex', flexDirection: 'row' }}>
-                            {brand_names.map((brandName, index) => (
-                              <div
-                                key={index}
-                                onClick={() => handleBrandClick(brandName)}
-                                style={{
-                                  border: brandName === clickedBrandName ? '0.1em solid green' : '0.1em solid black',
-                                  padding: '0.5em',
-                                  margin: '0.1em',
-                                  cursor: 'pointer',
-                                  textAlign: 'center'
-                                }}
-                              >
-                                {brandName} {dealershipCount.get(brandName) || 0}
-                              </div>
-                            ))}
-                          </div>
-                          <Typography sx={{ marginTop: clickedBrandName ? '0' : '5rem' }}>
-                            {clickedBrandName ? "" : "Select a brand to view"}
-                          </Typography>
-                        </div>
-
-                      </>
-                    )}
+                {/* render the search bar differently on mobile */}
+                {isMobile ? (
+                  <Accordion>
+                  <AccordionSummary  expandIcon={<ExpandMoreIcon />}>
+                    <h2>Search</h2>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', marginTop: '10vh', overflowX: 'auto' }}>
+                    <SearchBar onSearch={handleSearch} />
                   </div>
+                  </AccordionDetails>
+                  </Accordion>
+                  ) : (
+                    /* Search bar */
+                    <SearchBar onSearch={handleSearch} />
+                  )}
+
+            <Container fullWidth style={{overflowX: 'auto', marginTop: '5rem'}}>
+            {loading ? (
+            <CircularProgress color="success" />
+        ) : (
+          <>
+            <div>
+              <div style={{ display: 'flex', flexDirection: 'row' }}>
+                {brand_names.map((brandName, index) => (
+                  <div
+                    key={index}
+                    onClick={() => handleBrandClick(brandName)}
+                    style={{
+                      border: brandName === clickedBrandName ? '0.1em solid green' : '0.1em solid black',
+                      padding: '0.5em',
+                      margin: '0.1em',
+                      cursor: 'pointer',
+                      textAlign: 'center'
+                    }}
+                  >
+                    {brandName} {dealershipCount.get(brandName) || 0}
+                  </div>
+                ))}
+              </div>
+              <Typography sx={{ marginTop: clickedBrandName ? '0' : '5rem' }}>
+                {clickedBrandName ? "" : "Select a brand to view"}
+              </Typography>
+            </div>
+          </>
+        )}
+      </Container>
+
                   {/* handle pop up content accordingly */}
                   <div style={{ marginLeft: 15, display: 'flex', flexDirection: 'column' }}>
                     {/* handle the dealership list for each brand */}
@@ -269,7 +284,7 @@ function ResultsPage() {
                     ) : (
                       // handle the other pop ups like department and submission
                       popupContent && (
-                        <Dialog fullWidth open={isPopupOpen} onClose={closePopup} sx={{ marginLeft: 15, display: 'flex', flexDirection: 'column' }}>
+                        <Dialog fullWidth open={isPopupOpen} onClose={closePopup} sx={{ display: 'flex', flexDirection: 'column' }}>
                           <DialogTitle>{popupContent.name}</DialogTitle>
                           <DialogContent>
                             <Box sx={{ maxHeight: 400, overflowY: 'auto' }}>

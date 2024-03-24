@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Typography, Box, Divider, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import { Typography, Box, Divider, Accordion, AccordionSummary, AccordionDetails, useTheme, useMediaQuery } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Chart from 'chart.js/auto'; // Import Chart.js library
 import axios from 'axios';
@@ -202,6 +202,10 @@ const AdvancedResultsTabContent = ({ selectedTab, brandName, dealershipName, dep
 
   console.log("Testing indexing", expectedValueRange[tab - 1]);
 
+  // for mobile responsiveness
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   return (
     <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center' }}>
 
@@ -281,11 +285,11 @@ const AdvancedResultsTabContent = ({ selectedTab, brandName, dealershipName, dep
               <Typography variant="body1" align="center">
                 Overall Score: {totalScore} / 20
               </Typography>
-              <div style={{ display: 'flex', flexDirection: 'row', flex: 1 }}>
-                <div style={{ flex: 1 }}>
+              <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', flex: 1 }}>
+                <div style={{ flex: 1, marginBottom: isMobile ? '1rem' : '0' }}>
                   <canvas id="categoryChart" width="300" height="300"></canvas>
                 </div>
-                <Divider orientation="vertical" flexItem />
+              {isMobile ? null : <Divider orientation="vertical" flexItem />}
                 <div style={{ flex: 1 }}>
                   <canvas id="overallScoreChart" width="300" height="300"></canvas>
                 </div>

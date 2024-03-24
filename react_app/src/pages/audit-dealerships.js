@@ -26,15 +26,11 @@ function DealershipsPage () {
           <header className="App-header">
           <div className="App">
           <h1>Manage Dealerships</h1>
-          </div>
-          <div className="File">
-            <Container style={{marginBottom: '5rem'}}>
-              <MinRequirements></MinRequirements>
-            </Container>
-            <Container>
-              <DealershipListImport/>
-            </Container>
-          </div>
+        
+            <MinRequirements></MinRequirements>
+            <DealershipListImport/>
+      
+            </div>
             </header>
             </React.Fragment>
             

@@ -8,8 +8,7 @@ import * as MaterialUI from './MaterialUI';
 // for user table
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress } from '@mui/material';
 // for pop up
-import { Dialog, DialogTitle, DialogContent, DialogActions, Select, MenuItem, Button, TextField} from '@mui/material';
-
+import { Dialog, DialogTitle, DialogContent, DialogActions, Select, MenuItem, Button, TextField, Box, FormControl, InputLabel} from '@mui/material';
 //axios request to get users
 export const fetchData = async (setUsers, setLoading) => {
   setLoading(true);
@@ -25,12 +24,25 @@ export const fetchData = async (setUsers, setLoading) => {
 };
 
 // added props
-export const UserListImport = ({ refresh }) => {
+export const UserListImport = () => {
   // store user dealerships
   const [users, setUsers] = useState([]);
 
   // check if table is loading
   const [loading, setLoading] = useState(true);
+
+  // handle user table refresh
+  const [refresh, setRefresh] = useState(false);
+
+  const handleRefresh = () => {
+    setRefresh(!refresh);
+  };
+
+   // keep track of states for create user
+   const [email, setEmail] = useState('');
+   const [password, setPassword] = useState('');
+   const [confirm, setConfirm] = useState('');
+   const [error, setError] = useState(null);
 
   // get the dealerships when user enter page
   useEffect(() => {
@@ -113,16 +125,16 @@ export const UserListImport = ({ refresh }) => {
     setPopup(true);
   };
 
-   // control the pop up
-   const [popup, setPopup] = useState(false);
-   const handlePopup = () => {
-     setPopup(false);
-   };
+  // control the pop up
+  const [popup, setPopup] = useState(false);
+  const handlePopup = () => {
+    setPopup(false);
+  };
 
   // see if we are in edit mode
   const [editMode, setEditMode] = useState(false);
 
-   // cancel the edit
+  // cancel the edit
   const handleCancelEdit = () => {
     setRole(originalRole);
     setEditMode(false);
@@ -136,7 +148,7 @@ export const UserListImport = ({ refresh }) => {
     updateValues(role, clickedUser);
   };
 
-  // handle search
+  // state to handle search
   const [searchQuery, setSearchQuery] = useState('');
 
   // handle search
@@ -158,15 +170,118 @@ export const UserListImport = ({ refresh }) => {
     );
   });
 
+  // control the pop up for add users
+  const [popupUser, setPopupUser] = useState(false);
+  const handlePopupUser = () => {
+    setPopupUser(!popupUser);
+  };
 
+  // handles each form input states
+  const handleFormInput = (event, setFormInputState) => {
+    setFormInputState(event.target.value);
+  };
+
+  // create user function
+  const createUser = async () => {
+
+    if (password != confirm)
+    {
+      setError("Passwords do not match");
+    }
+    else if (role == "")
+    {
+      setError("User role not selected")
+    }
+    else {
+        // create a form and append this file
+        const formData = new FormData();
+        formData.append('email', email);
+        formData.append('password', password);
+        formData.append('role', role)
+
+        try {
+          const response = await axios.post('http://localhost:8080/create-user', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          });
+
+          // change state to refresh table
+          handleRefresh();
+          setError(`User created successfully: ${response.data.email}`);
+
+        }
+        catch (error) {
+          if (error.response) 
+          {
+            setError(`Error creating user: ${error.response.data.error}`);
+          } 
+          else if (error.request) 
+          {
+            setError('Error creating user: No response from server');
+          } 
+          else 
+          {
+            setError('Error creating user');
+          }
+        }
+    }
+};
+     
   return (
-    <Container component="main" maxWidth="s">
+    <Container component="main" maxWidth="s" fullWidth>
       <Typography variant="p" sx={{ display: "flex", alignItems: "center", marginBottom: "1rem" }}>
         <span style={{ fontWeight: "bold", marginRight: "0.5rem" }}>User List</span>
         <Tooltip disableFocusListener title="List of all users">
           <HelpIcon sx={{ fontSize: "small" }} />
         </Tooltip>
+        <span style={{marginLeft: 'auto'}}>
+          <MaterialUI.CustomButton onClick={handlePopupUser}>Add User</MaterialUI.CustomButton>
+        </span>
       </Typography>
+
+       {/* dialog for add user */}
+       <Dialog open={popupUser} onClose={handlePopupUser} fullWidth maxWidth="lg">
+          <DialogTitle>Add User</DialogTitle>
+          <DialogContent>
+          <Container component= "main" maxWidth="s">
+              <Typography variant="p" sx={{ display: "flex", alignItems: "center", marginBottom: "1rem" }}>
+                <span style={{ fontWeight: "bold", marginRight: "0.5rem" }}>Add User</span>
+              <Tooltip disableFocusListener title="The information of the user you want to create">
+                <HelpIcon sx={{ fontSize: "small" }} />
+              </Tooltip>
+              </Typography>
+
+              <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, alignItems: "center" }}>
+              <TextField  sx={{ margin: "0.1rem"}} fullWidth value = {email} onChange={(e) => setEmail(e.target.value)} required id="email" label='Email' variant="outlined" margin="normal"/>
+              <TextField  sx={{ margin: "0.1rem"}} fullWidth value = {password} onChange={(e) => setPassword(e.target.value)} required id="password" label='Password' variant="outlined" margin="normal" type="password"/>
+              <TextField  sx={{ margin: "0.1rem"}} fullWidth value = {confirm} onChange={(e) => setConfirm(e.target.value)} required id="confirm" label='Confirm Password' variant="outlined" margin="normal" type="password"/>
+              <FormControl required fullWidth sx={{ margin: "0.1rem"}}>
+                <InputLabel>User Role</InputLabel>
+                  <Select
+                    value={role}
+                    label="User Role"
+                    onChange={(event) => handleFormInput(event, setRole)}
+                  >
+                    <MenuItem value={"Admin"}>Admin</MenuItem>
+                    <MenuItem value={"Auditor"}>Auditor</MenuItem>
+                  </Select>
+              </FormControl>
+              </Box>
+              <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "0.1rem" }}>
+              <MaterialUI.CustomButton type ="submit" onClick={createUser}>Add User</MaterialUI.CustomButton>
+              {error && <p id="error">{error}</p>}
+              </Box>
+        </Container>
+
+          </DialogContent>
+          <DialogActions>
+            <MaterialUI.CustomButton onClick={handlePopupUser} color="primary">
+              Close
+            </MaterialUI.CustomButton>
+          </DialogActions>
+        </Dialog>
+
        {/* search bar */}
        <TextField
         label="Search"
@@ -175,7 +290,7 @@ export const UserListImport = ({ refresh }) => {
         onChange={handleSearchChange}
         fullWidth
       />
-      <TableContainer component={Paper} sx={{ maxHeight: "15rem" }}>
+      <TableContainer component={Paper} sx={{ maxHeight: "45vh" }} fullWidth>
         <Table stickyHeader>
           <TableHead>
             <TableRow>

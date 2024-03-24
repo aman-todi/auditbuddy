@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../App.css';
-import * as MaterialUI from '../components/MaterialUI';
 import FormImport from '../components/FormImport';
 import { auth } from '../components/Authentication';
-import { useTheme, useMediaQuery} from '@mui/material';
 
 function AuditPage() {
   

@@ -65,7 +65,7 @@ export const SearchBar = ({ onSearch }) => {
   const [dealershipName, setDealershipName] = useState('');
 
   return (
-    <Container component="main" maxWidth="s">
+    <Container component="main" maxWidth="s" fullWidth>
       <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, alignItems: "center" }}>
         <Typography variant="p" sx={{ display: "flex", alignItems: "center", marginBottom: "1rem", marginTop: "1rem" }}>
           <span style={{ fontWeight: "bold", marginRight: "0.5rem" }}>Search</span>
@@ -76,12 +76,12 @@ export const SearchBar = ({ onSearch }) => {
       </Box>
       <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, alignItems: "center" }}>
         <TextField label="Upload Name" variant="outlined" onChange={(event) => handleFormInput(event, setUploadName, 'uploadName')}
-          sx={{ margin: "0.1rem", width: "75vw" }}
+          sx={{ margin: "0.1rem"}} fullWidth
         />
         <TextField label="Dealership Name" variant="outlined" onChange={(event) => handleFormInput(event, setDealershipName, 'dealership')}
-          sx={{ margin: "0.1rem", width: "75vw" }}
+          sx={{ margin: "0.1rem"}} fullWidth
         />
-        <FormControl sx={{ margin: "0.1rem", width: "40vw" }}>
+        <FormControl sx={{ margin: "0.1rem"}} fullWidth>
           <InputLabel>Brand</InputLabel>
           <Select
             value={brandName}
@@ -104,7 +104,7 @@ export const SearchBar = ({ onSearch }) => {
 
           </Select>
         </FormControl>
-        <FormControl sx={{ margin: "0.1rem", width: "45vw" }}>
+        <FormControl sx={{ margin: "0.1rem" }} fullWidth>
           <InputLabel>Department</InputLabel>
           <Select
             value={department}
@@ -118,7 +118,7 @@ export const SearchBar = ({ onSearch }) => {
             <MenuItem value={"bodyandpaint"}>Body & Paint</MenuItem>
           </Select>
         </FormControl>
-        <FormControl sx={{ margin: "0.1rem", width: "35vw" }}>
+        <FormControl sx={{ margin: "0.1rem"}} fullWidth>
           <InputLabel>Country</InputLabel>
           <Select
             value={country}

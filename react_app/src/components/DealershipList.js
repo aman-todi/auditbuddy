@@ -202,7 +202,7 @@ export const DealershipListImport = () => {
     };
 
   return (
-    <Container component="main">
+    <Container component="main" maxWidth="s">
       <Typography variant="p" sx={{ display: "flex", alignItems: "center", marginBottom: "1rem" }}>
         <span style={{ fontWeight: "bold", marginRight: "0.5rem" }}>Dealerships</span>
         <Tooltip disableFocusListener title="List of all dealerships">
@@ -235,7 +235,7 @@ export const DealershipListImport = () => {
           </DialogActions>
         </Dialog>
 
-      <TableContainer component={Paper} sx={{ maxHeight: "15rem" }}>
+      <TableContainer component={Paper} sx={{ maxHeight: "35vh", maxWidth: "90vw"}}>
         <Table stickyHeader>
           <TableHead>
             <TableRow>
@@ -275,7 +275,7 @@ export const DealershipListImport = () => {
       </TableContainer>
 
        {/* pop up */}
-       <Dialog open={popup} onClose={handlePopup}>
+       <Dialog open={popup} onClose={handlePopup} fullWidth>
        <DialogTitle>{clickedDealership && `${clickedDealership['UID']} ${clickedDealership['Dealership Name']} ${clickedDealership['City']} ${clickedDealership['State']} ${clickedDealership['Country']}`}</DialogTitle>
         <DialogContent sx={{marginBotton: '5rem'}}>
 

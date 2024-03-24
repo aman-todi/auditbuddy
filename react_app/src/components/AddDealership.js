@@ -90,6 +90,8 @@ const AddDealershipImport = ({ refresh }) => {
           </div>
           , { autoClose: false, closeButton: true });
 
+          refresh();
+
       }
       catch (error) {
         toast.dismiss(currentlyAnalyzing);

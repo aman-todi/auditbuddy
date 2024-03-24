@@ -55,24 +55,24 @@ const AdvancedResultsPage = () => {
   console.log("Checking Values", brandName, dealershipName, department, submission);
 
   return (
-    <Container maxWidth="lg" fullWidth style={{ marginRight: '3rem', paddingTop: '5rem' }}>
-     <Typography variant="h4" gutterBottom align="center" style={{ marginBottom: '2rem', marginTop: '3rem', display: 'flex', alignItems: 'center'}}>
+    <Container maxWidth="lg" fullWidth style={{ paddingTop: '5rem' }}>
+      <Paper style={{ marginBottom: '2rem', marginTop: '1rem', padding: '1rem' }}>
+      <Typography variant="h4" gutterBottom align="center" style={{ marginBottom: '2rem', marginTop: '3rem', display: 'flex', alignItems: 'center'}}>
       {/* back button */}
       <Button
         variant="contained"
         onClick={handleGoBack}
         style={{
           backgroundColor: '#74b42c',
-          marginRight: '10rem'
+          marginRight: 'auto'
         }}
       >
-        Back to Results
+        Back
       </Button>
   
       {/* dealership name */}
         AuditBuddy Results for {dealershipName}
     </Typography>
-      <Paper elevation={3} style={{ marginBottom: '2rem', marginTop: '3rem', padding: '1rem', marginRight: '4rem' }} fullWidth>
         <ResponsiveAppBar handleTabChange={handleTabChange} />
         <AdvancedResultsTabContent
           selectedTab={selectedTab}

@@ -207,7 +207,7 @@ const AdvancedResultsTabContent = ({ selectedTab, brandName, dealershipName, dep
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
-    <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center' }}>
+    <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center', flexDirection: isMobile ? 'column' : 'row', flex: 1}}>
 
       <>
         {tab !== 0 && gradeResults && (
@@ -287,11 +287,11 @@ const AdvancedResultsTabContent = ({ selectedTab, brandName, dealershipName, dep
               </Typography>
               <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', flex: 1 }}>
                 <div style={{ flex: 1, marginBottom: isMobile ? '1rem' : '0' }}>
-                  <canvas id="categoryChart" width="300" height="300"></canvas>
+                  <canvas id="categoryChart" width="50%" height="50%"></canvas>
                 </div>
               {isMobile ? null : <Divider orientation="vertical" flexItem />}
                 <div style={{ flex: 1 }}>
-                  <canvas id="overallScoreChart" width="300" height="300"></canvas>
+                  <canvas id="overallScoreChart" width="50%" height="50%"></canvas>
                 </div>
               </div>
             </div>

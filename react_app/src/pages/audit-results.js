@@ -238,7 +238,7 @@ function ResultsPage() {
                     key={index}
                     onClick={() => handleBrandClick(brandName)}
                     style={{
-                      border: brandName === clickedBrandName ? '0.1em solid green' : '0.1em solid black',
+                      backgroundColor: brandName === clickedBrandName ? '#bae38c' : 'rgb(245,245,245)',
                       padding: '0.5em',
                       margin: '0.1em',
                       cursor: 'pointer',

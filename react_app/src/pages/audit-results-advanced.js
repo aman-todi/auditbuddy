@@ -4,6 +4,7 @@ import * as MaterialUI from '../components/MaterialUI';
 import { Container, Typography, Button, Paper, useTheme, useMediaQuery } from '@mui/material';
 import ResponsiveAppBar from '../components/ResponsiveAppBar';
 import AdvancedResultsTabContent from '../components/AdvancedResultsTabContent';
+import Chip from '@mui/material/Chip';
 
 const AdvancedResultsPage = () => {
 
@@ -57,6 +58,11 @@ const AdvancedResultsPage = () => {
   return (
     <Container maxWidth="lg" fullWidth style={{ paddingTop: '5rem' }}>
       <Paper style={{ marginBottom: '2rem', marginTop: '1rem', padding: '1rem' }}>
+         {/* add badge for department and submission */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end'}}>
+        <Chip label={department}  style={{ backgroundColor: '#bae38c' }}/>
+        <Chip label={submission}/>
+      </div>
       <Typography variant="h4" gutterBottom align="center" style={{ marginBottom: '2rem', marginTop: '3rem', display: 'flex', alignItems: 'center'}}>
       {/* back button */}
       <Button

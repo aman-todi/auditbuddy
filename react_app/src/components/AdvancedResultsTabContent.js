@@ -107,8 +107,8 @@ const AdvancedResultsTabContent = ({ selectedTab, brandName, dealershipName, dep
           datasets: [{
             label: 'Scores',
             data: scores,
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            borderColor: 'rgba(75, 192, 192, 1)',
+            backgroundColor: '#bae38c',
+            borderColor: '#f5f5f5',
             borderWidth: 1
           }]
         },
@@ -163,7 +163,7 @@ const AdvancedResultsTabContent = ({ selectedTab, brandName, dealershipName, dep
           labels: ['Score', 'Remaining'],
           datasets: [{
             data: [totalScore, 20 - totalScore],
-            backgroundColor: ['#467be3', '#e9edf7'],
+            backgroundColor: ['#bae38c', '#f5f5f5'],
             vals: [scorePercentage, remainingPercentage]
           }]
         },

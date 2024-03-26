@@ -21,7 +21,6 @@ import time
 from dateutil import parser
 import concurrent.futures
 from datetime import timedelta
-
 ANNOTATED_IMAGES_FOLDER = os.path.join(app.root_path, 'static', 'main', 'annotated_images')
 
 bucket = storage.bucket()
@@ -633,6 +632,209 @@ def dealership_update_values():
     except Exception as e:
         print("Error:", e)
         return jsonify({"error": str(e)}), 500
+    
+
+#
+# update the detection values in the submission
+#
+@app.route('/submission-update-values', methods=['POST'])
+def submission_update_values():
+    # get form inputs
+    new_cars = request.form['cars']
+    new_logo = request.form['logo']
+    new_parking = request.form['parking']
+    new_hospitality = request.form['hospitality']
+    new_spatial = request.form['spatial']
+
+    new_detection = [new_logo, new_cars, new_parking, new_hospitality, new_spatial]
+
+    # get dealership information
+    name = request.form['dealershipName'] # dealership name
+    submission = request.form['time'] # submission time
+    department = request.form['department'] # department
+
+    try:
+        # path to update
+        submission_doc = db.collection("results").document(name).collection(department).document(submission).get()
+        # if present, then we delete the submission
+        if submission_doc.exists:
+            # update the detection to the new
+            submission_doc.reference.update({
+                'Detection': new_detection
+            })
+
+        # get the uid from submission
+        uid = submission_doc.to_dict().get('UID')
+            
+        # after search this uid in the dealerships
+        dealership_doc = db.collection("dealerships").document(uid).get()
+
+        if dealership_doc.exists:
+            # extract the uio and sales
+            uio = int(dealership_doc.to_dict().get('UIO'))
+            sales = int(dealership_doc.to_dict().get('Sales'))
+            brand = dealership_doc.to_dict().get('Brand')
+
+            # recalculate the grades with the new values
+            grades = rebuild_audit_results(brand, new_detection, uio, sales)
+            print("grades", grades)
+            #return [scores, categories, total_score]
+
+            # update the fields in the submission here
+            test = submission_doc.to_dict().get('Category Eval')
+            print(test)
+
+            # update the evaluation scores in submission_doc
+            submission_doc.reference.update({
+                db.field_path(u'Category Eval'): {
+                    (u'Categories'): grades[1],
+                    (u'Scores'): grades[0]
+                },
+               db.field_path(u'Overall Eval'): {
+                  'Scores': grades[2]
+              }
+            })
+        
+        return jsonify("Submission updated successfully"), 200
+    
+    except Exception as e:
+        print("Error:", e)
+        return jsonify({"error": str(e)}), 500
+    
+#    
+# rebuilds the audit results on new values
+#    
+def rebuild_audit_results(brand, new_detection, past_sales=150, uio=300):
+    print("rebuild_audit_results called")
+
+    # extract results from various evaluations to build results
+    detected_logo = new_detection[0]
+    num_cars = float(new_detection[1])
+    num_parking = float(new_detection[2])
+    num_seating = float(new_detection[3])
+    sq_footage = float(new_detection[4])
+
+    # extract the minimum brand compliance
+    minimum_doc = db.collection("Brand compliance limits").document(brand).get()
+
+    if minimum_doc.exists:
+        minimum_dict = minimum_doc.to_dict()
+        cars_min = float(minimum_dict.get('minCars'))
+        parking_min = float(minimum_dict.get('minParking'))
+        seating_min = float(minimum_dict.get('minSeating'))
+        sq_footage_min = float(minimum_dict.get('minSqFt'))
+
+        # evaluation grades
+        def calculate_evaluation_grades():
+            # ratios
+            cars_ratio = 0.005
+            parking_ratio = 0.007
+            seating_ratio = 0.004
+            sq_footage_ratio = .025
+
+            # grade evaluation results
+            eval_factor = (past_sales + uio)//2
+            minParkingFactor = int(num_parking)/int(parking_min) + 1
+            minCarFactor = int(num_cars)/int(cars_min)+1
+            minSeatingFactor = int(num_seating)/int(seating_min) +1
+            minSqFactor = int(sq_footage)/int(sq_footage_min) +1
+            grades = {}
+
+            # logo detection
+            if detected_logo.upper() == brand.upper():
+                logo_result = ('Great', 4, detected_logo)
+            else:
+                logo_result = ('Poor', 1, detected_logo)
+
+            grades['Logo'] = logo_result
+
+            # cars detection
+            if num_cars < cars_min:
+                cars_result = ('Poor', 1, num_cars)
+            elif num_cars < cars_min+(eval_factor*cars_ratio*minCarFactor):
+                cars_result = ('Unsatisfactory', 2, num_cars)
+            elif num_cars == cars_min+(eval_factor*cars_ratio*minCarFactor) or cars_min+(eval_factor*cars_ratio*minCarFactor*2):
+                cars_result = ('Good', 3, num_cars)
+            elif num_cars >= cars_min+(eval_factor*cars_ratio*minCarFactor*2):
+                cars_result = ('Great', 4, num_cars)
+
+            min_vals = (cars_min,cars_min+(eval_factor*cars_ratio*minCarFactor),cars_min+(eval_factor*cars_ratio*minCarFactor*2))
+            cars_result = cars_result + min_vals
+            grades['Cars'] = cars_result 
+
+            # parking detection
+            if num_parking < parking_min:
+                parking_result = ('Poor', 1, num_parking)
+            elif num_parking < parking_min+(eval_factor*parking_ratio*minParkingFactor):
+                parking_result = ('Unsatisfactory', 2, num_parking)
+            elif num_parking == parking_min+(eval_factor*parking_ratio*minParkingFactor) or parking_min+(eval_factor*parking_ratio*minParkingFactor*2):
+                parking_result = ('Good', 3, num_parking)
+            elif num_parking >= parking_min+(eval_factor*parking_ratio*minParkingFactor*2):
+                parking_result = ('Great', 4, num_parking)
+
+            min_vals = (parking_min,parking_min+(eval_factor*parking_ratio*minParkingFactor),parking_min+(eval_factor*parking_ratio*minParkingFactor*2))
+            parking_result = parking_result + min_vals
+            grades['Parking'] = parking_result
+
+            # hospitality detection
+            if num_seating < seating_min:
+                seating_result = ('Poor', 1, num_seating)
+            elif num_seating < seating_min+(eval_factor*seating_ratio*minSeatingFactor):
+                seating_result = ('Unsatisfactory', 2, num_seating)
+            elif num_seating == seating_min+(eval_factor*seating_ratio*minSeatingFactor) or num_seating < seating_min+(eval_factor*seating_ratio*minSeatingFactor*2):
+                seating_result = ('Good', 3, num_seating)
+            elif num_seating >= seating_min+(eval_factor*seating_ratio*minSeatingFactor*2):
+                seating_result = ('Great', 4, num_seating)
+
+            min_vals = (seating_min,seating_min+(eval_factor*seating_ratio*minSeatingFactor),seating_min+(eval_factor*seating_ratio*minSeatingFactor*2))
+            seating_result = seating_result + min_vals
+            grades['Hospitality'] = seating_result
+
+            # spatial detection
+            if sq_footage < sq_footage_min:
+                sq_footage_result = ('Poor', 1, sq_footage)
+            elif sq_footage < sq_footage_min+(eval_factor*sq_footage_ratio* minSqFactor):
+                sq_footage_result = ('Unsatisfactory', 2, sq_footage)
+            elif sq_footage == sq_footage_min+(eval_factor*sq_footage_ratio* minSqFactor) or sq_footage < sq_footage_min+(eval_factor*sq_footage_ratio* minSqFactor *2):
+                sq_footage_result = ('Good', 3, sq_footage)
+            elif sq_footage >= sq_footage_min+(eval_factor*sq_footage_ratio* minSqFactor *2):
+                sq_footage_result = ('Great', 4, sq_footage)
+        
+            min_vals = (sq_footage_min,sq_footage_min+(eval_factor*sq_footage_ratio* minSqFactor),sq_footage_min+(eval_factor*sq_footage_ratio* minSqFactor *2))
+            sq_footage_result = sq_footage_result + min_vals
+            grades['Spatial'] = sq_footage_result
+
+            return grades   
+    
+        grades = calculate_evaluation_grades()
+
+        qualitative_scale = {1: 'Poor', 2: 'Unsatisfactory', 3: 'Good', 4: 'Great'} 
+
+        def calculate_overall_score():
+            # Build an overall score using grades from different evaluations
+            total_score = 0
+
+            for grade in grades.values():
+                total_score += grade[1]
+
+            final_grade = total_score // 5
+            final_grade = qualitative_scale[final_grade]
+
+            return total_score, final_grade
+    
+        total_score, final_grade = calculate_overall_score()
+
+        # Extract categories and their scores
+        categories = ['Logo', 'Cars', 'Parking', 'Hospitality', 'Spatial']
+        scores = [grades[category][1] for category in categories]
+        detection = [grades[category][2] for category in categories]
+
+        grades = calculate_evaluation_grades()
+
+        # return the scores values
+        return [scores, categories, total_score]
+
+        
 
 # pull results from the database
 @app.route('/generate-results', methods=['POST'])
@@ -975,4 +1177,3 @@ def get_graph_data():
                         submitted_list.append(submitted_field)
 
     return submitted_list
-

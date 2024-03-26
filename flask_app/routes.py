@@ -1044,9 +1044,12 @@ def get_brand_compliance_limits():
     except Exception as e:
         return jsonify({'error': str(e)})
 
+<<<<<<< HEAD
 
 # Dashboard Related Calls
     
+=======
+>>>>>>> 5cd93fc791fc01f4c76ad9104aa078ce858a8e8e
 @app.route('/get_submitted_data', methods=['GET'])
 def get_submitted_data():
     submitted_list = []
@@ -1084,6 +1087,10 @@ def get_submitted_data():
 
     return jsonify(submitted_list)
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> 5cd93fc791fc01f4c76ad9104aa078ce858a8e8e
 @app.route('/get_top_data', methods=['GET'])
 def get_top_data():
 
@@ -1131,11 +1138,17 @@ def get_top_data():
     return jsonify(top25)
 
 
+<<<<<<< HEAD
+from collections import defaultdict
+
+=======
+>>>>>>> 5cd93fc791fc01f4c76ad9104aa078ce858a8e8e
 @app.route('/get_names', methods=['GET'])
 def get_names():
     type = request.args.get('type')
     query = request.args.get('query')
 
+<<<<<<< HEAD
     # Initialize averages dictionary
     averages = defaultdict(list)
 
@@ -1349,3 +1362,54 @@ def get_data_for_item():
 
         
     return jsonify(navigateToResults)
+=======
+    #if the type is a brand
+    if type == 'brand':
+
+        brands_ref = db.collection("Brand compliance limits")
+        documents = brands_ref.stream()
+        brand_names = []
+
+
+        for doc in documents:
+            brand_name = doc.id
+            if query.lower() in brand_name.lower():
+                brand_names.append(brand_name)
+
+        return jsonify(brand_names)
+    #if the type is a dealership
+    elif type == 'dealership':
+
+        dealerships_ref = db.collection("dealerships")
+        documents = dealerships_ref.stream()
+        dealership_names = []
+
+        for doc in documents:
+            data = doc.to_dict()
+            if "Dealership Name" in data and query.lower() in data["Dealership Name"].lower():
+                dealership_names.append(data["Dealership Name"])
+
+        return jsonify(dealership_names)
+    else:
+        return jsonify({"error": "Invalid type parameter. Use 'brand' or 'dealership'."})
+
+@app.route('/get_graph_data', methods=['GET'])  
+def get_graph_data():
+    type = request.args.get('type')
+    results = request.args.get('result')
+
+    if type == 'dealership':
+        submitted_list = []
+        results_c = db.collection('results')
+        doc_c = results_c.document(results)
+        doc = doc_c.get()
+        if doc.exists:
+            for subcollection in doc_c.collections():
+                for doc_snapshot in subcollection.stream():
+                    # Access submitted
+                    submitted_field = doc_snapshot.get('Submitted')
+                    if submitted_field:
+                        submitted_list.append(submitted_field)
+
+    return submitted_list
+>>>>>>> 5cd93fc791fc01f4c76ad9104aa078ce858a8e8e

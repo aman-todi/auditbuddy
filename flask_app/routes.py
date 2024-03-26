@@ -20,6 +20,7 @@ from datetime import datetime
 import time
 from dateutil import parser
 import concurrent.futures
+from datetime import timedelta
 
 ANNOTATED_IMAGES_FOLDER = os.path.join(app.root_path, 'static', 'main', 'annotated_images')
 
@@ -632,209 +633,6 @@ def dealership_update_values():
     except Exception as e:
         print("Error:", e)
         return jsonify({"error": str(e)}), 500
-    
-
-#
-# update the detection values in the submission
-#
-@app.route('/submission-update-values', methods=['POST'])
-def submission_update_values():
-    # get form inputs
-    new_cars = request.form['cars']
-    new_logo = request.form['logo']
-    new_parking = request.form['parking']
-    new_hospitality = request.form['hospitality']
-    new_spatial = request.form['spatial']
-
-    new_detection = [new_logo, new_cars, new_parking, new_hospitality, new_spatial]
-
-    # get dealership information
-    name = request.form['dealershipName'] # dealership name
-    submission = request.form['time'] # submission time
-    department = request.form['department'] # department
-
-    try:
-        # path to update
-        submission_doc = db.collection("results").document(name).collection(department).document(submission).get()
-        # if present, then we delete the submission
-        if submission_doc.exists:
-            # update the detection to the new
-            submission_doc.reference.update({
-                'Detection': new_detection
-            })
-
-        # get the uid from submission
-        uid = submission_doc.to_dict().get('UID')
-            
-        # after search this uid in the dealerships
-        dealership_doc = db.collection("dealerships").document(uid).get()
-
-        if dealership_doc.exists:
-            # extract the uio and sales
-            uio = int(dealership_doc.to_dict().get('UIO'))
-            sales = int(dealership_doc.to_dict().get('Sales'))
-            brand = dealership_doc.to_dict().get('Brand')
-
-            # recalculate the grades with the new values
-            grades = rebuild_audit_results(brand, new_detection, uio, sales)
-            print("grades", grades)
-            #return [scores, categories, total_score]
-
-            # update the fields in the submission here
-            test = submission_doc.to_dict().get('Category Eval')
-            print(test)
-
-            # update the evaluation scores in submission_doc
-            submission_doc.reference.update({
-                db.field_path(u'Category Eval'): {
-                    (u'Categories'): grades[1],
-                    (u'Scores'): grades[0]
-                },
-               db.field_path(u'Overall Eval'): {
-                  'Scores': grades[2]
-              }
-            })
-        
-        return jsonify("Submission updated successfully"), 200
-    
-    except Exception as e:
-        print("Error:", e)
-        return jsonify({"error": str(e)}), 500
-    
-#    
-# rebuilds the audit results on new values
-#    
-def rebuild_audit_results(brand, new_detection, past_sales=150, uio=300):
-    print("rebuild_audit_results called")
-
-    # extract results from various evaluations to build results
-    detected_logo = new_detection[0]
-    num_cars = float(new_detection[1])
-    num_parking = float(new_detection[2])
-    num_seating = float(new_detection[3])
-    sq_footage = float(new_detection[4])
-
-    # extract the minimum brand compliance
-    minimum_doc = db.collection("Brand compliance limits").document(brand).get()
-
-    if minimum_doc.exists:
-        minimum_dict = minimum_doc.to_dict()
-        cars_min = float(minimum_dict.get('minCars'))
-        parking_min = float(minimum_dict.get('minParking'))
-        seating_min = float(minimum_dict.get('minSeating'))
-        sq_footage_min = float(minimum_dict.get('minSqFt'))
-
-        # evaluation grades
-        def calculate_evaluation_grades():
-            # ratios
-            cars_ratio = 0.005
-            parking_ratio = 0.007
-            seating_ratio = 0.004
-            sq_footage_ratio = .025
-
-            # grade evaluation results
-            eval_factor = (past_sales + uio)//2
-            minParkingFactor = int(num_parking)/int(parking_min) + 1
-            minCarFactor = int(num_cars)/int(cars_min)+1
-            minSeatingFactor = int(num_seating)/int(seating_min) +1
-            minSqFactor = int(sq_footage)/int(sq_footage_min) +1
-            grades = {}
-
-            # logo detection
-            if detected_logo.upper() == brand.upper():
-                logo_result = ('Great', 4, detected_logo)
-            else:
-                logo_result = ('Poor', 1, detected_logo)
-
-            grades['Logo'] = logo_result
-
-            # cars detection
-            if num_cars < cars_min:
-                cars_result = ('Poor', 1, num_cars)
-            elif num_cars < cars_min+(eval_factor*cars_ratio*minCarFactor):
-                cars_result = ('Unsatisfactory', 2, num_cars)
-            elif num_cars == cars_min+(eval_factor*cars_ratio*minCarFactor) or cars_min+(eval_factor*cars_ratio*minCarFactor*2):
-                cars_result = ('Good', 3, num_cars)
-            elif num_cars >= cars_min+(eval_factor*cars_ratio*minCarFactor*2):
-                cars_result = ('Great', 4, num_cars)
-
-            min_vals = (cars_min,cars_min+(eval_factor*cars_ratio*minCarFactor),cars_min+(eval_factor*cars_ratio*minCarFactor*2))
-            cars_result = cars_result + min_vals
-            grades['Cars'] = cars_result 
-
-            # parking detection
-            if num_parking < parking_min:
-                parking_result = ('Poor', 1, num_parking)
-            elif num_parking < parking_min+(eval_factor*parking_ratio*minParkingFactor):
-                parking_result = ('Unsatisfactory', 2, num_parking)
-            elif num_parking == parking_min+(eval_factor*parking_ratio*minParkingFactor) or parking_min+(eval_factor*parking_ratio*minParkingFactor*2):
-                parking_result = ('Good', 3, num_parking)
-            elif num_parking >= parking_min+(eval_factor*parking_ratio*minParkingFactor*2):
-                parking_result = ('Great', 4, num_parking)
-
-            min_vals = (parking_min,parking_min+(eval_factor*parking_ratio*minParkingFactor),parking_min+(eval_factor*parking_ratio*minParkingFactor*2))
-            parking_result = parking_result + min_vals
-            grades['Parking'] = parking_result
-
-            # hospitality detection
-            if num_seating < seating_min:
-                seating_result = ('Poor', 1, num_seating)
-            elif num_seating < seating_min+(eval_factor*seating_ratio*minSeatingFactor):
-                seating_result = ('Unsatisfactory', 2, num_seating)
-            elif num_seating == seating_min+(eval_factor*seating_ratio*minSeatingFactor) or num_seating < seating_min+(eval_factor*seating_ratio*minSeatingFactor*2):
-                seating_result = ('Good', 3, num_seating)
-            elif num_seating >= seating_min+(eval_factor*seating_ratio*minSeatingFactor*2):
-                seating_result = ('Great', 4, num_seating)
-
-            min_vals = (seating_min,seating_min+(eval_factor*seating_ratio*minSeatingFactor),seating_min+(eval_factor*seating_ratio*minSeatingFactor*2))
-            seating_result = seating_result + min_vals
-            grades['Hospitality'] = seating_result
-
-            # spatial detection
-            if sq_footage < sq_footage_min:
-                sq_footage_result = ('Poor', 1, sq_footage)
-            elif sq_footage < sq_footage_min+(eval_factor*sq_footage_ratio* minSqFactor):
-                sq_footage_result = ('Unsatisfactory', 2, sq_footage)
-            elif sq_footage == sq_footage_min+(eval_factor*sq_footage_ratio* minSqFactor) or sq_footage < sq_footage_min+(eval_factor*sq_footage_ratio* minSqFactor *2):
-                sq_footage_result = ('Good', 3, sq_footage)
-            elif sq_footage >= sq_footage_min+(eval_factor*sq_footage_ratio* minSqFactor *2):
-                sq_footage_result = ('Great', 4, sq_footage)
-        
-            min_vals = (sq_footage_min,sq_footage_min+(eval_factor*sq_footage_ratio* minSqFactor),sq_footage_min+(eval_factor*sq_footage_ratio* minSqFactor *2))
-            sq_footage_result = sq_footage_result + min_vals
-            grades['Spatial'] = sq_footage_result
-
-            return grades   
-    
-        grades = calculate_evaluation_grades()
-
-        qualitative_scale = {1: 'Poor', 2: 'Unsatisfactory', 3: 'Good', 4: 'Great'} 
-
-        def calculate_overall_score():
-            # Build an overall score using grades from different evaluations
-            total_score = 0
-
-            for grade in grades.values():
-                total_score += grade[1]
-
-            final_grade = total_score // 5
-            final_grade = qualitative_scale[final_grade]
-
-            return total_score, final_grade
-    
-        total_score, final_grade = calculate_overall_score()
-
-        # Extract categories and their scores
-        categories = ['Logo', 'Cars', 'Parking', 'Hospitality', 'Spatial']
-        scores = [grades[category][1] for category in categories]
-        detection = [grades[category][2] for category in categories]
-
-        grades = calculate_evaluation_grades()
-
-        # return the scores values
-        return [scores, categories, total_score]
-
-        
 
 # pull results from the database
 @app.route('/generate-results', methods=['POST'])
@@ -1038,4 +836,143 @@ def get_brand_compliance_limits():
         return jsonify(brand_limits)
     except Exception as e:
         return jsonify({'error': str(e)})
+
+@app.route('/get_submitted_data', methods=['GET'])
+def get_submitted_data():
+    submitted_list = []
+
+    top_collection = db.collection('results') 
+
+
+    top_documents = list(top_collection.stream())
+
+
+    for document in top_documents:
+
+        nested_collections = document.reference.collections()
+        for nested_collection in nested_collections:
+
+            nested_documents = nested_collection.stream()
+
+
+            for nested_document in nested_documents:
+                nested_data = nested_document.to_dict()
+
+                #acess name, submitted time, upload name
+                name = nested_data.get('Dealership Name')
+                submitted = nested_document.get('Submitted')
+                upload = nested_data.get('Upload Name')
+                print(upload)
+                given_datetime = datetime.strptime(submitted, "%Y-%m-%dT%H:%M:%S.%fZ")
+                current_datetime = datetime.utcnow()
+                time_difference = current_datetime - given_datetime
+
+                # Check if the time difference is less than 24 hours
+                if time_difference < timedelta(hours=24):
+                    result_str = f"{name}: {upload}"
+                    submitted_list.append(result_str)
+
+    return jsonify(submitted_list)
+
+@app.route('/get_top_data', methods=['GET'])
+def get_top_data():
+
+    topDealerships = {}
+
+
+    top_collection = db.collection('results') 
+    top_level_documents = list(top_collection.stream())
+
+    for top_level_document in top_level_documents:
+
+        nested_collections = top_level_document.reference.collections()
+
+        for nested_collection in nested_collections:
+            nested_documents = nested_collection.stream()
+
+
+            for nested_document in nested_documents:
+                #acess name, submitted time, upload name, uid
+                nested_data = nested_document.to_dict()
+                submitted = nested_document.get('Submitted')
+                uid = nested_document.get('UID')
+                overall_eval = nested_data.get('Overall Eval')
+                dealershipName = nested_data.get('Dealership Name')
+
+                score = overall_eval.get('Scores')
+
+                #add to dict in not in
+                if dealershipName not in topDealerships:
+                    topDealerships[dealershipName] = [uid,score,submitted]
+                #if in check if it is more recent than the latest
+                else:
+                    datetime_prev = datetime.strptime(topDealerships[dealershipName][2], "%Y-%m-%dT%H:%M:%S.%fZ")
+                    datetime_curr = datetime.strptime(submitted, "%Y-%m-%dT%H:%M:%S.%fZ")
+                    if datetime_curr > datetime_prev:
+                       topDealerships[dealershipName] = [uid,score,submitted]
+
+    # Sort the dictionary in descending order by score
+    sorted_dealerships = sorted(topDealerships.items(), key=lambda x: x[1][1], reverse=True)
+
+    #top 25 entries
+    top25 = sorted_dealerships[:25]
+                
+
+    return jsonify(top25)
+
+
+@app.route('/get_names', methods=['GET'])
+def get_names():
+    type = request.args.get('type')
+    query = request.args.get('query')
+
+    #if the type is a brand
+    if type == 'brand':
+
+        brands_ref = db.collection("Brand compliance limits")
+        documents = brands_ref.stream()
+        brand_names = []
+
+
+        for doc in documents:
+            brand_name = doc.id
+            if query.lower() in brand_name.lower():
+                brand_names.append(brand_name)
+
+        return jsonify(brand_names)
+    #if the type is a dealership
+    elif type == 'dealership':
+
+        dealerships_ref = db.collection("dealerships")
+        documents = dealerships_ref.stream()
+        dealership_names = []
+
+        for doc in documents:
+            data = doc.to_dict()
+            if "Dealership Name" in data and query.lower() in data["Dealership Name"].lower():
+                dealership_names.append(data["Dealership Name"])
+
+        return jsonify(dealership_names)
+    else:
+        return jsonify({"error": "Invalid type parameter. Use 'brand' or 'dealership'."})
+
+@app.route('/get_graph_data', methods=['GET'])  
+def get_graph_data():
+    type = request.args.get('type')
+    results = request.args.get('result')
+
+    if type == 'dealership':
+        submitted_list = []
+        results_c = db.collection('results')
+        doc_c = results_c.document(results)
+        doc = doc_c.get()
+        if doc.exists:
+            for subcollection in doc_c.collections():
+                for doc_snapshot in subcollection.stream():
+                    # Access submitted
+                    submitted_field = doc_snapshot.get('Submitted')
+                    if submitted_field:
+                        submitted_list.append(submitted_field)
+
+    return submitted_list
 

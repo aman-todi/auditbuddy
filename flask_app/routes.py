@@ -20,12 +20,8 @@ from datetime import datetime,timedelta
 import time
 from dateutil import parser
 import concurrent.futures
-<<<<<<< HEAD
 from collections import defaultdict
 
-=======
-from datetime import timedelta
->>>>>>> 5cd93fc791fc01f4c76ad9104aa078ce858a8e8e
 ANNOTATED_IMAGES_FOLDER = os.path.join(app.root_path, 'static', 'main', 'annotated_images')
 
 bucket = storage.bucket()

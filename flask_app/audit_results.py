@@ -6,7 +6,7 @@ import os
 from flask import current_app as app
 import firebase_admin
 from firebase_admin import credentials, storage, firestore
-
+import decimal
 import io
 import cv2
 
@@ -118,7 +118,7 @@ def build_audit_results(cv_results, dealership_info, past_sales=150, uio=300):
         elif num_cars >= cars_min+(eval_factor*cars_ratio*minCarFactor*2):
             cars_result = ('Great', 4, num_cars)
 
-        min_vals = (cars_min,cars_min+(eval_factor*cars_ratio*minCarFactor),cars_min+(eval_factor*cars_ratio*minCarFactor*2))
+        min_vals = (cars_min,round(cars_min+(eval_factor*cars_ratio*minCarFactor),2),round(cars_min+(eval_factor*cars_ratio*minCarFactor*2),2))
         cars_result = cars_result + min_vals
         grades['Cars'] = cars_result 
 
@@ -135,7 +135,7 @@ def build_audit_results(cv_results, dealership_info, past_sales=150, uio=300):
         elif num_parking >= parking_min+(eval_factor*parking_ratio*minParkingFactor*2):
             parking_result = ('Great', 4, num_parking)
 
-        min_vals = (parking_min,parking_min+(eval_factor*parking_ratio*minParkingFactor),parking_min+(eval_factor*parking_ratio*minParkingFactor*2))
+        min_vals = (parking_min,round(parking_min+(eval_factor*parking_ratio*minParkingFactor),2),round(parking_min+(eval_factor*parking_ratio*minParkingFactor*2),2))
         parking_result = parking_result + min_vals
         grades['Parking'] = parking_result
 
@@ -152,9 +152,11 @@ def build_audit_results(cv_results, dealership_info, past_sales=150, uio=300):
         elif num_seating >= seating_min+(eval_factor*seating_ratio*minSeatingFactor*2):
             seating_result = ('Great', 4, num_seating)
 
-        min_vals = (seating_min,seating_min+(eval_factor*seating_ratio*minSeatingFactor),seating_min+(eval_factor*seating_ratio*minSeatingFactor*2))
+        min_vals = (seating_min,round(seating_min+(eval_factor*seating_ratio*minSeatingFactor),2),round(seating_min+(eval_factor*seating_ratio*minSeatingFactor*2),2))
         seating_result = seating_result + min_vals
         grades['Hospitality'] = seating_result
+
+        sq_footage = round(sq_footage,2)
 
         # Square footage results
         if sq_footage < sq_footage_min:
@@ -170,7 +172,7 @@ def build_audit_results(cv_results, dealership_info, past_sales=150, uio=300):
             sq_footage_result = ('Great', 4, sq_footage)
         
         print("Test SQ FT", sq_footage_result)
-        min_vals = (sq_footage_min,sq_footage_min+(eval_factor*sq_footage_ratio* minSqFactor),sq_footage_min+(eval_factor*sq_footage_ratio* minSqFactor *2))
+        min_vals = (round(sq_footage_min,2),round(sq_footage_min+(eval_factor*sq_footage_ratio* minSqFactor),2),round(sq_footage_min+(eval_factor*sq_footage_ratio* minSqFactor *2),2))
         sq_footage_result = sq_footage_result + min_vals
         grades['Spatial'] = sq_footage_result
 

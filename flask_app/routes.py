@@ -16,10 +16,11 @@ from flask_app.audit_results import build_audit_results
 import firebase_admin
 import firebase_admin.auth as auth
 from firebase_admin import credentials, storage, firestore
-from datetime import datetime
+from datetime import datetime,timedelta
 import time
 from dateutil import parser
 import concurrent.futures
+from collections import defaultdict
 
 ANNOTATED_IMAGES_FOLDER = os.path.join(app.root_path, 'static', 'main', 'annotated_images')
 
@@ -836,3 +837,311 @@ def get_brand_compliance_limits():
     except Exception as e:
         return jsonify({'error': str(e)})
 
+
+# Dashboard Related Calls
+    
+@app.route('/get_submitted_data', methods=['GET'])
+def get_submitted_data():
+    submitted_list = []
+
+    top_collection = db.collection('results') 
+
+
+    top_documents = list(top_collection.stream())
+
+
+    for document in top_documents:
+
+        nested_collections = document.reference.collections()
+        for nested_collection in nested_collections:
+
+            nested_documents = nested_collection.stream()
+
+
+            for nested_document in nested_documents:
+                nested_data = nested_document.to_dict()
+
+                #acess name, submitted time, upload name
+                name = nested_data.get('Dealership Name')
+                submitted = nested_document.get('Submitted')
+                upload = nested_data.get('Upload Name')
+                print(upload)
+                given_datetime = datetime.strptime(submitted, "%Y-%m-%dT%H:%M:%S.%fZ")
+                current_datetime = datetime.utcnow()
+                time_difference = current_datetime - given_datetime
+
+                # Check if the time difference is less than 24 hours
+                if time_difference < timedelta(hours=24):
+                    result_str = f"{name}: {upload}"
+                    submitted_list.append(result_str)
+
+    return jsonify(submitted_list)
+
+
+@app.route('/get_top_data', methods=['GET'])
+def get_top_data():
+
+    topDealerships = {}
+
+
+    top_collection = db.collection('results') 
+    top_level_documents = list(top_collection.stream())
+
+    for top_level_document in top_level_documents:
+
+        nested_collections = top_level_document.reference.collections()
+
+        for nested_collection in nested_collections:
+            nested_documents = nested_collection.stream()
+
+
+            for nested_document in nested_documents:
+                #acess name, submitted time, upload name, uid
+                nested_data = nested_document.to_dict()
+                submitted = nested_document.get('Submitted')
+                uid = nested_document.get('UID')
+                overall_eval = nested_data.get('Overall Eval')
+                dealershipName = nested_data.get('Dealership Name')
+
+                score = overall_eval.get('Scores')
+
+                #add to dict in not in
+                if dealershipName not in topDealerships:
+                    topDealerships[dealershipName] = [uid,score,submitted]
+                #if in check if it is more recent than the latest
+                else:
+                    datetime_prev = datetime.strptime(topDealerships[dealershipName][2], "%Y-%m-%dT%H:%M:%S.%fZ")
+                    datetime_curr = datetime.strptime(submitted, "%Y-%m-%dT%H:%M:%S.%fZ")
+                    if datetime_curr > datetime_prev:
+                       topDealerships[dealershipName] = [uid,score,submitted]
+
+    # Sort the dictionary in descending order by score
+    sorted_dealerships = sorted(topDealerships.items(), key=lambda x: x[1][1], reverse=True)
+
+    #top 25 entries
+    top25 = sorted_dealerships[:25]
+                
+
+    return jsonify(top25)
+
+
+from collections import defaultdict
+
+@app.route('/get_names', methods=['GET'])
+def get_names():
+    type = request.args.get('type')
+    query = request.args.get('query')
+
+    # Initialize averages dictionary
+    averages = defaultdict(list)
+
+    # if the type is a brand
+    if type == 'brand':
+        # Get all documents from the "results" collection
+        top_collection = db.collection('results') 
+        top_level_documents = list(top_collection.stream())
+
+        brand_scores = defaultdict(list)
+
+        for top_level_document in top_level_documents:
+            nested_collections = top_level_document.reference.collections()
+
+            for nested_collection in nested_collections:
+                nested_documents = nested_collection.stream()
+
+                for nested_document in nested_documents:
+                    nested_data = nested_document.to_dict()
+
+                    # Check if the brand name matches the query
+                    if query.lower() in nested_data["Brand"].lower():
+                        brand_name = nested_data["Brand"]
+
+                        # Aggregate scores for each category
+                        overall_eval = nested_data.get('Category Eval')
+                        scores = overall_eval.get('Scores')
+                        if scores:
+                            brand_scores[brand_name].append(scores)
+
+        # Calculate averages for each brand
+        for brand_name, scores_list in brand_scores.items():
+            num_scores = len(scores_list)
+            if num_scores > 0:
+                averages['Name'].append(brand_name)
+                averages['Logo Avg'].append(round(sum(score[0] for score in scores_list) / num_scores,2))
+                averages['Car Avg'].append(round(sum(score[1] for score in scores_list) / num_scores,2))
+                averages['Parking Avg'].append(round(sum(score[2] for score in scores_list) / num_scores,2))
+                averages['Hospitality Avg'].append(round(sum(score[3] for score in scores_list) / num_scores,2))
+                averages['Spatial Avg'].append(round(sum(score[4] for score in scores_list) / num_scores,2))
+
+    # if the type is a dealership
+    elif type == 'dealership':
+        # Get all documents from the "results" collection
+        top_collection = db.collection('results') 
+        top_level_documents = list(top_collection.stream())
+
+        dealership_scores = defaultdict(list)
+
+        for top_level_document in top_level_documents:
+            nested_collections = top_level_document.reference.collections()
+
+            for nested_collection in nested_collections:
+                nested_documents = nested_collection.stream()
+
+                for nested_document in nested_documents:
+                    nested_data = nested_document.to_dict()
+
+                    # Check if the dealership name matches the query
+                    if query.lower() in nested_data["Dealership Name"].lower():
+                        dealership_name = nested_data["Dealership Name"]
+
+                        # Aggregate scores for each category
+                        overall_eval = nested_data.get('Category Eval')
+                        scores = overall_eval.get('Scores')
+                        if scores:
+                            dealership_scores[dealership_name].append(scores)
+
+        # Calculate averages for each dealership
+        for dealership_name, scores_list in dealership_scores.items():
+            num_scores = len(scores_list)
+            if num_scores > 0:
+                averages['Name'].append(dealership_name)
+                averages['Logo Avg'].append(round(sum(score[0] for score in scores_list) / num_scores,2))
+                averages['Car Avg'].append(round(sum(score[1] for score in scores_list) / num_scores,2))
+                averages['Parking Avg'].append(round(sum(score[2] for score in scores_list) / num_scores,2))
+                averages['Hospitality Avg'].append(round(sum(score[3] for score in scores_list) / num_scores,2))
+                averages['Spatial Avg'].append(round(sum(score[4] for score in scores_list) / num_scores,2))
+
+    print(averages)
+
+    return jsonify(averages)
+
+
+from collections import defaultdict
+from flask import jsonify
+
+@app.route('/get_dealership_data', methods=['GET'])
+def get_dealership_data():
+    clicked_dealership = request.args.get('dealership')
+    top_collection = db.collection('results') 
+    top_level_documents = list(top_collection.stream())
+    
+    dealership_scores = defaultdict(list)
+
+    for top_level_document in top_level_documents:
+        nested_collections = top_level_document.reference.collections()
+
+        for nested_collection in nested_collections:
+            nested_documents = nested_collection.stream()
+
+            for nested_document in nested_documents:
+                nested_data = nested_document.to_dict()
+                if nested_data['Dealership Name'] == clicked_dealership:
+                    department = nested_data['Department']
+                    # Get the overall score from 'Overall Eval' section
+                    overall_score = nested_data['Overall Eval']['Scores']
+                    dealership_scores[department].append(overall_score)
+
+    # Calculate the total score and average score for all departments
+    total_score = sum(sum(scores) for scores in dealership_scores.values())
+    total_departments = len(dealership_scores)
+    average_score = total_score / total_departments if total_departments > 0 else 0
+    
+    # Construct the response with total and average scores for each department
+    department_scores = {}
+    for department, scores in dealership_scores.items():
+        if scores:
+            total_score = sum(scores)
+            average_score = total_score / len(scores)
+        else:
+            total_score = 0
+            average_score = 0
+        department_scores[department] = {'total_score': total_score, 'average_score': round(average_score,2)}
+    
+    return jsonify(department_scores)
+
+
+
+@app.route('/get_brand_data', methods=['GET'])
+def get_brand_data():
+    clicked_brand = request.args.get('brand')
+
+    top_collection = db.collection('results') 
+    top_level_documents = list(top_collection.stream())
+
+    brand_scores = defaultdict(lambda: defaultdict(list))
+
+    for top_level_document in top_level_documents:
+        nested_collections = top_level_document.reference.collections()
+
+        for nested_collection in nested_collections:
+            nested_documents = nested_collection.stream()
+
+            for nested_document in nested_documents:
+                nested_data = nested_document.to_dict()
+
+                # Check if the brand name matches the query
+                if nested_data['Brand'] == clicked_brand:
+                    brand_name = nested_data["Brand"]
+                    dealership_name = nested_data["Dealership Name"]
+
+                    overall_score = nested_data['Overall Eval']['Scores']
+
+                    # Append the overall score for each dealership within the brand
+                    brand_scores[brand_name][dealership_name].append(overall_score)
+
+    # Calculate the total and average score for each dealership within the brand
+    dealership_scores = {}
+    for brand, dealerships in brand_scores.items():
+        for dealership, scores in dealerships.items():
+            if scores:
+                total_score = sum(scores)
+                average_score = total_score / len(scores)
+            else:
+                total_score = 0
+                average_score = 0
+            # Update dealership_scores with total and average scores for each dealership
+            if dealership in dealership_scores:
+                dealership_scores[dealership]['total_score'] += total_score
+                dealership_scores[dealership]['average_score'] = round((dealership_scores[dealership]['total_score']) / len(brand_scores),2)
+            else:
+                dealership_scores[dealership] = {'total_score': total_score, 'average_score': round(average_score,2)}
+
+    return jsonify(dealership_scores)
+
+
+@app.route('/get_data_for_item', methods=['GET'])
+def get_data_for_item():
+    upload_name = request.args.get('item')
+    parts = upload_name.split(":")
+
+    # Get the second part (index 1) after splitting
+    upload_name = parts[1].strip()
+
+    top_collection = db.collection('results') 
+    top_level_documents = list(top_collection.stream())
+
+    navigateToResults = {
+          'Department': '',
+          'Brand': '',
+          'Dealership Name': '',
+          'Submitted': ''
+    }
+       
+    print("UPLOAD NAME", upload_name)
+    for top_level_document in top_level_documents:
+        nested_collections = top_level_document.reference.collections()
+
+        for nested_collection in nested_collections:
+            nested_documents = nested_collection.stream()
+
+            for nested_document in nested_documents:
+                nested_data = nested_document.to_dict()
+                print(nested_data)
+                if nested_data['Upload Name'].lower() == upload_name.lower():
+                    navigateToResults['Dealership Name'] = nested_data["Dealership Name"]
+                    navigateToResults['Brand'] = nested_data["Brand"]
+                    navigateToResults['Department'] = nested_data["Department"]
+                    navigateToResults['Submitted'] = nested_data["Submitted"]
+
+        
+    return jsonify(navigateToResults)

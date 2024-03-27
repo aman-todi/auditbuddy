@@ -18,7 +18,7 @@ function ResultsPage() {
   const [dealershipCount, setDealershipCount] = useState(new Map());
 
   // order to display the keys of database results
-  const brand_names = ['Audi', 'BMW', 'Cadillac', 'Chevrolet', 'Ford', 'Honda', 'Kia', 'Porsche', 'Mercedes', 'Toyota', 'Volkswagen']
+  const brand_names = ['Audi', 'BMW', 'Cadillac', 'Chevrolet', 'Ford', 'Honda', 'Hyundai', 'Kia', 'Mercedes', 'Porsche', 'Subaru', 'Toyota', 'Volkswagen']
 
   // page authentication
   const [user, setUser] = useState(auth.currentUser);
@@ -46,52 +46,67 @@ function ResultsPage() {
   }
 
 
+
+
+  // fetch data from the database
   // fetch data from the database
   const fetchResults = async () => {
     try {
-
       // create a form and append this file
       const formData = new FormData();
 
-      // get logged in user
-      const user = auth.currentUser;
-      if (user)
-      {
-        const email = user.email;
-        // append the users email
-        formData.append('email', email);
-      } 
+      // Listen for changes in user authentication state
+      auth.onAuthStateChanged((currentUser) => {
+        // Update the user state when authentication state changes
+        setUser(currentUser);
 
-      // make request to the backend
-      const response = await axios.post('/generate-results', formData, {
+        // Check if a user is logged in
+        if (currentUser) {
+          const email = currentUser.email;
+          // Append the user's email to the form data
+          formData.append('email', email);
+
+          console.log("user", currentUser); // Log the user
+        } else {
+          console.log("No user logged in");
+        }
+
+        // Make the request to the backend after user state is updated
+        axios.post('/generate-results', formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
+        }).then(response => {
+          // Handle response
+          // set state of items to the data
+          setItems(response.data);
+
+          // filter dealerships and remove duplicates
+          const uniqueFilteredDealerships = filterUniqueDealerships(response.data);
+
+          // get the count of how many dealerships are available for each brand
+          const newDealershipCount = new Map();
+          uniqueFilteredDealerships.forEach(submission => {
+            const brandName = submission['Brand'];
+            newDealershipCount.set(brandName, (newDealershipCount.get(brandName) || 0) + 1);
+          });
+
+          setDealershipCount(newDealershipCount);
+        }).catch(error => {
+          // Handle error
+          console.error("Error fetching results:", error);
+        }).finally(() => {
+          // Show that the items are finished loading
+          setLoading(false);
         });
-
-      // set state of items to the data
-      setItems(response.data);
-
-      // filter dealerships and remove duplicates
-      const uniqueFilteredDealerships = filterUniqueDealerships(response.data);
-
-      // get the count of how many dealerships are avaliable for each brand
-      const newDealershipCount = new Map();
-      uniqueFilteredDealerships.forEach(submission => {
-        const brandName = submission['Brand'];
-        newDealershipCount.set(brandName, (newDealershipCount.get(brandName) || 0) + 1);
       });
-
-      setDealershipCount(newDealershipCount);
-
     } catch (error) {
-      // errors
+      // Handle error
       console.error("Error fetching results:", error);
     }
-    // show that the items are finished loading
-    setLoading(false);
-  }
-  // fetch results when the user goes on the page
+  };
+
+  // Fetch results when the user goes on the page
   useEffect(() => {
     fetchResults();
   }, []);
@@ -209,53 +224,53 @@ function ResultsPage() {
                 <h1>Results</h1>
                 <div>
 
-                {/* render the search bar differently on mobile */}
-                {isMobile ? (
-                  <Accordion>
-                  <AccordionSummary  expandIcon={<ExpandMoreIcon />}>
-                    <h2>Search</h2>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', marginTop: '10vh', overflowX: 'auto' }}>
-                    <SearchBar onSearch={handleSearch} />
-                  </div>
-                  </AccordionDetails>
-                  </Accordion>
+                  {/* render the search bar differently on mobile */}
+                  {isMobile ? (
+                    <Accordion>
+                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                        <h2>Search</h2>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', marginTop: '10vh', overflowX: 'auto' }}>
+                          <SearchBar onSearch={handleSearch} />
+                        </div>
+                      </AccordionDetails>
+                    </Accordion>
                   ) : (
                     /* Search bar */
                     <SearchBar onSearch={handleSearch} />
                   )}
 
-            <Container fullWidth style={{overflowX: 'auto', marginTop: '5rem'}}>
-            {loading ? (
-            <CircularProgress color="success" />
-        ) : (
-          <>
-            <div>
-              <div style={{ display: 'flex', flexDirection: 'row' }}>
-                {brand_names.map((brandName, index) => (
-                  <div
-                    key={index}
-                    onClick={() => handleBrandClick(brandName)}
-                    style={{
-                      backgroundColor: brandName === clickedBrandName ? '#bae38c' : 'rgb(245,245,245)',
-                      padding: '0.5em',
-                      margin: '0.1em',
-                      cursor: 'pointer',
-                      textAlign: 'center'
-                    }}
-                  >
-                    {brandName} {dealershipCount.get(brandName) || 0}
-                  </div>
-                ))}
-              </div>
-              <Typography sx={{ marginTop: clickedBrandName ? '0' : '5rem' }}>
-                {clickedBrandName ? "" : "Select a brand to view"}
-              </Typography>
-            </div>
-          </>
-        )}
-      </Container>
+                  <Container fullWidth style={{ overflowX: 'auto', marginTop: '5rem' }}>
+                    {loading ? (
+                      <CircularProgress color="success" />
+                    ) : (
+                      <>
+                        <div>
+                          <div style={{ display: 'flex', flexDirection: 'row' }}>
+                            {brand_names.map((brandName, index) => (
+                              <div
+                                key={index}
+                                onClick={() => handleBrandClick(brandName)}
+                                style={{
+                                  backgroundColor: brandName === clickedBrandName ? '#bae38c' : 'rgb(245,245,245)',
+                                  padding: '0.5em',
+                                  margin: '0.1em',
+                                  cursor: 'pointer',
+                                  textAlign: 'center'
+                                }}
+                              >
+                                {brandName} {dealershipCount.get(brandName) || 0}
+                              </div>
+                            ))}
+                          </div>
+                          <Typography sx={{ marginTop: clickedBrandName ? '0' : '5rem' }}>
+                            {clickedBrandName ? "" : "Select a brand to view"}
+                          </Typography>
+                        </div>
+                      </>
+                    )}
+                  </Container>
 
                   {/* handle pop up content accordingly */}
                   <div style={{ marginLeft: 15, display: 'flex', flexDirection: 'column' }}>

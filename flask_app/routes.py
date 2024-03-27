@@ -11,6 +11,7 @@ from werkzeug.utils import secure_filename
 from flask_app.media_analysis import count_cars_in_footage, assess_hospitality, count_parking_spaces
 from flask_app.brand_detection.logo import LogoDetector
 from flask_app.computer_vision.square_footage_detector import compute_square_footage
+from flask_app.emotional_recognition.emotion_detector import compute_satisfaction
 from flask_app.audit_results import build_audit_results
 # firebase auth
 import firebase_admin
@@ -185,11 +186,21 @@ def upload_video():
     # Computer Vision Tasks
 
     # emotion files in list
+    emotional_files = []
+    emotional_paths = []
     index = 0
     while f'emotion[{index}]' in request.files:
         file = request.files[f'emotion[{index}]']
-        print("file: ", file)
+        emotional_files.append(file.filename)
+        filename = secure_filename(file.filename)
+        save_path = os.path.join(app.root_path, 'static', 'main', 'media', filename)
+        file.save(save_path)
+        emotional_paths.append(save_path)
         index += 1
+     
+    # Run emotional if there are emotional files   
+    if len(emotional_files) != 0:
+        compute_satisfaction(emotional_paths[0], dealership_info)
     
     # spatial files in list
     spatial_files = []

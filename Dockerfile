@@ -3,14 +3,11 @@ FROM ubuntu:20.04
 # update ubuntu
 RUN apt update
 RUN apt-get update -qq
-RUN apt-get update && apt-get install libgl1
-
 
 # install mysql and create the database
 ENV TZ=America/New_York
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt-get install -y mysql-server 
-
 RUN service mysql start && mysql -e "CREATE USER 'master'@'localhost' IDENTIFIED BY 'master';CREATE DATABASE db; GRANT ALL PRIVILEGES ON db.* TO 'master'@'localhost';"
 
 # add flask application and install requirements

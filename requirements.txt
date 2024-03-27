@@ -11,5 +11,3 @@ flask-firebase-admin
 imutils
 matplotlib
 pandas
-
-

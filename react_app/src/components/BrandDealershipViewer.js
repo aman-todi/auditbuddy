@@ -46,7 +46,7 @@ const BrandDealershipViewer = ({ onClickResult }) => {
     <Paper elevation={3} sx={{ padding: 2, marginBottom: 2 }}>
       <Container>
         <Typography variant="h4" gutterBottom sx={{ textAlign: 'center' }}>
-          Brand / Delaership Viewer
+          Brand / Dealership Viewer
         </Typography>
         <FormControl sx={{ m: 1, minWidth: 120 }}>
           <Select

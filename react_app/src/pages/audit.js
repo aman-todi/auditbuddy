@@ -5,6 +5,7 @@ import TopDealershipsBox from '../components/TopDealershipsBox';
 import BrandDealershipViewer from '../components/BrandDealershipViewer';
 import { auth } from '../components/Authentication';
 import '../App.css';
+import { useAdmin } from '../components/Admin';
 
 function AuditPage() {
   const [user, setUser] = useState(auth.currentUser);
@@ -13,33 +14,39 @@ function AuditPage() {
     auth.onAuthStateChanged((currentUser) => setUser(currentUser));
   }, []);
 
+  // Assuming useAdmin is imported correctly
+  const { admin } = useAdmin();
+
   return (
     <React.Fragment>
-      <header className="App-header">
-        <div className="App">
-          <h1>Dashboard</h1>
-        </div>
-      </header>
-      {user ? (
-        <Grid container spacing={2} sx={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
-          {/* Left section */}
-          <Grid item style={{ width: '25%' }}>
-            <Grid container direction="column" spacing={1}>
-              <Grid item>
-                <NewChangesBox />
-              </Grid>
-              <Grid item>
-                <TopDealershipsBox />
+      {admin ? (
+        <React.Fragment>
+          <header className="App-header">
+            <div className="App">
+              <h1>Dashboard</h1>
+            </div>
+          </header>
+
+          <Grid container spacing={2} sx={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
+            {/* Left section */}
+            <Grid item style={{ width: '25%' }}>
+              <Grid container direction="column" spacing={1}>
+                <Grid item>
+                  <NewChangesBox />
+                </Grid>
+                <Grid item>
+                  <TopDealershipsBox />
+                </Grid>
               </Grid>
             </Grid>
+            {/* Right section */}
+            <Grid item style={{ width: '75%' }}>
+              <BrandDealershipViewer onClickResult={(result) => console.log(result)} />
+            </Grid>
           </Grid>
-          {/* Right section */}
-          <Grid item style={{ width: '75%' }}>
-            <BrandDealershipViewer onClickResult={(result) => console.log(result)} />
-          </Grid>
-        </Grid>
+        </React.Fragment>
       ) : (
-        <Typography variant="body1">Not Authorized</Typography>
+        <p>Not Authorized</p>
       )}
     </React.Fragment>
   );

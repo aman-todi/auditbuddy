@@ -1,28 +1,26 @@
 import React, { useState, useEffect, useRef } from 'react';
-// navbar/sidebar
+// navbar
 import { Dialog, DialogTitle, DialogContent, DialogActions, useMediaQuery, useTheme } from '@mui/material';
 import Button from '@mui/material/Button';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
-import Drawer from '@mui/material/Drawer';
 import Typography from '@mui/material/Typography';
-import { Link as RouterLink, useLocation, Link, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import Divider from '@mui/material/Divider';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import { makeStyles } from '@mui/material/styles';
 import { Card, CardContent, Grid, TextField } from '@mui/material';
 import { Box, Switch } from '@mui/material';
 // icons
 import AlignHorizontalLeftIcon from '@mui/icons-material/AlignHorizontalLeft';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import BallotIcon from '@mui/icons-material/Ballot';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import SettingsIcon from '@mui/icons-material/Settings';
+import IconButton from '@mui/material/IconButton';
+import MenuIcon from '@mui/icons-material/Menu';
 import AddBusinessIcon from '@mui/icons-material/AddBusiness';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import SettingsIcon from '@mui/icons-material/Settings';
+import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
+import LogoutIcon from '@mui/icons-material/Logout';
 // authentication
 import { auth } from '../components/Authentication';
 import { getAuth, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
@@ -30,11 +28,9 @@ import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import { useAdmin } from './Admin';
 import emailjs from '@emailjs/browser'
 
-import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Avatar from '@mui/material/Avatar';
-
 
 // custom button
 export const CustomButton = (props) => {
@@ -87,6 +83,17 @@ export const NavBar = (props) => {
         backgroundColor: 'rgb(50,50,50)'
     };
 
+    // for admin menu
+    const [anchorAdmin, setAnchorAdmin] = useState(null);
+
+    const handleAdminOpen = (event) => {
+        setAnchorAdmin(event.currentTarget);
+    };
+
+    const handleAdminClose = () => {
+        setAnchorAdmin(null);
+    };
+
     const [anchorEl, setAnchorEl] = useState(null);
 
     const handleMenuOpen = (event) => {
@@ -111,17 +118,194 @@ export const NavBar = (props) => {
         auth.onAuthStateChanged((currentUser) => setUser(currentUser));
     }, []);
 
+    // for color change based on path
+    const location = useLocation();
+    const path = location.pathname;
+
+    // admin render
+    const { admin } = useAdmin();
+
+    // for mobile responsive navbar
+    const [anchorNav, setAnchorNav] = useState(null);
+
+    const handleClickNav = (event) => {
+      setAnchorNav(event.currentTarget);
+    };
+  
+    const handleCloseNav = () => {
+      setAnchorNav(null);
+    };
+
+    // for mobile responsiveness
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+    // for checking dark mode
+    const isDarkTheme = theme.palette.mode === 'dark';
+
     return (
-        <AppBar position='fixed' style={style} sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+        <React.Fragment>
+        <AppBar position='fixed' style={style}>
             <Toolbar>
-                <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            {isMobile && (
+          <IconButton
+            color="inherit"
+            aria-label="menu"
+            aria-controls="menu"
+            aria-haspopup="true"
+            onClick={handleClickNav}
+          >
+            <MenuIcon />
+          </IconButton>
+        )}
+
+            <Menu
+                id="menu"
+                anchorEl={anchorNav}
+                open={Boolean(anchorNav)}
+                onClose={handleCloseNav}
+            >
+
+            {/* menu pop up for navigation */}
+            <Menu
+                id="nav-menu"
+                anchorEl={anchorNav}
+                open={Boolean(anchorNav)}
+                onClose={handleCloseNav}
+            >
+
+                <MenuItem onClick={handleCloseNav}>
+                    <NavLink 
+                        to="/audit/dashboard" 
+                        style={{textDecoration: 'none', color: (path === '/audit/dashboard' ? '#bae38c' : (isDarkTheme ? 'rgb(245,245,245)' : 'rgb(50, 50, 50)')),
+                        display: 'flex', alignItems: 'center'
+                        }}
+                    >
+                        <AlignHorizontalLeftIcon style={{ marginRight: '0.5rem' }} />
+                        Dashboard
+                    </NavLink>
+                </MenuItem>
+                
+                <MenuItem onClick={handleCloseNav}>
+                        <NavLink 
+                            to="/audit/upload" 
+                            style={{textDecoration: 'none', color: (path === '/audit/upload' ? '#bae38c' : (isDarkTheme ? 'rgb(245,245,245)' : 'rgb(50, 50, 50)')),
+                            display: 'flex', alignItems: 'center'
+                            }}
+                        >
+                            <CloudUploadIcon style={{ marginRight: '0.5rem' }} />
+                            Upload
+                        </NavLink>
+                </MenuItem>
+
+                <MenuItem onClick={handleCloseNav}>
+                        <NavLink 
+                            to="/audit/results" 
+                            style={{textDecoration: 'none', color: (path === '/audit/results' ? '#bae38c' : (isDarkTheme ? 'rgb(245,245,245)' : 'rgb(50, 50, 50)')),
+                            display: 'flex', alignItems: 'center'
+                            }}
+                        >
+                            <BallotIcon style={{ marginRight: '0.5rem' }} />
+                            Results
+                        </NavLink>
+                </MenuItem>
+        
+            </Menu>
+
+            </Menu>
+                <Typography variant="h7" component="div" sx={{ flexGrow: 1 }}>
                     AUDITBUDDY
                 </Typography>
 
                 {!user && <NavButton><NavLink to="/">Home</NavLink></NavButton>}
                 {user ? (
                     <React.Fragment>
-                        <NavButton><NavLink to="/audit">Audit</NavLink></NavButton>
+
+                        {!isMobile ? (
+                            <React.Fragment>
+                             {/* dashboard button */}
+                             <NavButton>
+                             <NavLink 
+                                 to="/audit/dashboard" 
+                                 style={{textDecoration: 'none', color: (path === '/audit/dashboard' ? '#bae38c' : 'rgb(245,245,245)'),
+                                 display: 'flex', alignItems: 'center'
+                                 }}
+                             >
+                                 <AlignHorizontalLeftIcon style={{ marginRight: '0.5rem' }} />
+                                 Dashboard
+                             </NavLink>
+                         </NavButton>
+
+                        {/* upload button */}
+                        <NavButton>
+                        <NavLink 
+                            to="/audit/upload" 
+                            style={{textDecoration: 'none', color: (path === '/audit/upload' ? '#bae38c' : 'rgb(245,245,245)'),
+                            display: 'flex', alignItems: 'center'
+                            }}
+                        >
+                            <CloudUploadIcon style={{ marginRight: '0.5rem' }} />
+                            Upload
+                        </NavLink>
+                    </NavButton>
+                    
+                         {/* results button */}
+                         <NavButton>
+                            <NavLink 
+                                to="/audit/results" 
+                                style={{textDecoration: 'none', color: (path === '/audit/results' ? '#bae38c' : 'rgb(245,245,245)'),
+                                display: 'flex', alignItems: 'center'
+                                }}
+                            >
+                                <BallotIcon style={{ marginRight: '0.5rem' }} />
+                                Results
+                            </NavLink>
+                        </NavButton>
+                    </React.Fragment>
+                        ) : null
+                        }
+
+                        {/* admin icon */}
+                        {admin ? (
+                        <NavButton><AdminPanelSettingsIcon 
+                            onClick={handleAdminOpen}
+                            style={{textDecoration: 'none', color: (path === '/audit/dealerships' || path === '/audit/users') ? '#bae38c' : 'rgb(245, 245, 245)'}}
+                            size="large"
+                            edge="end"
+                        />
+                        </NavButton>) : null}
+
+                        {/* admin menu */}
+                        <Menu
+                            id="admin-menu"
+                            anchorEl={anchorAdmin}
+                            open={Boolean(anchorAdmin)}
+                            onClose={handleAdminClose}
+                        >
+                            <MenuItem onClick={handleAdminClose}>
+                                <NavLink 
+                                    to="/audit/users" 
+                                    style={{textDecoration: 'none', color: (path === '/audit/users' ? '#bae38c' : (isDarkTheme ? 'rgb(245,245,245)' : 'rgb(50, 50, 50)')),
+                                    display: 'flex', alignItems: 'center'
+                                    }}
+                                >
+                                    <PersonAddIcon style={{ marginRight: '0.5rem' }} />
+                                    Users
+                                </NavLink>
+                            </MenuItem>
+
+                            <MenuItem onClick={handleAdminClose}>
+                                <NavLink 
+                                    to="/audit/dealerships" 
+                                    style={{textDecoration: 'none', color: (path === '/audit/dealerships' ? '#bae38c' : (isDarkTheme ? 'rgb(245,245,245)' : 'rgb(50, 50, 50)')),
+                                    display: 'flex', alignItems: 'center'
+                                    }}
+                                >
+                                    <AddBusinessIcon style={{ marginRight: '0.5rem' }} />
+                                    Dealerships
+                                </NavLink>
+                            </MenuItem>
+                        </Menu>
 
                         {/* Profile Icon and Menu */}
                         <IconButton
@@ -143,135 +327,59 @@ export const NavBar = (props) => {
                             onClose={handleMenuClose}
                         >
                             <MenuItem onClick={handleMenuClose}>
-                                <NavLink to="/audit/profile" style={{ color: 'inherit', textDecoration: 'none' }}>Profile</NavLink>
+                                <NavLink 
+                                    to="/audit/profile" 
+                                    style={{textDecoration: 'none', color: (path === '/audit/profile' ? '#bae38c' : (isDarkTheme ? 'rgb(245,245,245)' : 'rgb(50, 50, 50)')),
+                                    display: 'flex', alignItems: 'center'
+                                    }}
+                                >
+                                    <AccountBoxIcon style={{ marginRight: '0.5rem' }} />
+                                    Profile
+                                </NavLink>
                             </MenuItem>
+
                             <MenuItem onClick={handleMenuClose}>
-                                <NavLink to="/audit/settings" style={{ color: 'inherit', textDecoration: 'none' }}>Settings</NavLink>
+                                <NavLink 
+                                    to="/audit/contact" 
+                                    style={{textDecoration: 'none', color: (path === '/audit/contact' ? '#bae38c' : (isDarkTheme ? 'rgb(245,245,245)' : 'rgb(50, 50, 50)')),
+                                    display: 'flex', alignItems: 'center'
+                                    }}
+                                >
+                                    <QuestionAnswerIcon style={{ marginRight: '0.5rem' }} />
+                                    Contact
+                                </NavLink>
                             </MenuItem>
+
                             <MenuItem onClick={handleMenuClose}>
-                                <NavLink to="/audit/contact" style={{ color: 'inherit', textDecoration: 'none' }}>Contact</NavLink>
+                                <NavLink 
+                                    to="/audit/settings" 
+                                    style={{textDecoration: 'none', color: (path === '/audit/settings' ? '#bae38c' : (isDarkTheme ? 'rgb(245,245,245)' : 'rgb(50, 50, 50)')),
+                                    display: 'flex', alignItems: 'center'
+                                    }}
+                                >
+                                    <SettingsIcon style={{ marginRight: '0.5rem' }} />
+                                    Settings
+                                </NavLink>
                             </MenuItem>
-                            <MenuItem onClick={handleLogout}>Logout</MenuItem>
+
+                            <MenuItem onClick={handleLogout}>
+                                <NavLink 
+                                    style={{textDecoration: 'none', color: ((isDarkTheme ? 'rgb(245,245,245)' : 'rgb(50, 50, 50)')),
+                                    display: 'flex', alignItems: 'center'
+                                    }}
+                                >
+                                    <LogoutIcon style={{ marginRight: '0.5rem' }} />
+                                    Logout
+                                </NavLink>
+                            </MenuItem>
                         </Menu>
 
                     </React.Fragment>
                 ) : (<CustomButton><NavLink to="login">Login</NavLink></CustomButton>)}
             </Toolbar>
-        </AppBar>
-    );
-};
-
-export const SideBar = (props) => {
-
-    // for mobile responsiveness
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-    const [sidebarOpen, setSidebarOpen] = useState(false);
-    const toggleSidebar = () => {
-        setSidebarOpen(!sidebarOpen);
-    };
-
-    const location = useLocation();
-    const path = location.pathname;
-    const colorSelected = {
-        "&.Mui-selected": {
-            backgroundColor: "#bae38c",
-            "&:hover": {
-                backgroundColor: "#bae38c"
-            }
-        },
-        "&:hover": {
-            backgroundColor: "#ddf1c6"
-        },
-        marginLeft: -3,
-    };
-
-    // page authentication
-    const [user, setUser] = useState(auth.currentUser);
-
-    useEffect(() => {
-        auth.onAuthStateChanged((currentUser) => setUser(currentUser));
-    }, []);
-
-    const { admin } = useAdmin();
-
-    return (
-        <React.Fragment>
-            {isMobile && (
-                // fixed button at the button to toggle
-                <CustomButton
-                    sx={{
-                        position: 'fixed',
-                        bottom: theme.spacing(2),
-                        right: theme.spacing(2),
-                        zIndex: (theme) => theme.zIndex.drawer + 1,
-                    }}
-                    onClick={toggleSidebar}
-                >
-                    Menu
-                </CustomButton>
-            )}
-            <Drawer variant={isMobile ? 'temporary' : 'permanent'} anchor='left' sx={{ width: 100 }}
-                open={isMobile ? sidebarOpen : null}
-                onClose={toggleSidebar}
-            >
-                <Toolbar sx={{ marginTop: 7.5, width: 145 }}>
-                    <List>
-                        <Typography sx={{ fontSize: '0.9rem', marginLeft: -1 }} disablePadding><strong>Welcome,</strong> {user && user.email}</Typography>
-                        <ListItem disablePadding>
-                            <ListItemButton sx={{ ...colorSelected }} selected={path === '/audit'} component={Link} to="/audit">
-                                <ListItemIcon sx={{ minWidth: 40 }}><AlignHorizontalLeftIcon></AlignHorizontalLeftIcon></ListItemIcon>
-                                <ListItemText
-                                    primary={<Typography sx={{ fontSize: '0.9rem' }}>Dashboard</Typography>}
-                                />
-                            </ListItemButton>
-                        </ListItem>
-                        <ListItem disablePadding>
-                            <ListItemButton sx={{ ...colorSelected }} selected={path === '/audit/upload'} component={Link} to="/audit/upload">
-                                <ListItemIcon sx={{ minWidth: 40 }}><CloudUploadIcon></CloudUploadIcon></ListItemIcon>
-                                <ListItemText
-                                    primary={<Typography sx={{ fontSize: '0.9rem' }}>Upload</Typography>}
-                                />
-                            </ListItemButton>
-                        </ListItem>
-                        <ListItem disablePadding>
-                            <ListItemButton sx={{ ...colorSelected }} selected={path === '/audit/results'} component={Link} to="/audit/results">
-                                <ListItemIcon sx={{ minWidth: 40 }}><BallotIcon></BallotIcon></ListItemIcon>
-                                <ListItemText
-                                    primary={<Typography sx={{ fontSize: '0.9rem' }}>Results</Typography>}
-                                />
-                            </ListItemButton>
-                        </ListItem>
-
-
-                        {admin ? (
-                            <React.Fragment>
-                                <Divider sx={{ ...colorSelected }}></Divider>
-                                <ListItem disablePadding>
-                                    <ListItemButton sx={{ ...colorSelected }} selected={path === '/audit/admin-console'} component={Link} to="/audit/admin-console">
-                                        <ListItemIcon sx={{ minWidth: 40 }}><AdminPanelSettingsIcon /></ListItemIcon>
-                                        <ListItemText
-                                            primary={<Typography sx={{ fontSize: '0.9rem' }}>Console</Typography>}
-                                        />
-                                    </ListItemButton>
-                                </ListItem>
-                            </React.Fragment>
-                        ) : null}
-
-                        <Divider sx={{ ...colorSelected }}></Divider>
-                        <ListItem disablePadding>
-                            <ListItemButton sx={{ ...colorSelected }} selected={path === '/audit/dealerships'} component={Link} to="/audit/dealerships">
-                                <ListItemIcon sx={{ minWidth: 40 }}><AddBusinessIcon></AddBusinessIcon></ListItemIcon>
-                                <ListItemText
-                                    primary={<Typography sx={{ fontSize: '0.9rem' }}>Dealerships</Typography>}
-                                />
-                            </ListItemButton>
-                        </ListItem>
-
-                    </List>
-                </Toolbar>
-            </Drawer >
+            </AppBar>
         </React.Fragment>
+
     );
 };
 

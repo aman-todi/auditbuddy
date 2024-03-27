@@ -1,11 +1,10 @@
 import React, {useState, useEffect} from 'react';
 import '../App.css';
-import * as MaterialUI from '../components/MaterialUI';
 import {auth} from '../components/Authentication';
-import AddDealershipImport from '../components/AddDealership';
 import {DealershipListImport} from '../components/DealershipList';
-import { useTheme, useMediaQuery } from '@mui/material';
+import { useAdmin } from '../components/Admin';
 import MinRequirements from '../components/AddMinRequirements';
+import { Container } from '@mui/material';
 
 function DealershipsPage () {
 
@@ -16,33 +15,22 @@ function DealershipsPage () {
     auth.onAuthStateChanged((currentUser) => setUser(currentUser));
   }, []);
 
-   // handle user table refresh
-   const [refresh, setRefresh] = useState(false);
-
-   const handleRefresh = () => {
-     setRefresh(!refresh);
-   };
-
-   // for mobile responsiveness
-   const theme = useTheme();
-   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
+   // check if user is an admin
+   const { admin } = useAdmin();
+ 
     return (
         <React.Fragment>
-        {user ? 
+        {admin ? 
         (
           <React.Fragment>
-          <MaterialUI.SideBar></MaterialUI.SideBar>
-          <header className="App-header" style={{ marginLeft: isMobile ? 0 : 125 }}>
+          <header className="App-header">
           <div className="App">
           <h1>Manage Dealerships</h1>
-          </div>
-          <div className="File">
-            
-              <AddDealershipImport refresh={handleRefresh}/>
-              <DealershipListImport refresh={refresh}/>
-
-          </div>
+        
+            <MinRequirements></MinRequirements>
+            <DealershipListImport/>
+      
+            </div>
             </header>
             </React.Fragment>
             

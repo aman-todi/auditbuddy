@@ -69,9 +69,9 @@ const MinRequirements = () => {
   const brands = Object.keys(minRequirements || {});
 
   return (
-    <Container component="main" maxWidth="s">
+    <Container component="main">
       <Typography variant="p" sx={{ display: "flex", alignItems: "center", marginBottom: "1rem" }}>
-        <span style={{ fontWeight: "bold", marginRight: "0.5rem" }}>Add Minimum Compliance Standards</span>
+        <span style={{ fontWeight: "bold", marginRight: "0.5rem" }}>Minimum Brand Standards</span>
         <Tooltip disableFocusListener title="Add in minimum compliance standards for different brands">
           <HelpIcon sx={{ fontSize: "small" }} />
         </Tooltip>
@@ -93,28 +93,28 @@ const MinRequirements = () => {
     <Box sx={{ display: "flex", alignItems: "center", justifyContent: 'center', marginTop: "1rem" }}>
       <TextField
         type="number"
-        label="Minimum Cars"
+        label="Cars"
         value={formData.minCars}
         onChange={(e) => handleChange('minCars', e.target.value)}
         style={{ marginRight: "1rem" }}
       />
       <TextField
         type="number"
-        label="Minimum Parking"
+        label="Parking"
         value={formData.minParking}
         onChange={(e) => handleChange('minParking', e.target.value)}
         style={{ marginRight: "1rem" }}
       />
       <TextField
         type="number"
-        label="Minimum Seating"
+        label="Seating"
         value={formData.minSeating}
         onChange={(e) => handleChange('minSeating', e.target.value)}
         style={{ marginRight: "1rem" }}
       />
       <TextField
         type="number"
-        label="Minimum Square Feet"
+        label="Square Feet"
         value={formData.minSqFt}
         onChange={(e) => handleChange('minSqFt', e.target.value)}
         style={{ marginRight: "1rem" }}

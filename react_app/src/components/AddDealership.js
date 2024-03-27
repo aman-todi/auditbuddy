@@ -6,11 +6,110 @@ import HelpIcon from '@mui/icons-material/Help';
 import { InputLabel, FormControl, MenuItem, Select, TextField, Container, Box, Tooltip, Typography, Alert } from '@mui/material/';
 // axios
 import axios from 'axios';
+// filepond
+import { FilePond, registerPlugin } from 'react-filepond';
+
+// for the file validation
+import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
+// for notifications
+import { toast } from 'react-toastify';
+import CircularProgress from '@mui/material/CircularProgress';
+
+registerPlugin(FilePondPluginFileValidateType);
+
 
 const AddDealershipImport = ({ refresh }) => {
 
+  // state to keep track of a file box
+  const [file, setFile] = useState(null);
+
+  // handles how each file is added
+  const handleFileAdded = (setDetectionState) => (fileItems) => {
+    if (fileItems.length > 0) {
+      const allFiles = fileItems.map(item => item.file);
+      setDetectionState(allFiles);
+    }
+  };
+
+  // handle uploading and submitting dealership
+  const handleFileUpload = async () => {
+
+    // create a form and append this file
+    const formData = new FormData();
+
+    // error checking
+    if (!file) {
+      setFileError('Please upload a .json file')
+    }
+    else {
+      setFileError('')
+      // append files to form data
+      function appendFilesToFormData(files, formData, key) {
+        if (files && files.length > 0) {
+          files.forEach((file, index) => {
+            formData.append(`${key}[${index}]`, file);
+          });
+        }
+      }
+
+      // call files to append to form
+      appendFilesToFormData(file, formData, 'dealerships');
+
+      // append the time
+      const options = {
+        timeZone: 'America/New_York',
+      };
+
+      const currentDate = new Date().toLocaleString('en-US', options) + " (EST)";
+
+      formData.append('updated', currentDate);
+
+      // notification that the files have been submitted
+      const currentlyAnalyzing = toast(
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          Populating dealerships table
+          <CircularProgress color="success" style={{ marginLeft: '10px' }} />
+        </div>,
+        { autoClose: false, closeButton: false }
+      );
+
+      try {
+        const response = await axios.post('http://localhost:8080/prepopulate-dealerships', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+
+        // remove the first toast when the second one populates
+        toast.dismiss(currentlyAnalyzing);
+        // notification that the files have been analyzed
+
+        toast.success(
+          <div>
+            Completed populating dealerships
+          </div>
+          , { autoClose: false, closeButton: true });
+
+          refresh();
+
+      }
+      catch (error) {
+        toast.dismiss(currentlyAnalyzing);
+        if (error.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          setFileError(`Error uploading file: ${error.response.data.error}`);
+        } else if (error.request) {
+          // The request was made but no response was received
+          setFileError('Error uploading file: No response from server');
+        }
+      }
+    }
+  };
+
   // error message
   const [error, setError] = useState('')
+  const [fileError, setFileError] = useState('')
 
   // states to keep track of form
   const [name, setName] = useState(''); // dealership name
@@ -180,6 +279,32 @@ const AddDealershipImport = ({ refresh }) => {
           </Alert>
         ) : null}
         <MaterialUI.CustomButton type="submit" onClick={handleUpload}>Add Dealership</MaterialUI.CustomButton>
+      </Box>
+
+      {/* being able to upload a file to prepopulate this data */}
+      <Box sx={{marginTop: '5rem' }}>
+      <Typography variant="p" sx={{ display: "flex", alignItems: "center", marginBottom: "1rem" }}>
+        <span style={{ fontWeight: "bold", marginRight: "0.5rem" }}>Import .txt with required JSON formatting</span>
+        <Tooltip disableFocusListener title="The information of the dealership being added">
+          <HelpIcon sx={{ fontSize: "small" }} />
+        </Tooltip>
+      </Typography>
+      <FilePond
+              id="file"
+              allowMultiple={true}
+              acceptedFileTypes={'text/plain'}
+              onupdatefiles={handleFileAdded(setFile)}
+              maxFiles={1}
+              stylePanelLayout={'compact'}
+            />
+      </Box>
+      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "0.1rem" }}>
+      {fileError ? (
+          <Alert severity='error'>
+            {fileError}
+          </Alert>
+        ) : null}
+      <MaterialUI.CustomButton type="submit" onClick={handleFileUpload}>SUBMIT</MaterialUI.CustomButton>
       </Box>
     </Container>
   );

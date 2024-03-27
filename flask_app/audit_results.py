@@ -6,28 +6,24 @@ import os
 from flask import current_app as app
 import firebase_admin
 from firebase_admin import credentials, storage, firestore
-
+import decimal
 import io
 import cv2
 
 # Evaluation factors ideal ratios
-cars_ratio = 0.05
-parking_ratio = 0.10
-seating_ratio = 0.08
-sq_footage_ratio = 25
-
-# Evaluation factors min
-cars_min = 8
-parking_min = 10
-seating_min = 6
-sq_footage_min = 500
+cars_ratio = 0.005
+parking_ratio = 0.007
+seating_ratio = 0.004
+sq_footage_ratio = .025
 
 bucket = storage.bucket()
 
 db = firestore.client()
 
 # push results from the database
-def add_to_database(database_info,categories, scores,total_scores,detection):
+def add_to_database(database_info,categories, scores,total_scores,detection,min_vals,expected_logo):
+
+    print("TESTING MIN VALS",min_vals)
 
     # append the new data in the correct format for firebase
     data = {
@@ -46,7 +42,11 @@ def add_to_database(database_info,categories, scores,total_scores,detection):
              "Scores": total_scores
          },
          "Detection" : detection,
-         "Upload Name" : database_info[-1]
+         "Min Vals" : min_vals,
+         "Expected Logo" : expected_logo,
+         "Upload Name" : database_info[-1],
+         "User" : database_info[8]
+
     }
 
     # go to the collection, create a new document (dealership name), create a new collection with (department)
@@ -57,6 +57,7 @@ def build_audit_results(cv_results, dealership_info, past_sales=150, uio=300):
     # Extract results from various evaluations to build results
 
     detected_logo, num_cars, num_parking, num_seating, sq_footage = cv_results
+    
 
     brand_compliance_limits = {}
 
@@ -83,11 +84,18 @@ def build_audit_results(cv_results, dealership_info, past_sales=150, uio=300):
         # Grade the evaluation results using past sales and UIO information
 
         eval_factor = (past_sales + uio)//2
-        minParkingFactor = num_parking/min_parking + 1
-        minCarFactor = num_cars/min_cars+1
-        minSeatingFactor = num_seating/min_seating +1
-        minSqFactor = sq_footage/min_sqft +1
+        minParkingFactor = int(num_parking)/int(parking_min) + 1
+        minCarFactor = int(num_cars)/int(cars_min)+1
+        minSeatingFactor = int(num_seating)/int(seating_min) +1
+        minSqFactor = int(sq_footage)/int(sq_footage_min) +1
         grades = {}
+
+        print("Past sales and UIO", past_sales,uio)
+        print("Eval Factor",eval_factor)
+        print("minParkingFactor", minParkingFactor)
+        print("minCarFactor", minCarFactor)
+        print("minSeatingFactor", minSeatingFactor)
+        print("minSqFactor", minSqFactor)
 
         # Logo detection results
         if detected_logo.upper() == dealership_info[0].upper():
@@ -101,60 +109,71 @@ def build_audit_results(cv_results, dealership_info, past_sales=150, uio=300):
         if num_cars < cars_min:
             cars_result = ('Poor', 1, num_cars)
 
-        elif num_cars < eval_factor*cars_ratio*minCarFactor:
+        elif num_cars < cars_min+(eval_factor*cars_ratio*minCarFactor):
             cars_result = ('Unsatisfactory', 2, num_cars)
 
-        elif num_cars == eval_factor*cars_ratio*minCarFactor or num_cars < eval_factor*cars_ratio + 5*minCarFactor:
+        elif num_cars == cars_min+(eval_factor*cars_ratio*minCarFactor) or cars_min+(eval_factor*cars_ratio*minCarFactor*2):
             cars_result = ('Good', 3, num_cars)
 
-        elif num_cars >= eval_factor*cars_ratio*minCarFactor + 5:
+        elif num_cars >= cars_min+(eval_factor*cars_ratio*minCarFactor*2):
             cars_result = ('Great', 4, num_cars)
 
-        grades['Cars'] = cars_result
+        min_vals = (cars_min,round(cars_min+(eval_factor*cars_ratio*minCarFactor),2),round(cars_min+(eval_factor*cars_ratio*minCarFactor*2),2))
+        cars_result = cars_result + min_vals
+        grades['Cars'] = cars_result 
 
         # Customer parking results
         if num_parking < parking_min:
             parking_result = ('Poor', 1, num_parking)
 
-        elif num_parking < eval_factor*parking_ratio*minParkingFactor:
+        elif num_parking < parking_min+(eval_factor*parking_ratio*minParkingFactor):
             parking_result = ('Unsatisfactory', 2, num_parking)
 
-        elif num_parking == eval_factor*parking_ratio*minParkingFactor or num_parking < eval_factor*parking_ratio*minParkingFactor + 10:
+        elif num_parking == parking_min+(eval_factor*parking_ratio*minParkingFactor) or parking_min+(eval_factor*parking_ratio*minParkingFactor*2):
             parking_result = ('Good', 3, num_parking)
 
-        elif num_parking >= eval_factor*parking_ratio*minParkingFactor + 10:
+        elif num_parking >= parking_min+(eval_factor*parking_ratio*minParkingFactor*2):
             parking_result = ('Great', 4, num_parking)
 
+        min_vals = (parking_min,round(parking_min+(eval_factor*parking_ratio*minParkingFactor),2),round(parking_min+(eval_factor*parking_ratio*minParkingFactor*2),2))
+        parking_result = parking_result + min_vals
         grades['Parking'] = parking_result
 
         # Hospitality results
         if num_seating < seating_min:
             seating_result = ('Poor', 1, num_seating)
 
-        elif num_seating < eval_factor*seating_ratio*minSeatingFactor:
+        elif num_seating < seating_min+(eval_factor*seating_ratio*minSeatingFactor):
             seating_result = ('Unsatisfactory', 2, num_seating)
 
-        elif num_seating == eval_factor*seating_ratio*minSeatingFactor or num_seating < eval_factor*seating_ratio*minSeatingFactor + 6:
+        elif num_seating == seating_min+(eval_factor*seating_ratio*minSeatingFactor) or num_seating < seating_min+(eval_factor*seating_ratio*minSeatingFactor*2):
             seating_result = ('Good', 3, num_seating)
 
-        elif num_seating >= eval_factor*seating_ratio*minSeatingFactor + 6:
+        elif num_seating >= seating_min+(eval_factor*seating_ratio*minSeatingFactor*2):
             seating_result = ('Great', 4, num_seating)
 
+        min_vals = (seating_min,round(seating_min+(eval_factor*seating_ratio*minSeatingFactor),2),round(seating_min+(eval_factor*seating_ratio*minSeatingFactor*2),2))
+        seating_result = seating_result + min_vals
         grades['Hospitality'] = seating_result
+
+        sq_footage = round(sq_footage,2)
 
         # Square footage results
         if sq_footage < sq_footage_min:
             sq_footage_result = ('Poor', 1, sq_footage)
 
-        elif sq_footage < eval_factor*sq_footage_ratio* minSqFactor:
+        elif sq_footage < sq_footage_min+(eval_factor*sq_footage_ratio* minSqFactor):
             sq_footage_result = ('Unsatisfactory', 2, sq_footage)
 
-        elif sq_footage == eval_factor*sq_footage_ratio* minSqFactor or sq_footage < eval_factor*sq_footage_ratio* minSqFactor + 6:
+        elif sq_footage == sq_footage_min+(eval_factor*sq_footage_ratio* minSqFactor) or sq_footage < sq_footage_min+(eval_factor*sq_footage_ratio* minSqFactor *2):
             sq_footage_result = ('Good', 3, sq_footage)
 
-        elif sq_footage >= eval_factor*sq_footage* minSqFactor + 6:
+        elif sq_footage >= sq_footage_min+(eval_factor*sq_footage_ratio* minSqFactor *2):
             sq_footage_result = ('Great', 4, sq_footage)
-
+        
+        print("Test SQ FT", sq_footage_result)
+        min_vals = (round(sq_footage_min,2),round(sq_footage_min+(eval_factor*sq_footage_ratio* minSqFactor),2),round(sq_footage_min+(eval_factor*sq_footage_ratio* minSqFactor *2),2))
+        sq_footage_result = sq_footage_result + min_vals
         grades['Spatial'] = sq_footage_result
 
         return grades   
@@ -185,9 +204,14 @@ def build_audit_results(cv_results, dealership_info, past_sales=150, uio=300):
     scores = [grades[category][1] for category in categories]
     detection = [grades[category][2] for category in categories]
 
+    min_vals = {}
+    for category, values in grades.items():
+        min_vals[category] = values[-3:]
+    expected_logo = dealership_info[0].upper()
+
     grades = calculate_evaluation_grades()
     print("Grades by category: ", grades)
 
 
 
-    add_to_database(dealership_info,categories,scores,total_score,detection)
+    add_to_database(dealership_info,categories,scores,total_score,detection,min_vals,expected_logo)

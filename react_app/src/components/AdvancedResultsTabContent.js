@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Typography, Box, Divider, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import { Typography, Box, Divider, Accordion, AccordionSummary, AccordionDetails, useTheme, useMediaQuery } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Chart from 'chart.js/auto'; // Import Chart.js library
 import axios from 'axios';
@@ -11,6 +11,8 @@ const AdvancedResultsTabContent = ({ selectedTab, brandName, dealershipName, dep
   const [categoryScores, setCategoryScores] = useState([]);
   const [totalScore, setTotalScore] = useState('');
   const [detection, setDetection] = useState([]);
+  const [expectedValueRange, setExpectedValueRange] = useState([]);
+  const [expectedLogo, setExpectedLogo] = useState('');
 
   const tab = selectedTab ?? 0;
   console.log("Tab Selected", tab)
@@ -43,6 +45,8 @@ const AdvancedResultsTabContent = ({ selectedTab, brandName, dealershipName, dep
         setCategoryScores(gradeResponse.data["Category Eval"]["Scores"]);
         setTotalScore(gradeResponse.data["Overall Eval"]["Scores"]);
         setDetection(gradeResponse.data["Detection"]);
+        setExpectedValueRange(gradeResponse.data["Min Vals"]);
+        setExpectedLogo(gradeResponse.data["Expected Logo"])
         renderCategoryGraphs(gradeResponse.data["Category Eval"]["Categories"], gradeResponse.data["Category Eval"]["Scores"]);
         renderOverallScorePieChart(gradeResponse.data["Overall Eval"]["Scores"]);
 
@@ -103,8 +107,8 @@ const AdvancedResultsTabContent = ({ selectedTab, brandName, dealershipName, dep
           datasets: [{
             label: 'Scores',
             data: scores,
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            borderColor: 'rgba(75, 192, 192, 1)',
+            backgroundColor: '#bae38c',
+            borderColor: '#f5f5f5',
             borderWidth: 1
           }]
         },
@@ -145,7 +149,7 @@ const AdvancedResultsTabContent = ({ selectedTab, brandName, dealershipName, dep
     }
 
     // Calculate percentage for each value
-    const scorePercentage = (totalScore / 16) * 100;
+    const scorePercentage = (totalScore / 20) * 100;
     const remainingPercentage = 100 - scorePercentage;
 
     // Render the chart only if the canvas element exists
@@ -158,8 +162,8 @@ const AdvancedResultsTabContent = ({ selectedTab, brandName, dealershipName, dep
         data: {
           labels: ['Score', 'Remaining'],
           datasets: [{
-            data: [totalScore, 16 - totalScore],
-            backgroundColor: ['#467be3', '#e9edf7'],
+            data: [totalScore, 20 - totalScore],
+            backgroundColor: ['#bae38c', '#f5f5f5'],
             vals: [scorePercentage, remainingPercentage]
           }]
         },
@@ -196,21 +200,68 @@ const AdvancedResultsTabContent = ({ selectedTab, brandName, dealershipName, dep
     }
   };
 
+  console.log("Testing indexing", expectedValueRange[tab - 1]);
+
+  // for mobile responsiveness
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   return (
-    <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center' }}>
+    <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center', flexDirection: isMobile ? 'column' : 'row', flex: 1}}>
 
       <>
         {tab !== 0 && gradeResults && (
           <div style={{ flex: 1 }}>
-            <Typography variant="h6" align="center">Content</Typography>
-            <Box>
-              <Typography variant="body1" align="center">
-                Category Score: {categoryScores[tab - 1]} / 4
+            <Typography variant="body1" align="left">
+              <strong>Category Score:</strong> {categoryScores[tab - 1]} out of 4
+            </Typography>
+            <Typography variant="body1" align="left">
+              <strong>Detected Value:</strong> {detection[tab - 1]}
+            </Typography>
+            {tab !== 1 ? (
+              <Typography variant="body1" align="left">
+                <strong>Expected Value Range:</strong>
+                <ul>
+                  <li>
+                    <strong>Minimum:</strong> {expectedValueRange[categories[tab - 1]][0]}
+                  </li>
+                  <li>
+                    <strong>Above Minimum:</strong> {expectedValueRange[categories[tab - 1]][1]}
+                  </li>
+                  <li>
+                    <strong>Well Over Minimum:</strong> {expectedValueRange[categories[tab - 1]][2]}
+                  </li>
+                </ul>
               </Typography>
-              <Typography variant="body1" align="center">
-                Detected Value: {detection[tab - 1]}
+            ) : (
+              <Typography variant="body1" align="left" style={{ marginBottom: '2rem' }}>
+                <strong>Expected Value:</strong> {expectedLogo}
               </Typography>
-            </Box>
+            )}
+
+            <Typography variant="body1" align="left" style={{ marginBottom: '1rem' }}>
+              Based on the analysis, here's how the results are interpreted:
+            </Typography>
+            {categoryScores[tab - 1] === 1 && (
+              <Typography variant="body1" align="left">
+                The detected value falls below the minimum dealership standard. Improvement is needed.
+              </Typography>
+            )}
+            {categoryScores[tab - 1] === 2 && (
+              <Typography variant="body1" align="left">
+                The detected value is slightly below the expected standard. Consider making adjustments for better performance.
+              </Typography>
+            )}
+            {categoryScores[tab - 1] === 3 && (
+              <Typography variant="body1" align="left">
+                The detected value meets or slightly exceeds the expected standard. This is a satisfactory result.
+              </Typography>
+            )}
+            {categoryScores[tab - 1] === 4 && (
+              <Typography variant="body1" align="left">
+                The detected value significantly exceeds the expected standard. Congratulations on achieving an excellent result.
+              </Typography>
+            )}
           </div>
         )}
         {tab !== 0 ? (
@@ -234,13 +285,13 @@ const AdvancedResultsTabContent = ({ selectedTab, brandName, dealershipName, dep
               <Typography variant="body1" align="center">
                 Overall Score: {totalScore} / 20
               </Typography>
-              <div style={{ display: 'flex', flexDirection: 'row', flex: 1 }}>
-                <div style={{ flex: 1 }}>
-                  <canvas id="categoryChart" width="300" height="300"></canvas>
+              <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', flex: 1 }}>
+                <div style={{ flex: 1, marginBottom: isMobile ? '1rem' : '0' }}>
+                  <canvas id="categoryChart" width="50%" height="50%"></canvas>
                 </div>
-                <Divider orientation="vertical" flexItem />
+              {isMobile ? null : <Divider orientation="vertical" flexItem />}
                 <div style={{ flex: 1 }}>
-                  <canvas id="overallScoreChart" width="300" height="300"></canvas>
+                  <canvas id="overallScoreChart" width="50%" height="50%"></canvas>
                 </div>
               </div>
             </div>

@@ -46,17 +46,20 @@ def add_to_database(database_info,categories, scores,total_scores,detection,min_
          "Expected Logo" : expected_logo,
          "Upload Name" : database_info[-1],
          "User" : database_info[8]
+    }
 
+    data_field = {
+        "Brand" : database_info[0]
     }
 
     # go to the collection, create a new document (dealership name), create a new collection with (department)
     db.collection("results").document(database_info[1]).collection(database_info[2]).document(database_info[4]).set(data)
+    db.collection("results").document(database_info[1]).set(data_field)
     
 
 def build_audit_results(cv_results, dealership_info, past_sales=150, uio=300):
     # Extract results from various evaluations to build results
 
-    detected_logo, num_cars, num_parking, num_seating, sq_footage = cv_results
     
 
     brand_compliance_limits = {}
@@ -83,11 +86,13 @@ def build_audit_results(cv_results, dealership_info, past_sales=150, uio=300):
     def calculate_evaluation_grades():
         # Grade the evaluation results using past sales and UIO information
 
+        detected_logo, num_cars, num_parking, num_seating, sq_footage ,satisfaction_score= cv_results
+
         eval_factor = (past_sales + uio)//2
         minParkingFactor = int(num_parking)/int(parking_min) + 1
         minCarFactor = int(num_cars)/int(cars_min)+1
         minSeatingFactor = int(num_seating)/int(seating_min) +1
-        minSqFactor = int(sq_footage)/int(sq_footage_min) +1
+        minSqFactor = float(sq_footage)/float(sq_footage_min) +1
         grades = {}
 
         print("Past sales and UIO", past_sales,uio)
@@ -176,6 +181,19 @@ def build_audit_results(cv_results, dealership_info, past_sales=150, uio=300):
         sq_footage_result = sq_footage_result + min_vals
         grades['Spatial'] = sq_footage_result
 
+        # Emotional results
+        if satisfaction_score < 0:
+            emotion = ('Poor', 1, satisfaction_score)
+        elif satisfaction_score >= 0 and satisfaction_score < 2:
+            emotion = ('Unsatisfactory', 2, satisfaction_score)
+        elif satisfaction_score >= 2:
+            emotion = ('Good', 3, satisfaction_score)
+    
+        print("Test SQ FT", sq_footage_result)
+        min_vals = ("Below Zero","Between 0 and 2","Over 2")
+        emotion = emotion + min_vals
+        grades['Emotional'] = emotion
+
         return grades   
     
     grades = calculate_evaluation_grades()
@@ -200,7 +218,7 @@ def build_audit_results(cv_results, dealership_info, past_sales=150, uio=300):
     print("Overall grade: ", final_grade)
 
     # Extract categories and their scores
-    categories = ['Logo', 'Cars', 'Parking', 'Hospitality', 'Spatial']
+    categories = ['Logo', 'Cars', 'Parking', 'Hospitality', 'Spatial','Emotional']
     scores = [grades[category][1] for category in categories]
     detection = [grades[category][2] for category in categories]
 

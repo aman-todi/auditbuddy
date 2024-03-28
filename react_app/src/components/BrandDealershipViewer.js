@@ -42,6 +42,8 @@ const BrandDealershipViewer = ({ onClickResult }) => {
     handleSearch(searchQuery);
   }, [searchType, searchQuery]); // Watch for changes in searchType and searchQuery
 
+  console.log("searchResults", searchResults);
+
   return (
     <Paper elevation={3} sx={{ padding: 2, marginBottom: 2 }}>
       <Container>
@@ -77,6 +79,7 @@ const BrandDealershipViewer = ({ onClickResult }) => {
                 <TableCell>Parking Avg</TableCell>
                 <TableCell>Hospitality Avg</TableCell>
                 <TableCell>Spatial Avg</TableCell>
+                <TableCell>Emotional Avg</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -86,13 +89,14 @@ const BrandDealershipViewer = ({ onClickResult }) => {
                 </TableRow>
               ) : (
                 searchResults.length > 0 && Array.from({ length: searchResults[0]['Car Avg'].length }).map((_, index) => (
-                  <TableRow key={index} sx={{ cursor: 'pointer' }} onClick={() => handleClick(searchResults[3]['Name'][index])}>
-                    <TableCell>{searchResults[3]['Name'][index]}</TableCell>
-                    <TableCell>{searchResults[2]['Logo Avg'][index]}</TableCell>
+                  <TableRow key={index} sx={{ cursor: 'pointer' }} onClick={() => handleClick(searchResults[4]['Name'][index])}>
+                    <TableCell>{searchResults[4]['Name'][index]}</TableCell>
+                    <TableCell>{searchResults[3]['Logo Avg'][index]}</TableCell>
                     <TableCell>{searchResults[0]['Car Avg'][index]}</TableCell>
-                    <TableCell>{searchResults[4]['Parking Avg'][index]}</TableCell>
-                    <TableCell>{searchResults[1]['Hospitality Avg'][index]}</TableCell>
-                    <TableCell>{searchResults[5]['Spatial Avg'][index]}</TableCell>
+                    <TableCell>{searchResults[5]['Parking Avg'][index]}</TableCell>
+                    <TableCell>{searchResults[2]['Hospitality Avg'][index]}</TableCell>
+                    <TableCell>{searchResults[6]['Spatial Avg'][index]}</TableCell>
+                    <TableCell>{searchResults[1]['Emotional Avg'][index]}</TableCell>
                   </TableRow>
                 ))
               )}

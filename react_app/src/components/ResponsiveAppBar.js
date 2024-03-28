@@ -9,7 +9,7 @@ import Menu from '@mui/material/Menu';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 
-const categories = ['Overall', 'Logo', 'Cars', 'Parking', 'Hospitality', 'Spatial'];
+const categories = ['Overall', 'Logo', 'Cars', 'Parking', 'Hospitality', 'Spatial', 'Emotional'];
 
 function ResponsiveAppBar({ handleTabChange }) {
   const [anchorEl, setAnchorEl] = useState(null);

@@ -151,6 +151,26 @@ def get_annotated_images_spatial(brandName,dealershipName,department,submission)
         error_message = f"Error fetching annotated images: {str(e)}"
         print(error_message)
         return jsonify({'error': error_message}), 500
+    
+@app.route('/get-emotional-results/<brandName>/<dealershipName>/<department>/<submission>')
+def get_annotated_images_emotional(brandName,dealershipName,department,submission):
+    try:
+        # Construct the folder path based on the dealershipName
+        folder_path = f'{brandName}/{dealershipName}/{department}/{submission}/EmotionalResults/'
+        # Fetch annotated images from Firebase Storage and return their URLs
+        blobs = bucket.list_blobs(prefix=folder_path)
+        
+        # Extract public URLs of the annotated images only if it is a png (It will grab the folder as well if not)
+        image_urls = [blob.public_url for blob in blobs if os.path.splitext(blob.name)[1] == '.png']
+
+        print("Length of URLS", len(image_urls))
+
+        return jsonify({'images': image_urls}), 200
+    except Exception as e:
+        # Handle any errors that occur during image retrieval
+        error_message = f"Error fetching annotated images: {str(e)}"
+        print(error_message)
+        return jsonify({'error': error_message}), 500
 
 
 @app.route('/upload-video', methods=['POST'])
@@ -200,7 +220,7 @@ def upload_video():
      
     # Run emotional if there are emotional files   
     if len(emotional_files) != 0:
-        compute_satisfaction(emotional_paths[0], dealership_info)
+        satisfaction_score = compute_satisfaction(emotional_paths[0], dealership_info)
     
     # spatial files in list
     spatial_files = []
@@ -227,7 +247,7 @@ def upload_video():
         return jsonify({'error': error_message}), 404
 
     # loop the detection categories
-    required_categories = ['logo', 'cars', 'parking','hospitality', 'spatial']
+    required_categories = ['logo', 'cars', 'parking','hospitality', 'spatial','emotional']
     
 
     # logic for extracting file from different categories (works for multi files)
@@ -268,12 +288,16 @@ def upload_video():
         elif category == 'spatial':
             pass
 
+        elif category == 'emotional':
+            pass
+
         for file in files_list:
             if os.path.exists(file):
                 os.remove(file)
-            
+        
     # Build audit score
-    cv_results = (logo_result, num_cars, num_parking, num_seating, sq_ft_result)
+    cv_results = (logo_result, num_cars, num_parking, num_seating, sq_ft_result,satisfaction_score)
+    print("CHECKING RESULTS", cv_results)
     build_audit_results(cv_results, dealership_info,int(sales),int(uio))
                   
     # add the form info to the database
@@ -284,6 +308,7 @@ def upload_video():
     print("Number of parking spaces:", num_parking)
     print("Seating capacity:", num_seating)
     print("Square footage:", sq_ft_result)
+    print("Emotion", satisfaction_score)
 
     end_time = time.time()
 
@@ -738,21 +763,28 @@ def rebuild_audit_results(brand, new_detection, past_sales=150, uio=300):
 
         # evaluation grades
         def calculate_evaluation_grades():
-            # ratios
+
             cars_ratio = 0.005
             parking_ratio = 0.007
             seating_ratio = 0.004
             sq_footage_ratio = .025
+            # Grade the evaluation results using past sales and UIO information
 
-            # grade evaluation results
             eval_factor = (past_sales + uio)//2
             minParkingFactor = int(num_parking)/int(parking_min) + 1
             minCarFactor = int(num_cars)/int(cars_min)+1
             minSeatingFactor = int(num_seating)/int(seating_min) +1
-            minSqFactor = int(sq_footage)/int(sq_footage_min) +1
+            minSqFactor = float(sq_footage)/float(sq_footage_min) +1
             grades = {}
 
-            # logo detection
+            print("Past sales and UIO", past_sales,uio)
+            print("Eval Factor",eval_factor)
+            print("minParkingFactor", minParkingFactor)
+            print("minCarFactor", minCarFactor)
+            print("minSeatingFactor", minSeatingFactor)
+            print("minSqFactor", minSqFactor)
+
+            # Logo detection results
             if detected_logo.upper() == brand.upper():
                 logo_result = ('Great', 4, detected_logo)
             else:
@@ -760,67 +792,85 @@ def rebuild_audit_results(brand, new_detection, past_sales=150, uio=300):
 
             grades['Logo'] = logo_result
 
-            # cars detection
+            # Cars display results
             if num_cars < cars_min:
                 cars_result = ('Poor', 1, num_cars)
+
             elif num_cars < cars_min+(eval_factor*cars_ratio*minCarFactor):
                 cars_result = ('Unsatisfactory', 2, num_cars)
+
             elif num_cars == cars_min+(eval_factor*cars_ratio*minCarFactor) or cars_min+(eval_factor*cars_ratio*minCarFactor*2):
                 cars_result = ('Good', 3, num_cars)
+
             elif num_cars >= cars_min+(eval_factor*cars_ratio*minCarFactor*2):
                 cars_result = ('Great', 4, num_cars)
 
-            min_vals = (cars_min,cars_min+(eval_factor*cars_ratio*minCarFactor),cars_min+(eval_factor*cars_ratio*minCarFactor*2))
+            min_vals = (cars_min,round(cars_min+(eval_factor*cars_ratio*minCarFactor),2),round(cars_min+(eval_factor*cars_ratio*minCarFactor*2),2))
             cars_result = cars_result + min_vals
             grades['Cars'] = cars_result 
 
-            # parking detection
+            # Customer parking results
             if num_parking < parking_min:
                 parking_result = ('Poor', 1, num_parking)
+
             elif num_parking < parking_min+(eval_factor*parking_ratio*minParkingFactor):
                 parking_result = ('Unsatisfactory', 2, num_parking)
+
             elif num_parking == parking_min+(eval_factor*parking_ratio*minParkingFactor) or parking_min+(eval_factor*parking_ratio*minParkingFactor*2):
                 parking_result = ('Good', 3, num_parking)
+
             elif num_parking >= parking_min+(eval_factor*parking_ratio*minParkingFactor*2):
                 parking_result = ('Great', 4, num_parking)
 
-            min_vals = (parking_min,parking_min+(eval_factor*parking_ratio*minParkingFactor),parking_min+(eval_factor*parking_ratio*minParkingFactor*2))
+            min_vals = (parking_min,round(parking_min+(eval_factor*parking_ratio*minParkingFactor),2),round(parking_min+(eval_factor*parking_ratio*minParkingFactor*2),2))
             parking_result = parking_result + min_vals
             grades['Parking'] = parking_result
 
-            # hospitality detection
+            # Hospitality results
             if num_seating < seating_min:
                 seating_result = ('Poor', 1, num_seating)
+
             elif num_seating < seating_min+(eval_factor*seating_ratio*minSeatingFactor):
                 seating_result = ('Unsatisfactory', 2, num_seating)
+
             elif num_seating == seating_min+(eval_factor*seating_ratio*minSeatingFactor) or num_seating < seating_min+(eval_factor*seating_ratio*minSeatingFactor*2):
                 seating_result = ('Good', 3, num_seating)
+
             elif num_seating >= seating_min+(eval_factor*seating_ratio*minSeatingFactor*2):
                 seating_result = ('Great', 4, num_seating)
 
-            min_vals = (seating_min,seating_min+(eval_factor*seating_ratio*minSeatingFactor),seating_min+(eval_factor*seating_ratio*minSeatingFactor*2))
+            min_vals = (seating_min,round(seating_min+(eval_factor*seating_ratio*minSeatingFactor),2),round(seating_min+(eval_factor*seating_ratio*minSeatingFactor*2),2))
             seating_result = seating_result + min_vals
             grades['Hospitality'] = seating_result
 
-            # spatial detection
+            sq_footage = round(sq_footage,2)
+
+            # Square footage results
             if sq_footage < sq_footage_min:
                 sq_footage_result = ('Poor', 1, sq_footage)
+
             elif sq_footage < sq_footage_min+(eval_factor*sq_footage_ratio* minSqFactor):
                 sq_footage_result = ('Unsatisfactory', 2, sq_footage)
+
             elif sq_footage == sq_footage_min+(eval_factor*sq_footage_ratio* minSqFactor) or sq_footage < sq_footage_min+(eval_factor*sq_footage_ratio* minSqFactor *2):
                 sq_footage_result = ('Good', 3, sq_footage)
+
             elif sq_footage >= sq_footage_min+(eval_factor*sq_footage_ratio* minSqFactor *2):
                 sq_footage_result = ('Great', 4, sq_footage)
-        
-            min_vals = (sq_footage_min,sq_footage_min+(eval_factor*sq_footage_ratio* minSqFactor),sq_footage_min+(eval_factor*sq_footage_ratio* minSqFactor *2))
+                
+            
+            print("Test SQ FT", sq_footage_result)
+            min_vals = (round(sq_footage_min,2),round(sq_footage_min+(eval_factor*sq_footage_ratio* minSqFactor),2),round(sq_footage_min+(eval_factor*sq_footage_ratio* minSqFactor *2),2))
             sq_footage_result = sq_footage_result + min_vals
             grades['Spatial'] = sq_footage_result
 
-            return grades   
-    
-        grades = calculate_evaluation_grades()
 
-        qualitative_scale = {1: 'Poor', 2: 'Unsatisfactory', 3: 'Good', 4: 'Great'} 
+            return grades   
+        
+        grades = calculate_evaluation_grades()
+        print("Grades by category: ", grades)
+
+        qualitative_scale = {1: 'Poor', 2: 'Unsatisfactory', 3: 'Good', 4: 'Great'}    
 
         def calculate_overall_score():
             # Build an overall score using grades from different evaluations
@@ -833,7 +883,7 @@ def rebuild_audit_results(brand, new_detection, past_sales=150, uio=300):
             final_grade = qualitative_scale[final_grade]
 
             return total_score, final_grade
-    
+        
         total_score, final_grade = calculate_overall_score()
 
         # Extract categories and their scores
@@ -843,8 +893,9 @@ def rebuild_audit_results(brand, new_detection, past_sales=150, uio=300):
 
         grades = calculate_evaluation_grades()
 
-        # return the scores values
         return [scores, categories, total_score]
+
+
 
         
 
@@ -1183,6 +1234,7 @@ def get_names():
                 averages['Parking Avg'].append(round(sum(score[2] for score in scores_list) / num_scores,2))
                 averages['Hospitality Avg'].append(round(sum(score[3] for score in scores_list) / num_scores,2))
                 averages['Spatial Avg'].append(round(sum(score[4] for score in scores_list) / num_scores,2))
+                averages['Emotional Avg'].append(round(sum(score[5] for score in scores_list) / num_scores,2))
 
     # if the type is a dealership
     elif type == 'dealership':
@@ -1221,6 +1273,7 @@ def get_names():
                 averages['Parking Avg'].append(round(sum(score[2] for score in scores_list) / num_scores,2))
                 averages['Hospitality Avg'].append(round(sum(score[3] for score in scores_list) / num_scores,2))
                 averages['Spatial Avg'].append(round(sum(score[4] for score in scores_list) / num_scores,2))
+                averages['Emotional Avg'].append(round(sum(score[5] for score in scores_list) / num_scores,2))
 
     print(averages)
 

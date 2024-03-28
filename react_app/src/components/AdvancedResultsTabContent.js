@@ -69,6 +69,9 @@ const AdvancedResultsTabContent = ({ selectedTab, brandName, dealershipName, dep
           case 5:
             categoryEndpoint = `/get-spatial-results/${encodeURIComponent(brandName)}/${encodeURIComponent(dealershipName)}/${encodeURIComponent(department)}/${encodeURIComponent(submission)}`;
             break;
+          case 6:
+            categoryEndpoint = `/get-emotional-results/${encodeURIComponent(brandName)}/${encodeURIComponent(dealershipName)}/${encodeURIComponent(department)}/${encodeURIComponent(submission)}`;
+            break;
           default:
             break;
         }
@@ -149,7 +152,7 @@ const AdvancedResultsTabContent = ({ selectedTab, brandName, dealershipName, dep
     }
 
     // Calculate percentage for each value
-    const scorePercentage = (totalScore / 20) * 100;
+    const scorePercentage = (totalScore / 23) * 100;
     const remainingPercentage = 100 - scorePercentage;
 
     // Render the chart only if the canvas element exists
@@ -162,7 +165,7 @@ const AdvancedResultsTabContent = ({ selectedTab, brandName, dealershipName, dep
         data: {
           labels: ['Score', 'Remaining'],
           datasets: [{
-            data: [totalScore, 20 - totalScore],
+            data: [totalScore, 23 - totalScore],
             backgroundColor: ['#bae38c', '#f5f5f5'],
             vals: [scorePercentage, remainingPercentage]
           }]
@@ -207,7 +210,7 @@ const AdvancedResultsTabContent = ({ selectedTab, brandName, dealershipName, dep
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
-    <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center', flexDirection: isMobile ? 'column' : 'row', flex: 1}}>
+    <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center', flexDirection: isMobile ? 'column' : 'row', flex: 1 }}>
 
       <>
         {tab !== 0 && gradeResults && (
@@ -283,13 +286,13 @@ const AdvancedResultsTabContent = ({ selectedTab, brandName, dealershipName, dep
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', marginBottom: '2rem' }}>
               <Typography variant="h6" align="center">Evaluation Graphs</Typography>
               <Typography variant="body1" align="center">
-                Overall Score: {totalScore} / 20
+                Overall Score: {totalScore} / 23
               </Typography>
               <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', flex: 1 }}>
                 <div style={{ flex: 1, marginBottom: isMobile ? '1rem' : '0' }}>
                   <canvas id="categoryChart" width="50%" height="50%"></canvas>
                 </div>
-              {isMobile ? null : <Divider orientation="vertical" flexItem />}
+                {isMobile ? null : <Divider orientation="vertical" flexItem />}
                 <div style={{ flex: 1 }}>
                   <canvas id="overallScoreChart" width="50%" height="50%"></canvas>
                 </div>

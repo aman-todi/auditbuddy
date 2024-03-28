@@ -113,19 +113,12 @@ def compute_satisfaction(image_path, dealership_info):
     save_annotated_image_to_firebase(annotated_image,dealership_info,counter)
     counter += 1
 
-    print("SATISFACTION SCORES:")
-    print("Score: ", satisfaction_score)
-    if satisfaction_score < 0:
-        print("Unsatisfactory")
-    elif satisfaction_score > 0 and satisfaction_score < 2:
-        print("Satisfactory")
-    elif satisfaction_score >= 2:
-        print("Exceptional")
     return satisfaction_score
+
 def save_annotated_image_to_firebase(annotated_image,dealership_info,counter):
     print("Saving annotated image to Firebase")
     # Specify the path where you want to store the file in Firebase Storage
-    image_filename = f"{dealership_info[0]}/{dealership_info[1]}/{dealership_info[2]}/{dealership_info[4]}/SpatialResults/annotated_image_{counter}.png"
+    image_filename = f"{dealership_info[0]}/{dealership_info[1]}/{dealership_info[2]}/{dealership_info[4]}/EmotionalResults/annotated_image_{counter}.png"
     blob = storage.bucket().blob(image_filename)
     # Convert the OpenCV image to bytes
     _, buffer = cv2.imencode('.png', annotated_image)

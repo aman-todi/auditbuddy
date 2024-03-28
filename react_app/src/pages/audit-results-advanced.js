@@ -31,10 +31,6 @@ const AdvancedResultsPage = () => {
     setDepartment(params["Department"]);
     setSubmission(params["Submitted"]);
 
-    return () => {
-      // Clear session storage when the component unmounts
-      sessionStorage.removeItem('advancedResultsParams');
-    };
   }, []);
 
   const [selectedTab, setSelectedTab] = useState(0);

@@ -9,6 +9,8 @@ import cv2
 import time
 import numpy as np
 
+car_brands = ['Audi', 'BMW', 'Cadillac', 'Chevrolet', 'Ford', 'Honda', 'Hyundai', 'Kia', 
+              'Mercedes', 'Porsche', 'Subaru', 'Toyota', 'Volkswagen']
 
 class LogoDetector:
     def __init__(self, filePath, confidence_threshold=0.6, nms_threshold=0.4):
@@ -52,11 +54,18 @@ class LogoDetector:
 
         for logo in self.logos:
             print(logo.description)
-            print(logo.score)
             annotated_image = self.create_annotated_image(image_path, logo)
             self.save_annotated_image_to_firebase(annotated_image)
-            print(logo.description)
-            return logo.description
+
+            detected_logo = logo.description
+
+            # Make the brand detection consistent / redact to brand name only
+            for brand in car_brands:
+                if detected_logo.lower() == brand.lower() or brand.lower() in detected_logo.lower():
+                    detected_logo == brand
+                    break
+
+            return detected_logo
 
 
     # Creates the annotated images using pillow to find vertices of logo and create a bounding box with text
@@ -80,10 +89,6 @@ class LogoDetector:
             # Draw a rectangle around the logo
             draw.rectangle([top_left, bottom_right], outline="red")
 
-            # Annotate the image with the logo description and score
-            text = f"{logo.description} (Score: {logo.score})"
-            draw.text((top_left[0], top_left[1] - 15), text, fill="red")
-
             # Convert PIL image back to OpenCV format
             annotated_image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
 
@@ -101,15 +106,3 @@ class LogoDetector:
         # Upload the file to Firebase Storage
         blob.upload_from_string(buffer.tobytes(), content_type='image/png')
         print(f'Saved annotated image to Firebase Storage: {blob.public_url}')
-        
-    # # Saves the annotated images to local file
-    # def save_annotated_image_locally(self,annotated_image):
-    #     print("Saving annotated image")
-    #     save_folder = os.path.join(app.root_path, 'static', 'main', 'annotated_images')
-    #     os.makedirs(save_folder, exist_ok=True)
-
-    #     image_filename = f"annotated_image_{int(time.time())}.png"
-    #     image_path = os.path.join(save_folder, image_filename)
-    #     cv2.imwrite(image_path, annotated_image)
-
-    #     print(f'Saved annotated image: {image_path}')

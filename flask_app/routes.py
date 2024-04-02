@@ -217,6 +217,8 @@ def upload_video():
         file.save(save_path)
         emotional_paths.append(save_path)
         index += 1
+
+    satisfaction_score = 0
      
     # Run emotional if there are emotional files   
     if len(emotional_files) != 0:

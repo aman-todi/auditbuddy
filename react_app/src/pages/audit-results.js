@@ -18,7 +18,7 @@ function ResultsPage() {
   const [dealershipCount, setDealershipCount] = useState(new Map());
 
   // order to display the keys of database results
-  const brand_names = ['Audi', 'BMW', 'Cadillac', 'Chevrolet', 'Ford', 'Honda', 'Hyundai', 'Kia', 'Mercedes', 'Porsche', 'Subaru', 'Toyota', 'Volkswagen']
+  const brand_names = ['Audi', 'BMW', 'Cadillac', 'Chevrolet', 'Ford', 'Honda', 'Kia', 'Nissan', 'Porsche', 'Subaru', 'Toyota', 'Volkswagen']
 
   // page authentication
   const [user, setUser] = useState(auth.currentUser);

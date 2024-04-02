@@ -28,10 +28,6 @@ def create_app():
       'storageBucket': 'valued-range-411422.appspot.com'
   })
   
-  from .utils.database.database import database
-  db = database()
-  db.createTables(purge=True)
-
   with app.app_context():
     from . import routes
     return app

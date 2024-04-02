@@ -1,7 +1,6 @@
 flask
 gunicorn
 Flask-Failsafe
-mysql-connector-python
 flask_cors
 Pillow
 opencv-python-headless

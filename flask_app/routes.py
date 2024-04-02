@@ -1,11 +1,9 @@
 from flask import current_app as app
 from flask import render_template, redirect, request, jsonify, send_from_directory,abort
-from .utils.database.database  import database
 from pprint import pprint
 import json
 import random
 import os
-db = database()
 from werkzeug.utils import secure_filename
 # computer vision
 from flask_app.media_analysis import count_cars_in_footage, assess_hospitality, count_parking_spaces

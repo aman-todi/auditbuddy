@@ -77,7 +77,8 @@ const AdvancedResultsPage = () => {
   const [hospitality, setHospitality] = useState(null);
   const [originalHospitality, setOriginalHospitality] = useState(hospitality);
 
-  // need to add emotional api?
+  // emotion will not be edited
+  const [emotion, setEmotion] = useState(null);
 
   // see if we are in edit mode
   const [editMode, setEditMode] = useState(false);
@@ -126,15 +127,11 @@ const AdvancedResultsPage = () => {
       formData.append('parking', parking);
       formData.append('spatial', spatial);
       formData.append('hospitality', hospitality);
-      // formData.append('emotion', parking);
+      formData.append('emotion', emotion);
 
       // the new time
       const currentDate = new Date().toISOString();
       formData.append('updated', currentDate);
-
-      // update the page that the submission was overrided by a user
-      // to show who updated the values
-      // setUpdatedTime(currentDate);
 
       const response = await axios.post('http://localhost:8080/submission-update-values', formData, {
         headers: {
@@ -174,6 +171,12 @@ const AdvancedResultsPage = () => {
       setParking(gradeResponse.data["Detection"][2]);
       setHospitality(gradeResponse.data["Detection"][3]);
       setSpatial(gradeResponse.data["Detection"][4]);
+
+      // since emotion is optional
+      if (gradeResponse.data["Detection"][5] != null)
+      {
+        setEmotion(gradeResponse.data["Detection"][5]);
+      }
 
       // open the pop up
       setPopup(true);

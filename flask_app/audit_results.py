@@ -59,9 +59,6 @@ def add_to_database(database_info,categories, scores,total_scores,detection,min_
 
 def build_audit_results(cv_results, dealership_info, past_sales=150, uio=300):
     # Extract results from various evaluations to build results
-
-    
-
     brand_compliance_limits = {}
 
     brand_limits_ref = db.collection('Brand compliance limits')

@@ -52,20 +52,25 @@ class LogoDetector:
         self.logos = response.logo_annotations
         print("Logos:")
 
-        for logo in self.logos:
-            print(logo.description)
-            annotated_image = self.create_annotated_image(image_path, logo)
-            self.save_annotated_image_to_firebase(annotated_image)
-
-            detected_logo = logo.description
-
-            # Make the brand detection consistent / redact to brand name only
-            for brand in car_brands:
-                if detected_logo.lower() == brand.lower() or brand.lower() in detected_logo.lower():
-                    detected_logo == brand
-                    break
-
+        if self.logos == []:
+            detected_logo = "No Detection"
             return detected_logo
+        
+        else:
+            for logo in self.logos:
+                print(logo.description)
+                annotated_image = self.create_annotated_image(image_path, logo)
+                self.save_annotated_image_to_firebase(annotated_image)
+
+                detected_logo = logo.description
+
+                # Make the brand detection consistent / redact to brand name only
+                for brand in car_brands:
+                    if detected_logo.lower() == brand.lower() or brand.lower() in detected_logo.lower():
+                        detected_logo == brand
+                        break
+
+                return detected_logo
 
 
     # Creates the annotated images using pillow to find vertices of logo and create a bounding box with text

@@ -183,8 +183,10 @@ def build_audit_results(cv_results, dealership_info, past_sales=150, uio=300):
             emotion = ('Poor', 1, satisfaction_score)
         elif satisfaction_score >= 0 and satisfaction_score < 2:
             emotion = ('Unsatisfactory', 2, satisfaction_score)
-        elif satisfaction_score >= 2:
+        elif satisfaction_score >= 1:
             emotion = ('Good', 3, satisfaction_score)
+        elif satisfaction_score >= 2:
+            emotion = ('Great', 4, satisfaction_score)
     
         print("Test SQ FT", sq_footage_result)
         min_vals = ("Below Zero","Between 0 and 2","Over 2")

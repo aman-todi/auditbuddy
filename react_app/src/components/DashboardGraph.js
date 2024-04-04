@@ -51,20 +51,18 @@ const DashboardGraph = ({ clickedResult, type }) => {
     const ctx = document.getElementById('dashboardChart');
     if (ctx) {
       chartRef.current = new Chart(ctx, {
-        type: 'line',
+        type: 'bar',
         data: {
           labels: labels,
-          datasets: [{
-            label: 'Total Score',
-            data: type === 'brand' ? totalScores : averageScores,
-            borderColor: 'rgb(75, 192, 192)',
-            tension: 0.1
-          }, {
-            label: 'Average Score',
-            data: type === 'brand' ? averageScores : totalScores,
-            borderColor: 'rgb(192, 75, 192)',
-            tension: 0.1
-          }]
+          datasets: [
+            {
+              label: 'Average Score',
+              data: averageScores,
+              backgroundColor: 'rgba(75, 192, 192, 0.2)',
+              borderColor: 'rgba(75, 192, 192, 1)',
+              borderWidth: 1
+            }
+          ]
         },
         options: {
           scales: {

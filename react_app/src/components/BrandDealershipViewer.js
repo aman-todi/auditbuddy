@@ -45,7 +45,7 @@ const BrandDealershipViewer = ({ onClickResult }) => {
   console.log("searchResults", searchResults);
 
   return (
-    <Paper elevation={3} sx={{ padding: 2, marginBottom: 2 }}>
+    <Paper elevation={3} sx={{ padding: 2, marginBottom: 2, marginRight: '5rem' }}>
       <Container>
         <Typography variant="h4" gutterBottom sx={{ textAlign: 'center' }}>
           Brand / Dealership Viewer
@@ -69,8 +69,8 @@ const BrandDealershipViewer = ({ onClickResult }) => {
           onChange={(e) => setSearchQuery(e.target.value)}
           sx={{ m: 1, width: '25ch' }}
         />
-        <TableContainer component={Paper} sx={{ maxHeight: '50vh', overflow: 'auto' }}>
-          <Table>
+        <TableContainer component={Paper} sx={{ maxHeight: '20vh', overflow: 'auto' }}>
+          <Table stickyHeader>
             <TableHead>
               <TableRow>
                 <TableCell>Name</TableCell>

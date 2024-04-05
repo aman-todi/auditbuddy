@@ -27,61 +27,59 @@ const AdvancedResultsTabContent = ({ selectedTab, brandName, dealershipName, dep
   useEffect(() => {
     const fetchData = async (submission, dealershipName, department) => {
       try {
-        if (submission && dealershipName && department) {
-          // Fetch grade results
-          const formData = new FormData();
-          formData.append('submission', submission);
-          formData.append('name', dealershipName);
-          formData.append('department', department);
+        // Fetch grade results
+        const formData = new FormData();
+        formData.append('submission', submission);
+        formData.append('name', dealershipName);
+        formData.append('department', department);
 
-          const gradeResponse = await axios.post('http://localhost:8080/get-category-eval', formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-          });
-
-          // Set grade results
-          handleSetGradeResults(gradeResponse.data);
-          setCategories(gradeResponse.data["Category Eval"]["Categories"]);
-          setCategoryScores(gradeResponse.data["Category Eval"]["Scores"]);
-          setTotalScore(gradeResponse.data["Overall Eval"]["Scores"]);
-          setDetection(gradeResponse.data["Detection"]);
-          setExpectedValueRange(gradeResponse.data["Min Vals"]);
-          setExpectedLogo(gradeResponse.data["Expected Logo"])
-          renderCategoryGraphs(gradeResponse.data["Category Eval"]["Categories"], gradeResponse.data["Category Eval"]["Scores"]);
-          renderOverallScorePieChart(gradeResponse.data["Overall Eval"]["Scores"]);
-
-          // Fetch category results
-          let categoryEndpoint = '';
-
-          switch (tab) {
-            case 1:
-              categoryEndpoint = `/get-logo-results/${encodeURIComponent(brandName)}/${encodeURIComponent(dealershipName)}/${encodeURIComponent(department)}/${encodeURIComponent(submission)}`;
-              break;
-            case 2:
-              categoryEndpoint = `/get-car-results/${encodeURIComponent(brandName)}/${encodeURIComponent(dealershipName)}/${encodeURIComponent(department)}/${encodeURIComponent(submission)}`;
-              break;
-            case 3:
-              categoryEndpoint = `/get-parking-results/${encodeURIComponent(brandName)}/${encodeURIComponent(dealershipName)}/${encodeURIComponent(department)}/${encodeURIComponent(submission)}`;
-              break;
-            case 4:
-              categoryEndpoint = `/get-hospitality-results/${encodeURIComponent(brandName)}/${encodeURIComponent(dealershipName)}/${encodeURIComponent(department)}/${encodeURIComponent(submission)}`;
-              break;
-            case 5:
-              categoryEndpoint = `/get-spatial-results/${encodeURIComponent(brandName)}/${encodeURIComponent(dealershipName)}/${encodeURIComponent(department)}/${encodeURIComponent(submission)}`;
-              break;
-            case 6:
-              categoryEndpoint = `/get-emotional-results/${encodeURIComponent(brandName)}/${encodeURIComponent(dealershipName)}/${encodeURIComponent(department)}/${encodeURIComponent(submission)}`;
-              break;
-            default:
-              break;
+        const gradeResponse = await axios.post('http://localhost:8080/get-category-eval', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
           }
+        });
 
-          if (categoryEndpoint) {
-            const categoryResponse = await fetch(categoryEndpoint);
-            const categoryData = await categoryResponse.json();
-            setCategoryResults(categoryData.images);
-          }
+        // Set grade results
+        handleSetGradeResults(gradeResponse.data);
+        setCategories(gradeResponse.data["Category Eval"]["Categories"]);
+        setCategoryScores(gradeResponse.data["Category Eval"]["Scores"]);
+        setTotalScore(gradeResponse.data["Overall Eval"]["Scores"]);
+        setDetection(gradeResponse.data["Detection"]);
+        setExpectedValueRange(gradeResponse.data["Min Vals"]);
+        setExpectedLogo(gradeResponse.data["Expected Logo"])
+        renderCategoryGraphs(gradeResponse.data["Category Eval"]["Categories"], gradeResponse.data["Category Eval"]["Scores"]);
+        renderOverallScorePieChart(gradeResponse.data["Overall Eval"]["Scores"]);
+
+        // Fetch category results
+        let categoryEndpoint = '';
+
+        switch (tab) {
+          case 1:
+            categoryEndpoint = `/get-logo-results/${encodeURIComponent(brandName)}/${encodeURIComponent(dealershipName)}/${encodeURIComponent(department)}/${encodeURIComponent(submission)}`;
+            break;
+          case 2:
+            categoryEndpoint = `/get-car-results/${encodeURIComponent(brandName)}/${encodeURIComponent(dealershipName)}/${encodeURIComponent(department)}/${encodeURIComponent(submission)}`;
+            break;
+          case 3:
+            categoryEndpoint = `/get-parking-results/${encodeURIComponent(brandName)}/${encodeURIComponent(dealershipName)}/${encodeURIComponent(department)}/${encodeURIComponent(submission)}`;
+            break;
+          case 4:
+            categoryEndpoint = `/get-hospitality-results/${encodeURIComponent(brandName)}/${encodeURIComponent(dealershipName)}/${encodeURIComponent(department)}/${encodeURIComponent(submission)}`;
+            break;
+          case 5:
+            categoryEndpoint = `/get-spatial-results/${encodeURIComponent(brandName)}/${encodeURIComponent(dealershipName)}/${encodeURIComponent(department)}/${encodeURIComponent(submission)}`;
+            break;
+          case 6:
+            categoryEndpoint = `/get-emotional-results/${encodeURIComponent(brandName)}/${encodeURIComponent(dealershipName)}/${encodeURIComponent(department)}/${encodeURIComponent(submission)}`;
+            break;
+          default:
+            break;
+        }
+
+        if (categoryEndpoint) {
+          const categoryResponse = await fetch(categoryEndpoint);
+          const categoryData = await categoryResponse.json();
+          setCategoryResults(categoryData.images);
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -112,7 +110,7 @@ const AdvancedResultsTabContent = ({ selectedTab, brandName, dealershipName, dep
           datasets: [{
             label: 'Scores',
             data: scores,
-            backgroundColor: '#74b42c',
+            backgroundColor: '#bae38c',
             borderColor: '#f5f5f5',
             borderWidth: 1
           }]
@@ -154,7 +152,7 @@ const AdvancedResultsTabContent = ({ selectedTab, brandName, dealershipName, dep
     }
 
     // Calculate percentage for each value
-    const scorePercentage = (totalScore / 24) * 100;
+    const scorePercentage = (totalScore / 23) * 100;
     const remainingPercentage = 100 - scorePercentage;
 
     // Render the chart only if the canvas element exists
@@ -167,8 +165,8 @@ const AdvancedResultsTabContent = ({ selectedTab, brandName, dealershipName, dep
         data: {
           labels: ['Score', 'Remaining'],
           datasets: [{
-            data: [totalScore, 24 - totalScore],
-            backgroundColor: ['#74b42c', '#f5f5f5'],
+            data: [totalScore, 23 - totalScore],
+            backgroundColor: ['#bae38c', '#f5f5f5'],
             vals: [scorePercentage, remainingPercentage]
           }]
         },
@@ -204,41 +202,6 @@ const AdvancedResultsTabContent = ({ selectedTab, brandName, dealershipName, dep
       });
     }
   };
-  const MyComponent = ({ score }) => {
-    let emoji;
-
-    switch (score) {
-      case 1:
-        emoji = String.fromCodePoint(0x1F641); // 🙁
-        break;
-      case 2:
-        emoji = String.fromCodePoint(0x1F615); // 😕
-        break;
-      case 3:
-        emoji = String.fromCodePoint(0x1F642); // 🙂
-        break;
-      case 4:
-        emoji = String.fromCodePoint(0x1F601); // 😁
-        break;
-      default:
-        emoji = '';
-    }
-
-    const emojiStyle = {
-      fontSize: '3em', // Adjust the font size as needed
-      marginTop: '0.5rem' // Adjust the top margin to provide space between text and emoji
-    };
-
-    return (
-      <div style={{ textAlign: 'center' }}>
-        <Typography variant="body1" align="center">
-          Emotional Detection:
-        </Typography>
-        <span style={emojiStyle}>{emoji}</span>
-      </div>
-    );
-  };
-
 
   console.log("Testing indexing", expectedValueRange[tab - 1]);
 
@@ -325,16 +288,14 @@ const AdvancedResultsTabContent = ({ selectedTab, brandName, dealershipName, dep
               <Typography variant="body1" align="center">
                 Overall Score: {totalScore} / 23
               </Typography>
-              <MyComponent score={categoryScores[5]} />
               <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', flex: 1 }}>
                 <div style={{ flex: 1, marginBottom: isMobile ? '1rem' : '0' }}>
                   <canvas id="categoryChart" width="50%" height="50%"></canvas>
                 </div>
                 {isMobile ? null : <Divider orientation="vertical" flexItem />}
                 <div style={{ flex: 1 }}>
-                  <canvas id="overallScoreChart" ></canvas>
+                  <canvas id="overallScoreChart" width="50%" height="50%"></canvas>
                 </div>
-
               </div>
             </div>
           </>

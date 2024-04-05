@@ -38,15 +38,15 @@ const NewChangesBox = () => {
   };
 
   return (
-    <Paper elevation={3} sx={{ padding: '16px', width: '30rem', maxHeight: '50vh', overflow: 'hidden' }}>
+    <Paper elevation={3} sx={{ padding: '16px', maxWidth: '100vw', margin: '0 auto', overflow: 'hidden', maxHeight: '50vh' }}>
       <Typography variant="h4" gutterBottom sx={{ textAlign: 'center' }}>
         New Changes
       </Typography>
-
-      <Typography variant="h6" gutterBottom sx={{ textAlign: 'center' }}>
-        {submittedData.length} Recent Uploads <br /> In Past 24 Hours
-      </Typography>
-
+      {submittedData.length > 0 && (
+        <Typography variant="h6" gutterBottom sx={{ textAlign: 'center' }}>
+          {submittedData.length} Recent Uploads <br /> In Past 24 Hours
+        </Typography>
+      )}
       <List sx={{ width: 250, margin: 'auto', maxHeight: 175, overflow: 'auto', alignItems: 'center' }}>
         {submittedData.map((item, index) => (
           <ListItem key={index} button onClick={() => handleItemClick(item)}>

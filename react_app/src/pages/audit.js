@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, Typography } from '@mui/material';
+import { Typography, Grid, Container } from '@mui/material'; // Remove Paper import
 import NewChangesBox from '../components/NewChangesBox';
 import TopDealershipsBox from '../components/TopDealershipsBox';
 import BrandDealershipViewer from '../components/BrandDealershipViewer';
@@ -14,7 +14,6 @@ function AuditPage() {
     auth.onAuthStateChanged((currentUser) => setUser(currentUser));
   }, []);
 
-  // Assuming useAdmin is imported correctly
   const { admin } = useAdmin();
 
   return (
@@ -27,10 +26,10 @@ function AuditPage() {
             </div>
           </header>
 
-          <Grid container spacing={2} sx={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
-            {/* Left section */}
-            <Grid item style={{ width: '25%' }}>
-              <Grid container direction="column" spacing={1}>
+          {/* Replace Paper with a div */}
+          <div style={{ display: 'flex', height: '80vh', width: '100vw', overflow: 'hidden' }}>
+            <Container sx={{ flex: '1', overflow: 'hidden', padding: '2rem' }}>
+              <Grid container direction="column" justifyContent="space-between" alignItems="flex-start" spacing={4}>
                 <Grid item>
                   <NewChangesBox />
                 </Grid>
@@ -38,12 +37,12 @@ function AuditPage() {
                   <TopDealershipsBox />
                 </Grid>
               </Grid>
-            </Grid>
-            {/* Right section */}
-            <Grid item style={{ width: '75%' }}>
+            </Container>
+
+            <div sx={{ flex: '2', height: '100%', overflowY: 'auto' }}>
               <BrandDealershipViewer onClickResult={(result) => console.log(result)} />
-            </Grid>
-          </Grid>
+            </div>
+          </div>
         </React.Fragment>
       ) : (
         <p>Not Authorized</p>

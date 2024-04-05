@@ -792,6 +792,7 @@ def get_category_eval():
     name = request.form['name']
     department = request.form['department']
 
+    # access the database
 
     # results collection
     collection_ref = db.collection('results')

@@ -23,12 +23,11 @@ const TopDealershipsBox = () => {
   }, []);
 
   return (
-    <Paper elevation={3} sx={{ padding: '16px', width: '30rem', height: '20rem', margin: '0 auto', overflow: 'hidden' }}>
+    <Paper elevation={3} sx={{ padding: '16px', maxWidth: '100vw', margin: '0 auto', overflow: 'hidden', maxHeight: '50vh' }}>
       <Typography variant="h4" gutterBottom sx={{ textAlign: 'center' }}>
         Top Dealerships
       </Typography>
-      {/* Set a fixed height for TableContainer and enable vertical scrolling */}
-      <TableContainer component={Paper} style={{ maxHeight: '15rem', overflowY: 'auto' }}>
+      <TableContainer component={Paper} style={{ maxHeight: '30rem', overflowY: 'auto' }}>
         <Table stickyHeader>
           <TableHead>
             <TableRow>

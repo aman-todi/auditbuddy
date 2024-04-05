@@ -599,19 +599,23 @@ def rebuild_audit_results(brand, new_detection, past_sales=150, uio=300):
                 # emotional results
                 if satisfaction_score < 0:
                     emotion = ('Poor', 1, satisfaction_score)
-                elif satisfaction_score >= 0 and satisfaction_score < 2:
+                elif satisfaction_score >= 0 and satisfaction_score < 1:
                     emotion = ('Unsatisfactory', 2, satisfaction_score)
-                elif satisfaction_score >= 2:
+                elif satisfaction_score >= 1:
                     emotion = ('Good', 3, satisfaction_score)
+                elif satisfaction_score >= 2:
+                    emotion = ('Great', 3, satisfaction_score)
     
             print("Test SQ FT", sq_footage_result)
 
             if satisfaction_score < 0:
                 emotion = ('Poor', 1, satisfaction_score)
-            elif satisfaction_score >= 0 and satisfaction_score < 2:
+            elif satisfaction_score >= 0 and satisfaction_score < 1:
                 emotion = ('Unsatisfactory', 2, satisfaction_score)
-            elif satisfaction_score >= 2:
+            elif satisfaction_score >= 1:
                 emotion = ('Good', 3, satisfaction_score)
+            elif satisfaction_score >= 2:
+                emotion = ('Great', 3, satisfaction_score)
 
             min_vals = ("Below Zero","Between 0 and 2","Over 2")
             emotion = emotion + min_vals

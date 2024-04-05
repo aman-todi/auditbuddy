@@ -31,6 +31,11 @@ const AdvancedResultsPage = () => {
     setDepartment(params["Department"]);
     setSubmission(params["Submitted"]);
 
+    return () => {
+      // Clear session storage when the component unmounts
+      sessionStorage.removeItem('advancedResultsParams');
+    };
+
   }, []);
 
   const [selectedTab, setSelectedTab] = useState(0);
@@ -173,8 +178,7 @@ const AdvancedResultsPage = () => {
       setSpatial(gradeResponse.data["Detection"][4]);
 
       // since emotion is optional
-      if (gradeResponse.data["Detection"][5] != null)
-      {
+      if (gradeResponse.data["Detection"][5] != null) {
         setEmotion(gradeResponse.data["Detection"][5]);
       }
 

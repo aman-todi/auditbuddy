@@ -7,6 +7,45 @@ import concurrent.futures
 db = firestore.client()
 
 ##################################
+# MIN REQUIREMENTS
+##################################
+
+#
+# updates the min requirements
+#
+def submit_min_requirements(request):
+    data = request.json   
+    brand = data['selectedBrand']
+    minCars = data['minCars']
+    minParking = data['minParking']
+    minSeating = data['minSeating']
+    minSqFt = data['minSqFt'] 
+
+    minRef = db.collection('Brand compliance limits').document(brand)
+
+    minRef.update({
+        'minCars': minCars,
+        'minParking': minParking,
+        'minSeating': minSeating,
+        'minSqFt': minSqFt
+    })
+    return jsonify({'message': 'Success'})
+
+#
+# get the current min requirements
+#
+def get_brand_compliance_limits():
+    try:
+        brand_limits = []
+        docs = db.collection('Brand compliance limits').get()
+        for doc in docs:
+            data = doc.to_dict()
+            brand_limits.append(data)
+        return jsonify(brand_limits)
+    except Exception as e:
+        return jsonify({'error': str(e)})
+
+##################################
 # USERS
 ##################################
 

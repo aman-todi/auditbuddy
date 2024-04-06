@@ -346,7 +346,6 @@ def get_submitted_data():
                 name = nested_data.get('Dealership Name')
                 submitted = nested_document.get('Submitted')
                 upload = nested_data.get('Upload Name')
-                print(upload)
                 given_datetime = datetime.strptime(submitted, "%Y-%m-%dT%H:%M:%S.%fZ")
                 current_datetime = datetime.utcnow()
                 time_difference = current_datetime - given_datetime
@@ -405,7 +404,7 @@ def get_top_data():
 
     return jsonify(top25)
 
-
+# get the names of dealership
 @app.route('/get_names', methods=['GET'])
 def get_names():
     type = request.args.get('type')

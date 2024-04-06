@@ -1,6 +1,6 @@
 // TopDealershipsBox.jsx
 import React, { useState, useEffect } from 'react';
-import { Typography, Container, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Paper } from '@mui/material';
+import { Typography, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Paper } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import axios from 'axios';
 
@@ -23,12 +23,12 @@ const TopDealershipsBox = () => {
   }, []);
 
   return (
-    <Paper elevation={3} sx={{ padding: '16px', width: '30rem', height: '20rem', margin: '0 auto', overflow: 'hidden' }}>
-      <Typography variant="h4" gutterBottom sx={{ textAlign: 'center' }}>
+    <Paper sx={{ padding: '1rem', width: '30vw', height: '45vh', maxHeight: '45vh'}}>
+      <Typography gutterBottom sx={{ textAlign: 'center', fontWeight: 'bold', color: '#74b42c' }}>
         Top Dealerships
       </Typography>
       {/* Set a fixed height for TableContainer and enable vertical scrolling */}
-      <TableContainer component={Paper} style={{ maxHeight: '15rem', overflowY: 'auto' }}>
+      <TableContainer component={Paper} style={{ height: '35vh', maxHeight: '35vh', overflowY: 'auto' }}>
         <Table stickyHeader>
           <TableHead>
             <TableRow>
@@ -44,7 +44,7 @@ const TopDealershipsBox = () => {
               </TableRow>
             ) : (
               Array.isArray(topDealerships) && topDealerships.map((dataItem, index) => (
-                <TableRow key={index} sx={{ cursor: 'pointer' }}>
+                <TableRow key={index}>
                   <TableCell>{dataItem[1][0]}</TableCell>
                   <TableCell>{dataItem[0]}</TableCell>
                   <TableCell>{dataItem[1][1]}</TableCell>

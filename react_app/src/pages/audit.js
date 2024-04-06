@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Grid, Container } from '@mui/material'; // Remove Paper import
+import { Typography, Grid, Container } from '@mui/material';
 import NewChangesBox from '../components/NewChangesBox';
 import TopDealershipsBox from '../components/TopDealershipsBox';
 import BrandDealershipViewer from '../components/BrandDealershipViewer';
@@ -27,8 +27,8 @@ function AuditPage() {
           </header>
 
           {/* Replace Paper with a div */}
-          <div style={{ display: 'flex', height: '80vh', width: '100vw', overflow: 'hidden' }}>
-            <Container sx={{ flex: '1', overflow: 'hidden', padding: '2rem' }}>
+          <div style={{ display: 'flex'}}>
+            <Container sx={{ flex: '1', overflow: 'hidden'}}>
               <Grid container direction="column" justifyContent="space-between" alignItems="flex-start" spacing={4}>
                 <Grid item>
                   <NewChangesBox />
@@ -39,8 +39,10 @@ function AuditPage() {
               </Grid>
             </Container>
 
-            <div sx={{ flex: '2', height: '100%', overflowY: 'auto' }}>
+            <div>
+            <Container sx={{ flex: '1', overflow: 'hidden'}}>
               <BrandDealershipViewer onClickResult={(result) => console.log(result)} />
+            </Container>
             </div>
           </div>
         </React.Fragment>

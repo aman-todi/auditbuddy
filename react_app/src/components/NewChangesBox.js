@@ -1,7 +1,6 @@
 // NewChangesBox.jsx
 import React, { useState, useEffect } from 'react';
-import { Typography, Container, List, ListItem, ListItemText, Paper } from '@mui/material';
-import CircularProgress from '@mui/material/CircularProgress';
+import { Typography, List, ListItem, ListItemText, Paper} from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -38,22 +37,24 @@ const NewChangesBox = () => {
   };
 
   return (
-    <Paper elevation={3} sx={{ padding: '16px', width: '30rem', maxHeight: '50vh', overflow: 'hidden' }}>
-      <Typography variant="h4" gutterBottom sx={{ textAlign: 'center' }}>
+    <Paper sx={{ padding: '1rem', width: '30vw', height: '25.5vh'}}>
+      <Typography gutterBottom sx={{ textAlign: 'center', fontWeight: 'bold', color: '#74b42c' }}>
         New Changes
       </Typography>
 
-      <Typography variant="h6" gutterBottom sx={{ textAlign: 'center' }}>
-        {submittedData.length} Recent Uploads <br /> In Past 24 Hours
+      <Typography gutterBottom sx={{ textAlign: 'center' }}>
+        {submittedData.length} Recent Uploads in Past 24 Hrs
       </Typography>
 
-      <List sx={{ width: 250, margin: 'auto', maxHeight: 175, overflow: 'auto', alignItems: 'center' }}>
+    
+      <List component={Paper} sx={{ height: '15vh', maxHeight: '15vh', overflowY: 'auto', alignItems: 'center' }}>
         {submittedData.map((item, index) => (
-          <ListItem key={index} button onClick={() => handleItemClick(item)}>
-            <ListItemText primary={item} sx={{ alignItems: 'center' }} />
+          <ListItem key={index} onClick={() => handleItemClick(item)}>
+            <ListItemText primary={item} sx={{ alignItems: 'center', cursor: 'pointer' }} />
           </ListItem>
         ))}
       </List>
+    
     </Paper>
   );
 };

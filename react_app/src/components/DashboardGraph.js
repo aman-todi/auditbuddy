@@ -58,8 +58,8 @@ const DashboardGraph = ({ clickedResult, type }) => {
             {
               label: 'Average Score',
               data: averageScores,
-              backgroundColor: 'rgba(75, 192, 192, 0.2)',
-              borderColor: 'rgba(75, 192, 192, 1)',
+              backgroundColor: '#74b42c',
+              borderColor: '#74b42c',
               borderWidth: 1
             }
           ]
@@ -77,12 +77,12 @@ const DashboardGraph = ({ clickedResult, type }) => {
 
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-      <Paper elevation={3} sx={{ width: '70%', p: 2, marginBottom: '2rem' }}>
+      <Paper elevation={3} sx={{ width: '70%', p: '1vw', marginBottom: '2rem' }}>
         <Typography variant="h6" gutterBottom align="center">
-          Dashboard Graph
+          Average Scores
         </Typography>
         {/* Render the chart canvas */}
-        <canvas id="dashboardChart" width="400" height="150"></canvas>
+        <canvas id="dashboardChart" width="75%" height="25%"></canvas>
       </Paper>
     </Box>
   );

@@ -45,12 +45,12 @@ const BrandDealershipViewer = ({ onClickResult }) => {
   console.log("searchResults", searchResults);
 
   return (
-    <Paper elevation={3} sx={{ padding: 2, marginBottom: 2, marginRight: '5rem' }}>
+    <Paper sx={{ padding: "1rem", marginBottom: "1rem",  width: '65vw', height: '75vh', maxHeight: '75vh'}}>
       <Container>
-        <Typography variant="h4" gutterBottom sx={{ textAlign: 'center' }}>
+        <Typography gutterBottom sx={{ textAlign: 'center', fontWeight: 'bold', color: '#74b42c'}}>
           Brand / Dealership Viewer
         </Typography>
-        <FormControl sx={{ m: 1, minWidth: 120 }}>
+        <FormControl sx={{ m: "1rem", minWidth: "10rem" }}>
           <Select
             labelId="search-type-label"
             id="search-type"
@@ -61,15 +61,17 @@ const BrandDealershipViewer = ({ onClickResult }) => {
             <MenuItem value="dealership">Dealership</MenuItem>
           </Select>
         </FormControl>
+
         <TextField
           label="Search"
           id="search"
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          sx={{ m: 1, width: '25ch' }}
+          sx={{ m: "1rem", width: '25rem', float: 'right' }}
         />
-        <TableContainer component={Paper} sx={{ maxHeight: '20vh', overflow: 'auto' }}>
+
+        <TableContainer component={Paper} sx={{ height: '20vh', maxHeight: '20vh', overflowY: 'auto' }}>
           <Table stickyHeader>
             <TableHead>
               <TableRow>

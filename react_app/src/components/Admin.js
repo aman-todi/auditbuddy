@@ -10,7 +10,7 @@ import { auth } from './Authentication';
 export const checkAdmin = async (user) => {
     try 
     {
-        const userToken = await user.getIdToken();
+        const userToken = user.email
         const response = await axios.post('http://localhost:8080/check-admin', {userToken});
         const isAdmin = response.data.isAdmin;
         return isAdmin;
@@ -49,7 +49,7 @@ export const AdminCheck = ({ children }) => {
             }
         });
     
-    }, [auth.currentUser]); // dependency if the user is changed (rechecks admin)
+    });
 
     return (
         <AdminContext.Provider value={{ admin }}>

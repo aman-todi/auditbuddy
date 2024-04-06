@@ -168,7 +168,7 @@ const AdvancedResultsTabContent = ({ selectedTab, brandName, dealershipName, dep
           labels: ['Score', 'Remaining'],
           datasets: [{
             data: [totalScore, 24 - totalScore],
-            backgroundColor: ['#74b42c', '#f5f5f5'],
+            backgroundColor: ['#74b42c', 'rgb(165,156,148)'],
             vals: [scorePercentage, remainingPercentage]
           }]
         },

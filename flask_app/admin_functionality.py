@@ -53,17 +53,14 @@ def get_brand_compliance_limits():
 # checks if a user is an admin
 #
 def check_admin(request):
-    # get the user token
+    # get the user email
     token = request.json.get('userToken')
-    # decode the token
-    decoded_token = auth.verify_id_token(token)
-    user_email = decoded_token['email']
 
     # get the admins database
     db = firestore.client()
     collection_ref = db.collection('admins')
     # find the document with the user's email
-    user_doc = collection_ref.document(user_email).get()
+    user_doc = collection_ref.document(token).get()
 
     # if present, then the user is an admin
     if user_doc.exists:

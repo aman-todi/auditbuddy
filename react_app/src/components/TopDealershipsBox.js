@@ -1,10 +1,15 @@
 // TopDealershipsBox.jsx
 import React, { useState, useEffect } from 'react';
-import { Typography, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Paper } from '@mui/material';
+import { Typography, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Paper, useTheme, useMediaQuery} from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import axios from 'axios';
 
 const TopDealershipsBox = () => {
+
+  // for mobile responsiveness
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   const [topDealerships, setTopDealerships] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -23,7 +28,7 @@ const TopDealershipsBox = () => {
   }, []);
 
   return (
-    <Paper sx={{ padding: '1rem', width: '30vw', height: '45vh', maxHeight: '45vh'}}>
+    <Paper sx={{ padding: '1rem', width: isMobile ? '100vw' : '30vw', height: '45vh', maxHeight: '45vh'}}>
       <Typography gutterBottom sx={{ textAlign: 'center', fontWeight: 'bold', color: '#74b42c' }}>
         Top Dealerships
       </Typography>

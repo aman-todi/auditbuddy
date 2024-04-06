@@ -1,10 +1,15 @@
 // NewChangesBox.jsx
 import React, { useState, useEffect } from 'react';
-import { Typography, List, ListItem, ListItemText, Paper} from '@mui/material';
+import { Typography, List, ListItem, ListItemText, Paper, useTheme, useMediaQuery} from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const NewChangesBox = () => {
+
+  // for mobile responsiveness
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   const [submittedData, setSubmittedData] = useState([]);
   const navigate = useNavigate();
 
@@ -37,7 +42,7 @@ const NewChangesBox = () => {
   };
 
   return (
-    <Paper sx={{ padding: '1rem', width: '30vw', height: '25.5vh'}}>
+    <Paper sx={{ padding: '1rem', width: isMobile ? '100vw' : '30vw', height: '25.5vh'}}>
       <Typography gutterBottom sx={{ textAlign: 'center', fontWeight: 'bold', color: '#74b42c' }}>
         New Changes
       </Typography>

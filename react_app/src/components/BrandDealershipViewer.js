@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Paper, CircularProgress, FormControl, InputLabel, Select, MenuItem, TextField, Box, Container } from '@mui/material';
+import { Typography, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Paper, CircularProgress, FormControl, useTheme, useMediaQuery, Select, MenuItem, TextField, Box, Container } from '@mui/material';
 import axios from 'axios';
 import DashboardGraph from './DashboardGraph';
 
 const BrandDealershipViewer = ({ onClickResult }) => {
+  // for mobile responsiveness
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   const [searchResults, setSearchResults] = useState([]);
   const [searchType, setSearchType] = useState('brand');
   const [loading, setLoading] = useState(true);
@@ -45,31 +49,38 @@ const BrandDealershipViewer = ({ onClickResult }) => {
   console.log("searchResults", searchResults);
 
   return (
-    <Paper sx={{ padding: "1rem", marginBottom: "1rem",  width: '65vw', height: '75vh', maxHeight: '75vh'}}>
+    <Paper sx={{ padding: "1rem", marginBottom: "1rem",  width: isMobile ? '100vw' : '65vw', height: '75vh', maxHeight: '75vh'}}>
       <Container>
         <Typography gutterBottom sx={{ textAlign: 'center', fontWeight: 'bold', color: '#74b42c'}}>
           Brand / Dealership Viewer
         </Typography>
-        <FormControl sx={{ m: "1rem", minWidth: "10rem" }}>
-          <Select
-            labelId="search-type-label"
-            id="search-type"
-            value={searchType}
-            onChange={(e) => setSearchType(e.target.value)}
-          >
-            <MenuItem value="brand">Brand</MenuItem>
-            <MenuItem value="dealership">Dealership</MenuItem>
-          </Select>
-        </FormControl>
 
-        <TextField
-          label="Search"
-          id="search"
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          sx={{ m: "1rem", width: '25rem', float: 'right' }}
-        />
+      {/* brand/dealership selector and search box */}
+      <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}>
+        <div>
+          <FormControl sx={{ m: "1rem", width: '15rem' }}>
+            <Select
+              labelId="search-type-label"
+              id="search-type"
+              value={searchType}
+              onChange={(e) => setSearchType(e.target.value)}
+            >
+              <MenuItem value="brand">Brand</MenuItem>
+              <MenuItem value="dealership">Dealership</MenuItem>
+            </Select>
+          </FormControl>
+        </div>
+        <div>
+          <TextField
+            label="Search"
+            id="search"
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            sx={{ m: "1rem", width: isMobile ? '15rem' : '25rem', float: isMobile ? 'left': 'right' }}
+          />
+        </div>
+      </div>
 
         <TableContainer component={Paper} sx={{ height: '20vh', maxHeight: '20vh', overflowY: 'auto' }}>
           <Table stickyHeader>

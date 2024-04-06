@@ -1,9 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Typography, Paper, Box } from '@mui/material';
+import { Typography, Paper, Box, useTheme, useMediaQuery } from '@mui/material';
 import axios from 'axios';
 import Chart from 'chart.js/auto';
 
 const DashboardGraph = ({ clickedResult, type }) => {
+
+  // for mobile responsiveness
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   const [graphData, setGraphData] = useState(null);
   const chartRef = useRef(null);
 
@@ -77,12 +82,14 @@ const DashboardGraph = ({ clickedResult, type }) => {
 
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-      <Paper elevation={3} sx={{ width: '70%', p: '1vw', marginBottom: '2rem' }}>
+      <Paper elevation={3} sx={{ width: isMobile ? '100%' : '70%', p: '1vw', marginBottom: '2rem' }}>
         <Typography variant="h6" gutterBottom align="center">
           Average Scores
         </Typography>
         {/* Render the chart canvas */}
-        <canvas id="dashboardChart" width="75%" height="25%"></canvas>
+        <canvas id="dashboardChart"   
+        width={isMobile ? '100%' : '75%'}
+        height={isMobile ? '50%' : '25%'}></canvas>
       </Paper>
     </Box>
   );

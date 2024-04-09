@@ -7,6 +7,7 @@ import AdvancedResultsTabContent from '../components/AdvancedResultsTabContent';
 import Chip from '@mui/material/Chip';
 import axios from 'axios';
 import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { AllResultsProvider } from '../components/AllResultsContext';
 
 const AdvancedResultsPage = () => {
 
@@ -263,6 +264,7 @@ const AdvancedResultsPage = () => {
           {/* dealership name */}
           AuditBuddy Results for {dealershipName}
         </Typography>
+        <AllResultsProvider>
         <ResponsiveAppBar handleTabChange={handleTabChange} />
         <AdvancedResultsTabContent
           // this is just to re-render the component
@@ -273,6 +275,7 @@ const AdvancedResultsPage = () => {
           department={department}
           submission={submission}
         />
+                </AllResultsProvider>
       </Paper >
 
 

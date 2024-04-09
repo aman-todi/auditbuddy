@@ -179,7 +179,7 @@ doc.text(remainingText, textLeftX, textY);
             </Button>
           ))}
         </Box>
-        <Button onClick={handleClick}>
+        <Button onClick={handleClick} style={{ color: '#74b42c'}}>
     Download PDF
       </Button>
       </Toolbar>

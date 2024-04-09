@@ -3,6 +3,9 @@ import { Typography, Box, Divider, Accordion, AccordionSummary, AccordionDetails
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Chart from 'chart.js/auto'; // Import Chart.js library
 import axios from 'axios';
+import { jsPDF } from 'jspdf';
+import { useAllResults } from './AllResultsContext';
+import html2canvas from 'html2canvas'; // Import html2canvas library
 
 const AdvancedResultsTabContent = ({ selectedTab, brandName, dealershipName, department, submission }) => {
   const [categoryResults, setCategoryResults] = useState(null);
@@ -13,8 +16,92 @@ const AdvancedResultsTabContent = ({ selectedTab, brandName, dealershipName, dep
   const [detection, setDetection] = useState([]);
   const [expectedValueRange, setExpectedValueRange] = useState([]);
   const [expectedLogo, setExpectedLogo] = useState('');
-
+  const { setAllResultText } = useAllResults();
   const tab = selectedTab ?? 0;
+  const { setCategoryResultsData, setCategoryImageData, setOverallScoreImageData, setbrandName, setdealershipName, setdepartment, setsubmission } = useAllResults();
+
+  useEffect(() => {
+    console.log(categoryResults);
+    setCategoryResultsData(categoryResults)
+  }, [categoryResults]);
+
+  setbrandName(brandName)
+  setdealershipName(dealershipName)
+  setdepartment(department)
+  setsubmission(submission)
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+    const promises = [];
+
+    promises.push(
+      new Promise((resolve) => {
+        html2canvas(document.getElementById('categoryChart')).then((canvas) => {
+          const imageData = canvas.toDataURL('image/png');
+          setCategoryImageData(imageData); 
+          resolve();
+        });
+      })
+    );
+
+    // Capture overall score chart as image
+    promises.push(
+      new Promise((resolve) => {
+        html2canvas(document.getElementById('overallScoreChart')).then((canvas) => {
+          const imageData = canvas.toDataURL('image/png');
+          setOverallScoreImageData(imageData); 
+          resolve();
+        });
+      })
+    );
+
+    Promise.all(promises).then(() => {
+    });
+  };
+
+
+  const generateResultTextForTab1 = (t) => {
+    const keys = Object.keys(expectedValueRange);
+    if (keys.length > 0) {
+        if (t !== 0 && gradeResults) {
+            return `Category Score: ${categoryScores[t - 1]} out of 4\n
+Detected Value:${detection[t - 1]}
+${tab !== 1 ? `
+Expected Value Range:
+Minimum:${expectedValueRange[categories[t - 1]][0]}
+Above Minimum:${expectedValueRange[categories[t - 1]][1]}
+Well Over Minimum:${expectedValueRange[categories[t - 1]][2]}\n
+` : `
+Expected Value:${expectedLogo}`}Based on the analysis, here's how the results are interpreted: ${
+categoryScores[t - 1] === 1 ? `
+The detected value falls below the minimum dealership standard. Improvement is needed.
+` : categoryScores[t - 1] === 2 ? `
+The detected value is slightly below the expected standard. Consider making adjustments for better performance.
+` : categoryScores[t - 1] === 3 ? `
+The detected value meets or slightly exceeds the expected standard. This is a satisfactory result.
+` : categoryScores[t - 1] === 4 ? `
+The detected value significantly exceeds the expected standard. Congratulations on achieving an excellent result.
+` : ``}`;
+        }
+    } else {
+        return '';
+    }
+};
+
+
+  let allResultText = '';
+  const tabNames = ['Logo', 'Cars', 'Parking', 'Hospitality', 'Spatial', 'Emotional'];
+  const categoryResultsData = [];
+
+  for (let t = 1; t <= 6; t++) {
+    const resultTextForTab = generateResultTextForTab1(t);
+    allResultText += tabNames[t - 1] + '\n' + resultTextForTab + '\n\n'; 
+
+
+  }
+  console.log(categoryResultsData)
+  exportToPDF();
+  setAllResultText(allResultText);
+
   console.log("Tab Selected", tab)
 
   const categoryChartRef = useRef(null);

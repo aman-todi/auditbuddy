@@ -34,11 +34,9 @@ class LogoDetector:
 
         # Create an Image object from the byte string
         image = Image.open(BytesIO(content))
-        print("We are past converting bytes to image")
         
         # Convert the image to grayscale
         gray_image = image.convert("L")
-        print("The image is gray")
 
         # Convert the grayscale image back to a byte string
         buffered = BytesIO()
@@ -46,7 +44,6 @@ class LogoDetector:
         gray_image_bytes = buffered.getvalue()
 
         image = vision.Image(content=gray_image_bytes)     
-        print("Logo detection working???")
         
         response = client.logo_detection(image=image)
         self.logos = response.logo_annotations

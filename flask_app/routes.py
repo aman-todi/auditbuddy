@@ -165,34 +165,10 @@ def upload_video():
     # Run emotional if there are emotional files   
     if len(emotional_files) != 0:
         satisfaction_score = compute_satisfaction(emotional_paths[0], dealership_info)
-    
-    # spatial files in list
-    spatial_files = []
-    spatial_paths = []
-    index = 0
-    while f'spatial[{index}]' in request.files:
-        file = request.files[f'spatial[{index}]']
-        spatial_files.append(file.filename)
-        filename = secure_filename(file.filename)
-        save_path = os.path.join(app.root_path, 'static', 'main', 'media', filename)
-        file.save(save_path)
-        spatial_paths.append(save_path)
-        index += 1
-    print("Running Spatial")
-    sq_ft_result = compute_square_footage(spatial_files,dealership_info)  
-
-    for file in spatial_paths:
-        if os.path.exists(file):
-            os.remove(file)    
-
-    if sq_ft_result == -1:
-        error_message = f"No image named calibration was found"
-        print(error_message)
-        return jsonify({'error': error_message}), 404
+      
 
     # loop the detection categories
-    required_categories = ['logo', 'cars', 'parking','hospitality']
-    
+    required_categories = ['logo', 'cars', 'parking','hospitality', 'spatial']
 
     # logic for extracting file from different categories (works for multi files)
     for category in required_categories:
@@ -229,6 +205,13 @@ def upload_video():
         elif category == 'hospitality':
             num_seating = assess_hospitality(files_list,dealership_info)
 
+        elif category == 'spatial':
+            sq_ft_result = compute_square_footage(files_list,dealership_info)
+            if sq_ft_result == -1:
+                error_message = f"No image named calibration was found"
+                print(error_message)
+                return jsonify({'error': error_message}), 404
+            
         for file in files_list:
             if os.path.exists(file):
                 os.remove(file)

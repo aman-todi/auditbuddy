@@ -1,4 +1,3 @@
-
 from flask import current_app as app, jsonify, render_template, redirect, request
 from google.cloud import vision
 import firebase_admin
@@ -22,11 +21,9 @@ def compute_satisfaction(image_path, dealership_info):
 
     # Create an Image object from the byte string
     image = Image.open(BytesIO(content))
-    print("We are past converting bytes to image")
     
     # Convert the image to grayscale
     gray_image = image.convert("L")
-    print("The image is gray")
 
     # Convert the grayscale image back to a byte string
     buffered = BytesIO()
@@ -35,9 +32,7 @@ def compute_satisfaction(image_path, dealership_info):
 
     image = vision.Image(content=gray_image_bytes)  
     cv_im = cv2.imread(image_path)
-   
-    print("Emotion detection working???")
-    
+       
     response = client.face_detection(image=image)
     if response.error.message:
         raise Exception(
@@ -60,29 +55,49 @@ def compute_satisfaction(image_path, dealership_info):
     # Save the frames with top emotion recognition results and compute the grade
     counter = 1
     annotated_image = cv_im.copy()
-
+    face_count = 0
     for face in faces:
         text = ""
-        if likelihood_name[face.anger_likelihood] == "VERY_LIKELY" or likelihood_name[face.anger_likelihood] == "LIKELY":
-            print("Angry Face Detected")
+        face_count += 1
+        if likelihood_name[face.anger_likelihood] == "VERY_LIKELY":
+            print("Very Likely an Angry Face Detected")
+            text = f"anger: {likelihood_name[face.anger_likelihood]}"
+            satisfaction_score -= 2.0
+        elif likelihood_name[face.anger_likelihood] == "LIKELY":
+            print("Likely an Angry Face Detected")
             text = f"anger: {likelihood_name[face.anger_likelihood]}"
             satisfaction_score -= 1.0
             
-        elif likelihood_name[face.joy_likelihood] == "VERY_LIKELY" or likelihood_name[face.joy_likelihood] == "LIKELY":
-            print("Happy Face Detected")
+        if likelihood_name[face.joy_likelihood] == "VERY_LIKELY":
+            print("Very likely a Happy Face Detected")
+            text = f"joy: {likelihood_name[face.joy_likelihood]}"
+            satisfaction_score += 2.0
+        elif likelihood_name[face.joy_likelihood] == "LIKELY":
+            print("likely a Happy Face Detected")
             text = f"joy: {likelihood_name[face.joy_likelihood]}"
             satisfaction_score += 1.0
-        elif likelihood_name[face.sorrow_likelihood] == "VERY_LIKELY" or likelihood_name[face.sorrow_likelihood] == "LIKELY":
-            print("Sad Face Detected")
+                
+        if likelihood_name[face.sorrow_likelihood] == "VERY_LIKELY":
+            print("Very likely a Sad Face Detected")
             text = f"sorrow: {likelihood_name[face.sorrow_likelihood]}"
-            satisfaction_score -= 1.0
+            satisfaction_score -= 2.0
+        elif likelihood_name[face.sorrow_likelihood] == "LIKELY":
+            print("likely a Sad Face Detected")
+            text = f"sorrow: {likelihood_name[face.sorrow_likelihood]}"
+            satisfaction_score -= 1.0    
 
-        elif likelihood_name[face.surprise_likelihood] == "VERY_LIKELY" or likelihood_name[face.surprise_likelihood] == "LIKELY":
-            print("Surprised face detected")
+        if likelihood_name[face.surprise_likelihood] == "VERY_LIKELY":
+            print("Very Likely Surprised face detected")
+            text = f"surprise: {likelihood_name[face.surprise_likelihood]}"
+            satisfaction_score += 2.0
+        elif likelihood_name[face.surprise_likelihood] == "LIKELY":
+            print("Likely Surprised face detected")
             text = f"surprise: {likelihood_name[face.surprise_likelihood]}"
             satisfaction_score += 1.0
-
         
+        if len(text) == 0:
+            text = f"Emotion undetermined or Neutral"
+            
         # Get bounding box vertices
         vertices = [(vertex.x, vertex.y) for vertex in face.bounding_poly.vertices]
 
@@ -93,11 +108,7 @@ def compute_satisfaction(image_path, dealership_info):
         # Extract top-left and bottom-right vertices
         top_left = vertices[0]
         bottom_right = vertices[2]
-        print("Drawing at verts:")
-        print(top_left)
-        print(bottom_right)
-        print("With this text:")
-        print(text)
+
         # Draw a rectangle around the face
         cv2.rectangle(annotated_image, top_left, bottom_right, (0, 0, 255), 2)
 
@@ -113,7 +124,12 @@ def compute_satisfaction(image_path, dealership_info):
     save_annotated_image_to_firebase(annotated_image,dealership_info,counter)
     counter += 1
 
-    return satisfaction_score
+    # New grading implements an average based on the total number of faces
+    # satisfaction_score < -1 is Poor
+    # -1 <= satisfaction_score < 0: Unsatisfactory
+    # 0 <= satisfaction_score < 1: Satisfactory
+    # 1 < satisfaction_score: Exceptional
+    return satisfaction_score / face_count
 
 def save_annotated_image_to_firebase(annotated_image,dealership_info,counter):
     print("Saving annotated image to Firebase")

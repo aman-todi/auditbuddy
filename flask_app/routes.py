@@ -146,29 +146,9 @@ def upload_video():
     dealership_info = (brandName, dealershipName, department, country, submission,uid,sales,uio, email, name)
 
     # Computer Vision Tasks
-
-    # emotion files in list
-    emotional_files = []
-    emotional_paths = []
-    index = 0
-    while f'emotion[{index}]' in request.files:
-        file = request.files[f'emotion[{index}]']
-        emotional_files.append(file.filename)
-        filename = secure_filename(file.filename)
-        save_path = os.path.join(app.root_path, 'static', 'main', 'media', filename)
-        file.save(save_path)
-        emotional_paths.append(save_path)
-        index += 1
-
     satisfaction_score = 0
-     
-    # Run emotional if there are emotional files   
-    if len(emotional_files) != 0:
-        satisfaction_score = compute_satisfaction(emotional_paths[0], dealership_info)
-      
-
     # loop the detection categories
-    required_categories = ['logo', 'cars', 'parking','hospitality', 'spatial']
+    required_categories = ['logo', 'cars', 'parking','hospitality', 'spatial', 'emotion']
 
     # logic for extracting file from different categories (works for multi files)
     for category in required_categories:
@@ -212,6 +192,10 @@ def upload_video():
                 print(error_message)
                 return jsonify({'error': error_message}), 404
             
+        
+        elif category == 'emotion':     
+            satisfaction_score = compute_satisfaction(files_list, dealership_info) 
+              
         for file in files_list:
             if os.path.exists(file):
                 os.remove(file)

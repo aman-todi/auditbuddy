@@ -107,6 +107,7 @@ const FormImport = () => {
     else if (!logo && !cars && !parking && !spatial && !hospitality) {
       setError('Please select a file in at least one category')
     }
+    
     else if (!logo) {
       setError('Please upload logo files')
     }

@@ -126,17 +126,15 @@ def compute_square_footage(files,dealership_info):
         else:
             distances_images.append(file)
         
-    print(len(distances_images))
     for i in range(len(distances_images)):
-        print(distances_images[i])
         if "calibration.png" in distances_images[i]:
             cal_index = i
-            print(cal_index)
+            print(distances_images[cal_index])
     if cal_index == -1:
         return -1.0
  
 
-    cal_image = resize_image(files[cal_index])
+    cal_image = resize_image(distances_images[cal_index])
     marker = find_reference(cal_image)
     
     # compute the focal length from the callibration image 
@@ -146,13 +144,13 @@ def compute_square_footage(files,dealership_info):
     distances_list = []
     print("Testing distances")
     for file in distances_images:
-        new_path = os.path.join("flask_app", "static", "main", "media", file)
         print("file in distance images")
         print(file)
         if file == distances_images[cal_index]:
+            os.remove(file)
             continue
-        print(new_path)
-        img = resize_image(new_path)
+        
+        img = resize_image(file)
         marker = find_reference(img)
         dist = compute_distance(reference_obj_width, focalLength, marker[1][0])
         distances_list.append(dist)
@@ -161,8 +159,8 @@ def compute_square_footage(files,dealership_info):
         annotated_image = draw_box(img, marker, dist)
 
         save_annotated_image_to_firebase(annotated_image,dealership_info,counter)
-
         counter += 1 
+        os.remove(file)
     print("Done testing distances")
     len_ft = distances_list[0] / 12
     wi_ft = distances_list[1] / 12

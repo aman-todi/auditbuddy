@@ -11,10 +11,12 @@ export const AllResultsProvider = ({ children }) => {
   const [department, setdepartment] = useState('');
   const [submission, setsubmission] = useState('');
   const [CategoryResultsData, setCategoryResultsData]= useState('');
+  const [emoji, setEmoji]= useState('');
+  const [totalScore, setTScore]= useState('');
 
 
   return (
-    <AllResultsContext.Provider value={{ allResultText, setAllResultText, categoryImageData, setCategoryImageData, overallScoreImageData, setOverallScoreImageData,brandName, setbrandName,dealershipName, setdealershipName,department, setdepartment,submission, setsubmission,CategoryResultsData, setCategoryResultsData }}>
+    <AllResultsContext.Provider value={{ allResultText, setAllResultText, categoryImageData, setCategoryImageData, overallScoreImageData, setOverallScoreImageData,brandName, setbrandName,dealershipName, setdealershipName,department, setdepartment,submission, setsubmission,CategoryResultsData, setCategoryResultsData, emoji, setEmoji, totalScore, setTScore }}>
       {children}
     </AllResultsContext.Provider>
   );

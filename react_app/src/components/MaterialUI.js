@@ -425,7 +425,7 @@ export const ContactForm = () => {
 
     return (
 
-        <Grid container justifyContent="center">
+        <Grid container justifyContent="center" style={{ marginTop: '8%' }}>
             <Grid item xs={12} sm={8} md={6}>
                 <Card sx={{ maxWidth: 450, padding: "20px 5px", margin: "0 auto" }}>
                     <CardContent>
@@ -531,7 +531,8 @@ export const Settings = ({ darkMode, toggleDarkMode }) => {
                 border: '1px solid',
                 borderColor: 'divider',
                 borderRadius: 'borderRadius',
-                marginBottom: '200px'
+                marginBottom: '200px',
+                marginTop: '8%'
             }}
         >
             <Typography variant="h5">Settings</Typography>

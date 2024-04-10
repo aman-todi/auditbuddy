@@ -18,17 +18,17 @@ const AdvancedResultsTabContent = ({ selectedTab, brandName, dealershipName, dep
   const [expectedLogo, setExpectedLogo] = useState('');
   const { setAllResultText } = useAllResults();
   const tab = selectedTab ?? 0;
-  const { setCategoryResultsData, setCategoryImageData, setOverallScoreImageData, setbrandName, setdealershipName, setdepartment, setsubmission } = useAllResults();
+  const { setCategoryResultsData, setCategoryImageData, setOverallScoreImageData, setbrandName, setdealershipName, setdepartment, setsubmission, setEmoji, setTScore} = useAllResults();
 
   useEffect(() => {
     console.log(categoryResults);
     setCategoryResultsData(categoryResults)
   }, [categoryResults]);
-
   setbrandName(brandName)
   setdealershipName(dealershipName)
   setdepartment(department)
   setsubmission(submission)
+  setTScore(totalScore)
   const exportToPDF = () => {
     const doc = new jsPDF();
     const promises = [];
@@ -310,6 +310,7 @@ The detected value significantly exceeds the expected standard. Congratulations 
       default:
         emoji = '';
     }
+    setEmoji(emoji)
 
     const emojiStyle = {
       fontSize: '3em', // Adjust the font size as needed

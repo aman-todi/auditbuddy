@@ -9,7 +9,7 @@ function ContactPage() {
 
     <React.Fragment>
     <header className="App-header">
-    <MaterialUI.ContactForm></MaterialUI.ContactForm>
+    <MaterialUI.ContactForm ></MaterialUI.ContactForm>
     </header>
     </React.Fragment>
 

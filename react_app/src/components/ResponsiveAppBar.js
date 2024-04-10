@@ -15,7 +15,7 @@ const categories = ['Overall', 'Logo', 'Cars', 'Parking', 'Hospitality', 'Spatia
 function ResponsiveAppBar({ handleTabChange }) {
   const { allResultText } = useAllResults();
   const { categoryImageData, overallScoreImageData } = useAllResults();
-  const { brandName, dealershipName, department, submission, CategoryResultsData } = useAllResults();
+  const { brandName, dealershipName, department, submission, CategoryResultsData, emoji, totalScore} = useAllResults();
   const dateObject = new Date(submission);
 
   const readableDate = dateObject.toLocaleDateString();
@@ -25,7 +25,7 @@ function ResponsiveAppBar({ handleTabChange }) {
 
   const handleClick = () => {
     console.log(CategoryResultsData)
-    console.log(allResultText);
+    console.log(emoji);
     const doc = new jsPDF();
     const imageWidth = 100; // Width of image
     const imageHeight = 100; // Height of image
@@ -77,10 +77,21 @@ function ResponsiveAppBar({ handleTabChange }) {
         imageHeight
       );
     }
+    const evaluationText = [
+      "Evaluation Graphs",
+      "Overall Score: " + totalScore,
+      "Emotional Detection:",
+      emoji
+    ];
 
-textY += 50 + imageHeight + 20; 
+    textY += 50 + imageHeight + 20; // Adjust Y coordinate for text
+    evaluationText.forEach((line, index) => {
+      doc.text(line, doc.internal.pageSize.width / 2, textY + (index * 10), { align: "center" });
+    });
+
+textY +=   40; 
 const textLines = doc.splitTextToSize(allResultText, maxTextWidth);
-const firstTwentyLines = textLines.slice(0, 20);
+const firstTwentyLines = textLines.slice(0, 13);
 
 const lineHeight = doc.getLineHeight() / doc.internal.scaleFactor;
 const textHeight = firstTwentyLines.length * lineHeight;
@@ -88,7 +99,7 @@ const textHeight = firstTwentyLines.length * lineHeight;
 const textCenterX = doc.internal.pageSize.width / 2;
 const textLeftX = textCenterX - maxTextWidth / 2;
 
-const textTopY = textY + (imageHeight - textHeight) / 2;
+const textTopY = textY + (imageHeight - textHeight) / 2-25;
 
 doc.text(firstTwentyLines, textLeftX, textTopY);
 
@@ -100,18 +111,18 @@ textY = 10; // Reset y coordinate for new page
 textY += 15;
 
 // Add next lines of text on the second page
-const nextHundredLines = textLines.slice(20, 75);
+const nextHundredLines = textLines.slice(13, 65);
 doc.text(nextHundredLines, textLeftX, textY);
 
 // Add next page
 doc.addPage();
 
 // Add remaining text on the third page
-const remainingText = textLines.slice(75);
+const remainingText = textLines.slice(65);
 doc.text(remainingText, textLeftX, textY);
 
     // Save the PDF
-    doc.save("charts.pdf");
+    doc.save("Results.pdf");
 };
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(0);

@@ -11,7 +11,7 @@ export const checkAdmin = async (user) => {
     try 
     {
         const userToken = user.email
-        const response = await axios.post('http://localhost:8080/check-admin', {userToken});
+        const response = await axios.post('/check-admin', {userToken});
         const isAdmin = response.data.isAdmin;
         return isAdmin;
     }

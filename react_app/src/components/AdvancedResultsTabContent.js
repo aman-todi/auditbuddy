@@ -121,7 +121,7 @@ The detected value significantly exceeds the expected standard. Congratulations 
           formData.append('name', dealershipName);
           formData.append('department', department);
 
-          const gradeResponse = await axios.post('http://localhost:8080/get-category-eval', formData, {
+          const gradeResponse = await axios.post('/get-category-eval', formData, {
             headers: {
               'Content-Type': 'multipart/form-data'
             }

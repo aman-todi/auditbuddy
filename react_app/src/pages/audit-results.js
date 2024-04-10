@@ -49,7 +49,6 @@ function ResultsPage() {
 
 
   // fetch data from the database
-  // fetch data from the database
   const fetchResults = async () => {
     try {
       // create a form and append this file

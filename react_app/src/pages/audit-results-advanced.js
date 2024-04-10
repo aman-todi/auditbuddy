@@ -139,7 +139,7 @@ const AdvancedResultsPage = () => {
       const currentDate = new Date().toISOString();
       formData.append('updated', currentDate);
 
-      const response = await axios.post('http://localhost:8080/submission-update-values', formData, {
+      const response = await axios.post('/submission-update-values', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -165,7 +165,7 @@ const AdvancedResultsPage = () => {
       formData.append('name', dealershipName);
       formData.append('department', department);
 
-      const gradeResponse = await axios.post('http://localhost:8080/get-category-eval', formData, {
+      const gradeResponse = await axios.post('/get-category-eval', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -218,7 +218,7 @@ const AdvancedResultsPage = () => {
       formData.append('brand', brandName)
       formData.append('department', department)
 
-      const response = await axios.post('http://localhost:8080/delete-submission', formData, {
+      const response = await axios.post('/delete-submission', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

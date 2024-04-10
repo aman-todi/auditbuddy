@@ -74,7 +74,7 @@ const AddDealershipImport = ({ refresh }) => {
       );
 
       try {
-        const response = await axios.post('http://localhost:8080/prepopulate-dealerships', formData, {
+        const response = await axios.post('/prepopulate-dealerships', formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
@@ -177,7 +177,7 @@ const AddDealershipImport = ({ refresh }) => {
       formData.append('updated', currentDate);
 
       try {
-        const response = await axios.post('http://localhost:8080/add-dealership', formData, {
+        const response = await axios.post('/add-dealership', formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }

@@ -13,7 +13,7 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, Select, MenuItem, Bu
 export const fetchData = async (setUsers, setLoading) => {
   setLoading(true);
   try {
-    const response = await axios.post('http://localhost:8080/all-users');
+    const response = await axios.post('/all-users');
     setUsers(response.data);
     setLoading(false);
     console.log(response.data);
@@ -63,7 +63,7 @@ export const UserListImport = () => {
       formData.append('old_role', clickedUser['role']);
       formData.append('new_role', role);
 
-    const response = await axios.post('http://localhost:8080/user-update-values', formData, {
+    const response = await axios.post('/user-update-values', formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
@@ -95,7 +95,7 @@ export const UserListImport = () => {
     formData.append('email', clickedUser['email']);
     formData.append('role', clickedUser['role'])
 
-    const response = await axios.post('http://localhost:8080/delete-user', formData, {
+    const response = await axios.post('/delete-user', formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
@@ -200,7 +200,7 @@ export const UserListImport = () => {
         formData.append('role', role)
 
         try {
-          const response = await axios.post('http://localhost:8080/create-user', formData, {
+          const response = await axios.post('/create-user', formData, {
             headers: {
               'Content-Type': 'multipart/form-data'
             }

@@ -59,7 +59,7 @@ const MinRequirements = () => {
         selectedBrand,
         ...formData
       };
-      const response = await axios.post('http://localhost:8080/submit-min-requirements', data);
+      await axios.post('/submit-min-requirements', data);
       console.log('Successful');
     } catch (error) {
       console.error('Error:', error);

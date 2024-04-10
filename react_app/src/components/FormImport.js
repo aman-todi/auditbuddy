@@ -61,7 +61,7 @@ const FormImport = () => {
     // axios request to get dealerships
     const fetchUserDealerships = async () => {
       try {
-        const response = await axios.post('http://localhost:8080/user-dealerships');
+        const response = await axios.post('/user-dealerships');
 
         // set dealerships
         setDealershipsList(response.data);

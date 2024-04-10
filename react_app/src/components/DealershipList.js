@@ -15,7 +15,7 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button} f
  // axios request to get dealerships
  export const fetchUserDealerships = async (setDealerships, setLoading) => {
   try {
-    const response = await axios.post('http://localhost:8080/user-dealerships');
+    const response = await axios.post('/user-dealerships');
 
     // set dealerships
     setDealerships(response.data);
@@ -78,7 +78,7 @@ export const DealershipListImport = () => {
     // update the time in the pop up
     setUpdatedTime(currentDate);
 
-    const response = await axios.post('http://localhost:8080/dealership-update-values', formData, {
+    const response = await axios.post('/dealership-update-values', formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
@@ -118,7 +118,7 @@ export const DealershipListImport = () => {
     formData.append('uid', clickedDealership['UID']);
     formData.append('name', clickedDealership['Dealership Name'])
 
-    const response = await axios.post('http://localhost:8080/delete-dealership', formData, {
+    const response = await axios.post('/delete-dealership', formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }

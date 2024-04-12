@@ -252,7 +252,7 @@ function ResultsPage() {
                                 key={index}
                                 onClick={() => handleBrandClick(brandName)}
                                 style={{
-                                  backgroundColor: brandName === clickedBrandName ? '#bae38c' : 'rgb(245,245,245)',
+                                  backgroundColor: brandName === clickedBrandName ? '#bae38c' : theme.palette.mode === 'dark' ? 'rgb(50,50,50)' : 'rgb(245,245,245)',
                                   padding: '0.5em',
                                   margin: '0.1em',
                                   cursor: 'pointer',
@@ -285,7 +285,9 @@ function ResultsPage() {
                               <Button
                                 key={index}
                                 variant="outlined"
-                                style={{ color: '#000000', borderColor: '#bae38c', marginBottom: '0.5rem' }}
+                                style={{         color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#000000',
+                                borderColor: theme.palette.mode === 'dark' ? '#bae38c' : '#bae38c',
+                                marginBottom: '0.5rem' }}
                                 fullWidth
                                 onClick={() => handleDealershipClick(item)}
                               >
@@ -306,7 +308,9 @@ function ResultsPage() {
                                 <Button
                                   key={index}
                                   variant="outlined"
-                                  style={{ color: '#000000', borderColor: '#bae38c', marginBottom: '0.5rem' }}
+                                  style={{         color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#000000',
+                                  borderColor: theme.palette.mode === 'dark' ? '#bae38c' : '#bae38c',
+                                  marginBottom: '0.5rem' }}
                                   fullWidth
                                   onClick={() => {
                                     if (popupContent.type === 'Department') {

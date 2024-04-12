@@ -64,12 +64,12 @@ const AdvancedResultsTabContent = ({ selectedTab, brandName, dealershipName, dep
     if (keys.length > 0) {
         if (t !== 0 && gradeResults) {
             return `Category Score: ${categoryScores[t - 1]} out of 4\n
-Detected Value:${detection[t - 1]}
+Detected Value: ${detection[t - 1]}
 ${tab !== 1 ? `
 Expected Value Range:
-Minimum:${expectedValueRange[categories[t - 1]][0]}
-Above Minimum:${expectedValueRange[categories[t - 1]][1]}
-Well Over Minimum:${expectedValueRange[categories[t - 1]][2]}\n
+Minimum: ${expectedValueRange[categories[t - 1]][0]}
+Above Minimum: ${expectedValueRange[categories[t - 1]][1]}
+Well Over Minimum: ${expectedValueRange[categories[t - 1]][2]}\n
 ` : `
 Expected Value:${expectedLogo}`}Based on the analysis, here's how the results are interpreted: ${
 categoryScores[t - 1] === 1 ? `

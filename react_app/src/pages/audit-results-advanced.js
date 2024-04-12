@@ -248,6 +248,7 @@ const AdvancedResultsPage = () => {
           <Button onClick={handleOverride}>Override</Button>
           <Button color="error" onClick={handlePopupDelete}>Delete Submission</Button>
         </div>
+        
         <Typography variant="h4" gutterBottom align="center" style={{ marginBottom: '2rem', marginTop: '3rem', display: 'flex', alignItems: 'center' }}>
           {/* back button */}
           <Button

@@ -77,11 +77,18 @@ function ResponsiveAppBar({ handleTabChange }) {
         imageHeight
       );
     }
+    const emojis = {
+       "🙁": "Very Sad",
+       "😕": "Sad",
+      "🙂": "Happy",
+      "😁": "Very Happy"
+  };
+  const emojiUnicode = emojis[emoji] || '';
     const evaluationText = [
       "Evaluation Graphs",
       "Overall Score: " + totalScore,
       "Emotional Detection:",
-      emoji
+      emojiUnicode
     ];
 
     textY += 50 + imageHeight + 20; // Adjust Y coordinate for text
@@ -89,7 +96,7 @@ function ResponsiveAppBar({ handleTabChange }) {
       doc.text(line, doc.internal.pageSize.width / 2, textY + (index * 10), { align: "center" });
     });
 
-textY +=   40; 
+textY +=   50; 
 const textLines = doc.splitTextToSize(allResultText, maxTextWidth);
 const firstTwentyLines = textLines.slice(0, 13);
 
@@ -107,18 +114,18 @@ doc.text(firstTwentyLines, textLeftX, textTopY);
 doc.addPage();
 
 // Add space at the top of the text on the second page
-textY = 10; // Reset y coordinate for new page
+textY = 5; // Reset y coordinate for new page
 textY += 15;
 
 // Add next lines of text on the second page
-const nextHundredLines = textLines.slice(13, 65);
+const nextHundredLines = textLines.slice(13, 68);
 doc.text(nextHundredLines, textLeftX, textY);
 
 // Add next page
 doc.addPage();
 
 // Add remaining text on the third page
-const remainingText = textLines.slice(65);
+const remainingText = textLines.slice(68);
 doc.text(remainingText, textLeftX, textY);
 
     // Save the PDF

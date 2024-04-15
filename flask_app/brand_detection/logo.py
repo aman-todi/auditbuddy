@@ -64,7 +64,7 @@ class LogoDetector:
                 # Make the brand detection consistent / redact to brand name only
                 for brand in car_brands:
                     if detected_logo.lower() == brand.lower() or brand.lower() in detected_logo.lower():
-                        detected_logo == brand
+                        detected_logo = brand
                         break
 
                 return detected_logo

@@ -115,7 +115,7 @@ doc.addPage();
 
 // Add space at the top of the text on the second page
 textY = 5; // Reset y coordinate for new page
-textY += 15;
+textY += 10;
 
 // Add next lines of text on the second page
 const nextHundredLines = textLines.slice(13, 68);
@@ -123,7 +123,7 @@ doc.text(nextHundredLines, textLeftX, textY);
 
 // Add next page
 doc.addPage();
-
+textY = 10;
 // Add remaining text on the third page
 const remainingText = textLines.slice(68);
 doc.text(remainingText, textLeftX, textY);

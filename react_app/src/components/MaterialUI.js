@@ -320,15 +320,13 @@ export const NavBar = (props) => {
 
                             {/* Profile Icon and Menu */}
                             <IconButton
-                                size="large"
-                                edge="end"
                                 color="inherit"
-                                aria-label="profile"
-                                aria-controls="profile-menu"
+                                aria-label="menu"
+                                aria-controls="menu"
                                 aria-haspopup="true"
                                 onClick={handleMenuOpen}
                             >
-                                <Avatar /> {/* You can add the source for the Avatar if needed */}
+                                <MenuIcon />
                             </IconButton>
 
                             <Menu
@@ -337,18 +335,6 @@ export const NavBar = (props) => {
                                 open={Boolean(anchorEl)}
                                 onClose={handleMenuClose}
                             >
-                                <MenuItem onClick={handleMenuClose}>
-                                    <NavLink
-                                        to="/audit/profile"
-                                        style={{
-                                            textDecoration: 'none', color: (path === '/audit/profile' ? '#bae38c' : (isDarkTheme ? 'rgb(245,245,245)' : 'rgb(50, 50, 50)')),
-                                            display: 'flex', alignItems: 'center'
-                                        }}
-                                    >
-                                        <AccountBoxIcon style={{ marginRight: '0.5rem' }} />
-                                        Profile
-                                    </NavLink>
-                                </MenuItem>
 
                                 <MenuItem onClick={handleMenuClose}>
                                     <NavLink

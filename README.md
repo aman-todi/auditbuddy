@@ -1,25 +1,34 @@
-**Team Urban Science**
+# Team Urban Science
+
+**AuditBuddy** 
+The AuditBuddy application improves upon the audit process done in car dealerships by leveraging computer vision and artificial intelligence to automate the generation of comprehensive dealership evaluation reports.
 
 **Useful Commands**
-
 Web deployed version: auditbuddy.web.app
 
-Docker
-```
-cd to your local repository
-docker-compose -f docker-compose.yml -p urban-science-container up
+**Getting Started**
+Below are instructions used for setting up this application on a local host. 
 
-```
-
-React
-```
-cd to react_app
-npm run build - After making changes to the front end, run this command to sync with Docker
-npm install - Installs any dependencies on your machine from package.json (ex.JQuery)
-
-```
-
-
+1. Clone the repository:
+    ```bash
+    git clone https://gitlab.msu.edu/tranash31/urban-science.git
+    ```
+2. Navigate to local directory:
+    ```bash
+    cd to your local repository
+    docker-compose -f docker-compose.yml -p urban-science-container up
+    ```
+3. Install dependencies:
+    ```bash
+    cd to react_app
+    npm run build - Run this after making changes to App.js
+    npm install - Installs any dependencies on your machine from package.json (ex.JQuery)
+    ```
+4. Build container using Docker:
+    ```bash
+    docker-compose build --nocache
+    docker-compose -f docker-compose.yml -p urban-science-container up
+    ```
 Login Information
 ```
 auditor: can only access the upload, results

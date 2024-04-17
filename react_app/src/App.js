@@ -3,7 +3,7 @@ import * as MaterialUI from './components/MaterialUI';
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import HomePage from './pages/home';
 import LoginPage from './pages/login';
-
+import { AllResultsProvider } from './components/AllResultsContext';
 // audit and subpages
 import SettingsPage from './pages/settings';
 import ContactPage from './pages/contact';
@@ -65,6 +65,7 @@ function App() {
           <AdminCheck>
             <BrowserRouter>
               <MaterialUI.NavBar></MaterialUI.NavBar>
+              <AllResultsProvider>
               <Routes>
                 <Route exact path="/" element={<HomePage />}></Route>
                 <Route exact path="/login" element={<LoginPage />}></Route>
@@ -81,6 +82,7 @@ function App() {
 
                 <Route path="/audit/results/advanced-results" element={<AdvancedResultsPage />} />
               </Routes>
+              </AllResultsProvider>
             </BrowserRouter>
           </AdminCheck>
         </div>

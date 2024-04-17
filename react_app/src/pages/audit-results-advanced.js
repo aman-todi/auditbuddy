@@ -7,7 +7,8 @@ import AdvancedResultsTabContent from '../components/AdvancedResultsTabContent';
 import Chip from '@mui/material/Chip';
 import axios from 'axios';
 import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
-import { AllResultsProvider } from '../components/AllResultsContext';
+import { useAllResults } from '../components/AllResultsContext';
+import { jsPDF } from 'jspdf';
 
 const AdvancedResultsPage = () => {
 
@@ -15,7 +16,124 @@ const AdvancedResultsPage = () => {
   const [dealershipName, setDealershipName] = useState('');
   const [department, setDepartment] = useState('');
   const [submission, setSubmission] = useState('');
+  const { allResultText } = useAllResults();
+  const { categoryImageData, overallScoreImageData } = useAllResults();
+  const {  CategoryResultsData, emoji, totalScore} = useAllResults();
+  const dateObject = new Date(submission);
 
+  const readableDate = dateObject.toLocaleDateString();
+  const readableTime = dateObject.toLocaleTimeString();
+  
+  const DateTimeS = readableDate +", "+ readableTime
+
+  const handleClick = () => {
+    console.log(CategoryResultsData)
+    console.log(emoji);
+    const doc = new jsPDF();
+    const imageWidth = 100; // Width of image
+    const imageHeight = 100; // Height of image
+    const horizontalPadding = 1; // Padding between images
+    const startX = 10; // X coordinate to start drawing images
+    let textY = 10; // Y coordinate to start drawing text
+    const maxTextWidth = doc.internal.pageSize.width - 20; // Max width for text
+
+    // Add text variables
+    const brandNameS = "Brand: " + brandName;
+    const dealershipNameS = "Dealership: " + dealershipName;
+    const departmentS = "Department: " + department;
+    const submissionS = "Submission Date: " + DateTimeS;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0); 
+
+    // Add brand name
+    const brandNameX = doc.internal.pageSize.width / 2;
+    doc.text(brandNameS, brandNameX, textY, { align: "center" });
+
+    // Add dealership name
+    const dealershipNameX = doc.internal.pageSize.width / 2;
+    doc.text(dealershipNameS, dealershipNameX, textY + 10, { align: "center" });
+
+    // Add department
+    const departmentX = doc.internal.pageSize.width / 2;
+    doc.text(departmentS, departmentX, textY + 20, { align: "center" });
+
+    // Add submission date
+    const submissionX = doc.internal.pageSize.width / 2;
+    doc.text(submissionS, submissionX, textY + 30, { align: "center" });
+
+    // Add category chart image
+    if (categoryImageData) {
+      doc.addImage(categoryImageData, "PNG", startX, textY + 50, imageWidth, imageHeight);
+    }
+
+    if (overallScoreImageData) {
+      const secondImageX = startX + imageWidth + horizontalPadding;
+
+      doc.addImage(
+        overallScoreImageData,
+        "PNG",
+        secondImageX,
+        textY + 50,
+        imageWidth,
+        imageHeight
+      );
+    }
+    const emojis = {
+       "🙁": "Very Sad",
+       "😕": "Sad",
+      "🙂": "Happy",
+      "😁": "Very Happy"
+  };
+  const emojiUnicode = emojis[emoji] || '';
+    const evaluationText = [
+      "Evaluation Graphs",
+      "Overall Score: " + totalScore,
+      "Emotional Detection:",
+      emojiUnicode
+    ];
+
+    textY += 50 + imageHeight + 20; // Adjust Y coordinate for text
+    evaluationText.forEach((line, index) => {
+      doc.text(line, doc.internal.pageSize.width / 2, textY + (index * 10), { align: "center" });
+    });
+
+textY +=   50; 
+const textLines = doc.splitTextToSize(allResultText, maxTextWidth);
+const firstTwentyLines = textLines.slice(0, 13);
+
+const lineHeight = doc.getLineHeight() / doc.internal.scaleFactor;
+const textHeight = firstTwentyLines.length * lineHeight;
+
+const textCenterX = doc.internal.pageSize.width / 2;
+const textLeftX = textCenterX - maxTextWidth / 2;
+
+const textTopY = textY + (imageHeight - textHeight) / 2-25;
+
+doc.text(firstTwentyLines, textLeftX, textTopY);
+
+// Add new page
+doc.addPage();
+
+// Add space at the top of the text on the second page
+textY = 5; // Reset y coordinate for new page
+textY += 10;
+
+// Add next lines of text on the second page
+const nextHundredLines = textLines.slice(13, 68);
+doc.text(nextHundredLines, textLeftX, textY);
+
+// Add next page
+doc.addPage();
+textY = 10;
+// Add remaining text on the third page
+const remainingText = textLines.slice(68);
+doc.text(remainingText, textLeftX, textY);
+
+    // Save the PDF
+    doc.save("Results.pdf");
+};
   useEffect(() => {
     // Retrieve parameters from session storage
     const params = JSON.parse(sessionStorage.getItem('advancedResultsParams'));
@@ -247,6 +365,7 @@ const AdvancedResultsPage = () => {
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
           <Button onClick={handleOverride}>Override</Button>
           <Button color="error" onClick={handlePopupDelete}>Delete Submission</Button>
+          <Button onClick={handleClick}>Download PDF</Button>
         </div>
         
         <Typography variant="h4" gutterBottom align="center" style={{ marginBottom: '2rem', marginTop: '3rem', display: 'flex', alignItems: 'center' }}>
@@ -265,7 +384,7 @@ const AdvancedResultsPage = () => {
           {/* dealership name */}
           AuditBuddy Results for {dealershipName}
         </Typography>
-        <AllResultsProvider>
+
         <ResponsiveAppBar handleTabChange={handleTabChange} />
         <AdvancedResultsTabContent
           // this is just to re-render the component
@@ -276,7 +395,7 @@ const AdvancedResultsPage = () => {
           department={department}
           submission={submission}
         />
-                </AllResultsProvider>
+
       </Paper >
 
 

@@ -302,12 +302,12 @@ const FormImport = () => {
             }
           }}
         >
-          <Tab label={<span style={{ display: 'flex', alignItems: 'center', color: isDarkTheme ? 'rgb(245,245,245)' : 'rgb(50,50,50)', }}>LOGOS<PhotoCameraIcon sx={{ fontSize: '1rem'}} /></span>} />
-          <Tab label={<span style={{ display: 'flex', alignItems: 'center', color: isDarkTheme ? 'rgb(245,245,245)' : 'rgb(50,50,50)',  }}>DISPLAY CARS<PhotoCameraIcon sx={{ fontSize: '1rem'}} /><VideocamIcon sx={{ fontSize: '1rem' }} /></span>} />
-          <Tab label={<span style={{ display: 'flex', alignItems: 'center', color: isDarkTheme ? 'rgb(245,245,245)' : 'rgb(50,50,50)',  }}>PARKING SPACES<PhotoCameraIcon sx={{ fontSize: '1rem' }} /><VideocamIcon sx={{ fontSize: '1rem' }} /></span>} />
-          <Tab label={<span style={{ display: 'flex', alignItems: 'center', color: isDarkTheme ? 'rgb(245,245,245)' : 'rgb(50,50,50)',  }}>HOSPITALITY<PhotoCameraIcon sx={{ fontSize: '1rem' }} /><VideocamIcon sx={{ fontSize: '1rem' }} /></span>} />
-          <Tab label={<span style={{ display: 'flex', alignItems: 'center', color: isDarkTheme ? 'rgb(245,245,245)' : 'rgb(50,50,50)',  }}>SPATIAL<PhotoCameraIcon sx={{ fontSize: '1rem' }} /></span>} />
-          <Tab label={<span style={{ display: 'flex', alignItems: 'center', color: isDarkTheme ? 'rgb(245,245,245)' : 'rgb(50,50,50)',  }}>EMOTION<PhotoCameraIcon sx={{ fontSize: '1rem' }} /><VideocamIcon sx={{ fontSize: '1rem' }} /></span>} />
+          <Tab label={<span style={{ display: 'flex', alignItems: 'center', color: isDarkTheme ? 'rgb(245,245,245)' : 'rgb(50,50,50)', }}>LOGOS<PhotoCameraIcon sx={{ fontSize: '1rem'}} />*</span>} />
+          <Tab label={<span style={{ display: 'flex', alignItems: 'center', color: isDarkTheme ? 'rgb(245,245,245)' : 'rgb(50,50,50)',  }}>DISPLAY CARS<PhotoCameraIcon sx={{ fontSize: '1rem'}} /><VideocamIcon sx={{ fontSize: '1rem' }} />*</span>} />
+          <Tab label={<span style={{ display: 'flex', alignItems: 'center', color: isDarkTheme ? 'rgb(245,245,245)' : 'rgb(50,50,50)',  }}>PARKING SPACES<PhotoCameraIcon sx={{ fontSize: '1rem' }} /><VideocamIcon sx={{ fontSize: '1rem' }} />*</span>} />
+          <Tab label={<span style={{ display: 'flex', alignItems: 'center', color: isDarkTheme ? 'rgb(245,245,245)' : 'rgb(50,50,50)',  }}>HOSPITALITY<PhotoCameraIcon sx={{ fontSize: '1rem' }} /><VideocamIcon sx={{ fontSize: '1rem' }} />*</span>} />
+          <Tab label={<span style={{ display: 'flex', alignItems: 'center', color: isDarkTheme ? 'rgb(245,245,245)' : 'rgb(50,50,50)',  }}>SPATIAL<PhotoCameraIcon sx={{ fontSize: '1rem' }} />*</span>} />
+          <Tab label={<span style={{ display: 'flex', alignItems: 'center', color: isDarkTheme ? 'rgb(245,245,245)' : 'rgb(50,50,50)',  }}>EMOTION<PhotoCameraIcon sx={{ fontSize: '1rem' }} /></span>} />
         </Tabs>
       </Box>
 

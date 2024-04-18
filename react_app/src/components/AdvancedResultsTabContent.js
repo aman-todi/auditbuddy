@@ -18,7 +18,7 @@ const AdvancedResultsTabContent = ({ selectedTab, brandName, dealershipName, dep
   const [expectedLogo, setExpectedLogo] = useState('');
   const { setAllResultText } = useAllResults();
   const tab = selectedTab ?? 0;
-  const { setCategoryResultsData, setCategoryImageData, setOverallScoreImageData, setbrandName, setdealershipName, setdepartment, setsubmission, setEmoji, setTScore} = useAllResults();
+  const { setCategoryResultsData, setCategoryImageData, setOverallScoreImageData, setbrandName, setdealershipName, setdepartment, setsubmission, setEmoji, setTScore } = useAllResults();
 
   useEffect(() => {
     console.log(categoryResults);
@@ -37,7 +37,7 @@ const AdvancedResultsTabContent = ({ selectedTab, brandName, dealershipName, dep
       new Promise((resolve) => {
         html2canvas(document.getElementById('categoryChart')).then((canvas) => {
           const imageData = canvas.toDataURL('image/png');
-          setCategoryImageData(imageData); 
+          setCategoryImageData(imageData);
           resolve();
         });
       })
@@ -48,7 +48,7 @@ const AdvancedResultsTabContent = ({ selectedTab, brandName, dealershipName, dep
       new Promise((resolve) => {
         html2canvas(document.getElementById('overallScoreChart')).then((canvas) => {
           const imageData = canvas.toDataURL('image/png');
-          setOverallScoreImageData(imageData); 
+          setOverallScoreImageData(imageData);
           resolve();
         });
       })
@@ -62,8 +62,8 @@ const AdvancedResultsTabContent = ({ selectedTab, brandName, dealershipName, dep
   const generateResultTextForTab1 = (t) => {
     const keys = Object.keys(expectedValueRange);
     if (keys.length > 0) {
-        if (t !== 0 && gradeResults) {
-            return `Category Score: ${categoryScores[t - 1]} out of 4\n
+      if (t !== 0 && gradeResults) {
+        return `Category Score: ${categoryScores[t - 1]} out of 4\n
 Detected Value: ${detection[t - 1]}
 ${tab !== 1 ? `
 Expected Value Range:
@@ -71,8 +71,7 @@ Minimum: ${expectedValueRange[categories[t - 1]][0]}
 Above Minimum: ${expectedValueRange[categories[t - 1]][1]}
 Well Over Minimum: ${expectedValueRange[categories[t - 1]][2]}\n
 ` : `
-Expected Value:${expectedLogo}`}Based on the analysis, here's how the results are interpreted: ${
-categoryScores[t - 1] === 1 ? `
+Expected Value:${expectedLogo}`}Based on the analysis, here's how the results are interpreted: ${categoryScores[t - 1] === 1 ? `
 The detected value falls below the minimum dealership standard. Improvement is needed.
 ` : categoryScores[t - 1] === 2 ? `
 The detected value is slightly below the expected standard. Consider making adjustments for better performance.
@@ -81,11 +80,11 @@ The detected value meets or slightly exceeds the expected standard. This is a sa
 ` : categoryScores[t - 1] === 4 ? `
 The detected value significantly exceeds the expected standard. Congratulations on achieving an excellent result.
 ` : ``}`;
-        }
+      }
     } else {
-        return '';
+      return '';
     }
-};
+  };
 
 
   let allResultText = '';
@@ -94,7 +93,7 @@ The detected value significantly exceeds the expected standard. Congratulations 
 
   for (let t = 1; t <= 6; t++) {
     const resultTextForTab = generateResultTextForTab1(t);
-    allResultText += tabNames[t - 1] + '\n' + resultTextForTab + '\n\n'; 
+    allResultText += tabNames[t - 1] + '\n' + resultTextForTab + '\n\n';
 
 
   }
@@ -411,7 +410,7 @@ The detected value significantly exceeds the expected standard. Congratulations 
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', marginBottom: '2rem' }}>
               <Typography variant="h6" align="center">Evaluation Graphs</Typography>
               <Typography variant="body1" align="center">
-                Overall Score: {totalScore} / 23
+                Overall Score: {totalScore} / 24x
               </Typography>
               <MyComponent score={categoryScores[5]} />
               <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', flex: 1 }}>

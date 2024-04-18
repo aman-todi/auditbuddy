@@ -107,7 +107,7 @@ const FormImport = () => {
     else if (!logo && !cars && !parking && !spatial && !hospitality) {
       setError('Please select a file in at least one category')
     }
-    
+
     else if (!logo) {
       setError('Please upload logo files')
     }
@@ -161,12 +161,11 @@ const FormImport = () => {
 
       // get logged in user
       const user = auth.currentUser;
-      if (user)
-      {
+      if (user) {
         const email = user.email;
         // append the users email
         formData.append('email', email);
-      } 
+      }
 
       try {
         const response = await axios.post('/upload-video', formData, {
@@ -186,7 +185,7 @@ const FormImport = () => {
           'Dealership Name': dealerships['Dealership Name'],
           'Submitted': time
         };
-       
+
         sessionStorage.setItem('advancedResultsParams', JSON.stringify(navigateToResults));
 
         toast.success(
@@ -247,12 +246,31 @@ const FormImport = () => {
         <FormControl required fullWidth sx={{ margin: "0.1rem" }}>
           <InputLabel>Dealership</InputLabel>
           <Select
-            // name
             value={dealerships}
             label="Dealerships"
-            // setName
             onChange={(event) => handleFormInput(event, setDealerships)}
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  maxHeight: 300, // Set your preferred max height
+                  width: 250,    // Set your preferred width
+                },
+              },
+              getContentAnchorEl: null, // Prevents popover positioning based on selected element
+              anchorOrigin: {
+                vertical: "bottom",
+                horizontal: "left",
+              },
+              transformOrigin: {
+                vertical: "top",
+                horizontal: "left",
+              },
+              variant: "menu",
+              disablePortal: true, // Render the menu in the DOM to enable scrolling
+            }}
+            className="custom-select" // Add custom class for styling
           >
+
             {dealershipsList.map((dealership, index) => (
               <MenuItem key={index} value={dealership}>
                 {dealership['UID']} {dealership['Dealership Name']}
@@ -277,10 +295,10 @@ const FormImport = () => {
         </FormControl>
       </Box>
       <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, alignItems: "center" }}>
-      <FormControl required fullWidth sx={{ margin: "0.1rem" }}>
-        <TextField label="Name of Upload" variant="outlined" onChange={(event) => handleFormInput(event, setName)}
-        />
-      </FormControl>
+        <FormControl required fullWidth sx={{ margin: "0.1rem" }}>
+          <TextField label="Name of Upload" variant="outlined" onChange={(event) => handleFormInput(event, setName)}
+          />
+        </FormControl>
       </Box>
 
       {/* detection header */}
@@ -302,12 +320,12 @@ const FormImport = () => {
             }
           }}
         >
-          <Tab label={<span style={{ display: 'flex', alignItems: 'center', color: isDarkTheme ? 'rgb(245,245,245)' : 'rgb(50,50,50)', }}>LOGOS<PhotoCameraIcon sx={{ fontSize: '1rem'}} />*</span>} />
-          <Tab label={<span style={{ display: 'flex', alignItems: 'center', color: isDarkTheme ? 'rgb(245,245,245)' : 'rgb(50,50,50)',  }}>DISPLAY CARS<PhotoCameraIcon sx={{ fontSize: '1rem'}} /><VideocamIcon sx={{ fontSize: '1rem' }} />*</span>} />
-          <Tab label={<span style={{ display: 'flex', alignItems: 'center', color: isDarkTheme ? 'rgb(245,245,245)' : 'rgb(50,50,50)',  }}>PARKING SPACES<PhotoCameraIcon sx={{ fontSize: '1rem' }} /><VideocamIcon sx={{ fontSize: '1rem' }} />*</span>} />
-          <Tab label={<span style={{ display: 'flex', alignItems: 'center', color: isDarkTheme ? 'rgb(245,245,245)' : 'rgb(50,50,50)',  }}>HOSPITALITY<PhotoCameraIcon sx={{ fontSize: '1rem' }} /><VideocamIcon sx={{ fontSize: '1rem' }} />*</span>} />
-          <Tab label={<span style={{ display: 'flex', alignItems: 'center', color: isDarkTheme ? 'rgb(245,245,245)' : 'rgb(50,50,50)',  }}>SPATIAL<PhotoCameraIcon sx={{ fontSize: '1rem' }} />*</span>} />
-          <Tab label={<span style={{ display: 'flex', alignItems: 'center', color: isDarkTheme ? 'rgb(245,245,245)' : 'rgb(50,50,50)',  }}>EMOTION<PhotoCameraIcon sx={{ fontSize: '1rem' }} /></span>} />
+          <Tab label={<span style={{ display: 'flex', alignItems: 'center', color: isDarkTheme ? 'rgb(245,245,245)' : 'rgb(50,50,50)', }}>LOGOS<PhotoCameraIcon sx={{ fontSize: '1rem' }} />*</span>} />
+          <Tab label={<span style={{ display: 'flex', alignItems: 'center', color: isDarkTheme ? 'rgb(245,245,245)' : 'rgb(50,50,50)', }}>DISPLAY CARS<PhotoCameraIcon sx={{ fontSize: '1rem' }} /><VideocamIcon sx={{ fontSize: '1rem' }} />*</span>} />
+          <Tab label={<span style={{ display: 'flex', alignItems: 'center', color: isDarkTheme ? 'rgb(245,245,245)' : 'rgb(50,50,50)', }}>PARKING SPACES<PhotoCameraIcon sx={{ fontSize: '1rem' }} /><VideocamIcon sx={{ fontSize: '1rem' }} />*</span>} />
+          <Tab label={<span style={{ display: 'flex', alignItems: 'center', color: isDarkTheme ? 'rgb(245,245,245)' : 'rgb(50,50,50)', }}>HOSPITALITY<PhotoCameraIcon sx={{ fontSize: '1rem' }} /><VideocamIcon sx={{ fontSize: '1rem' }} />*</span>} />
+          <Tab label={<span style={{ display: 'flex', alignItems: 'center', color: isDarkTheme ? 'rgb(245,245,245)' : 'rgb(50,50,50)', }}>SPATIAL<PhotoCameraIcon sx={{ fontSize: '1rem' }} />*</span>} />
+          <Tab label={<span style={{ display: 'flex', alignItems: 'center', color: isDarkTheme ? 'rgb(245,245,245)' : 'rgb(50,50,50)', }}>EMOTION<PhotoCameraIcon sx={{ fontSize: '1rem' }} /></span>} />
         </Tabs>
       </Box>
 

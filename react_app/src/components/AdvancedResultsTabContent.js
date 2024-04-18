@@ -410,7 +410,7 @@ The detected value significantly exceeds the expected standard. Congratulations 
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', marginBottom: '2rem' }}>
               <Typography variant="h6" align="center">Evaluation Graphs</Typography>
               <Typography variant="body1" align="center">
-                Overall Score: {totalScore} / 24x
+                Overall Score: {totalScore} / 24
               </Typography>
               <MyComponent score={categoryScores[5]} />
               <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', flex: 1 }}>

@@ -33,9 +33,9 @@ function AuditPage() {
           </header>
 
           {/* Replace Paper with a div */}
-          <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row'}}>
+          <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'center'}}>
             <Container sx={{ flex: '1', overflow: 'hidden'}}>
-              <Grid container direction="column" justifyContent="space-between" alignItems="flex-start" spacing={4}>
+              <Grid container direction="column" justifyContent="space-between" alignItems="flex-start" spacing={3}>
                 <Grid item>
                   <NewChangesBox />
                 </Grid>
@@ -46,7 +46,7 @@ function AuditPage() {
             </Container>
 
             <div>
-              <Container sx={{ flex: '1', overflow: 'hidden'}}>
+              <Container sx={{ display: 'flex', overflow: 'hidden'}}>
                 <BrandDealershipViewer onClickResult={(result) => console.log(result)} />
               </Container>
             </div>
